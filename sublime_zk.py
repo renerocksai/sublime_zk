@@ -32,13 +32,14 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
             new_view = window.open_file(the_file)
         else:
             # suppose you have entered "[[my new note]]", then we are going to create
-            # "201710201631 my new note.md"
-            # so: prepend timestamp to text, add extension and open the non-existing file
-            the_file = directory + timestamp() + ' ' + selected_text + extension
+            # "201710201631 my new note.md". we will also add a link "[[201710201631]] into the current document"
+
+            new_id = timestamp()
+            the_file = directory + new_id + ' ' + selected_text + extension
+            self.view.replace(edit, location, new_id)
             # open(the_file, "a")   # un-comment if you want to create an empty file
             new_view = window.open_file(the_file)
 
-       
 
 class NewZettelCommand(sublime_plugin.WindowCommand):
     def run(self):
