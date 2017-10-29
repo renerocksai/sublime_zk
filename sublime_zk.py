@@ -78,7 +78,7 @@ class GetWikiLinkCommand(sublime_plugin.TextCommand):
         extension = settings.get('wiki_extension')
 
         self.outputText = '[['
-        self.files = os.listdir(directory)
+        self.files = [f for f in os.listdir(directory) if f.endswith(extension)]
         self.modified_files = [item.replace(extension,"") for item in self.files]
         self.view.window().show_quick_panel(self.modified_files, self.on_done)
 
