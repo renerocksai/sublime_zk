@@ -72,6 +72,14 @@ A new note will be created and assigned the timestamp based ID in the format des
 
 Example: Let's say you entered "AI is going to kill us all" as the note title, then a file with the name `201710282118 AI is going to kill us all.md` will be created and opened for you.
 
+The new note will look like this:
+
+```python
+# AI is going to kill us all
+tags = 
+
+```
+
 ### Creating a link 
 
 Let's assume, you work in the note "201710282120 The rise of the machines":
@@ -167,6 +175,13 @@ As a consequence, they might turn evil and try to kill us all ........... [[2017
 
 **Note** how the note title "AI is going to kill us all" has been replaced by the note's ID "201710282118".
 
+The new note will be pre-filled with the following text:
+
+```python
+# AI is going to kill us all
+tags = 
+
+```
 
 
 ## Credits
