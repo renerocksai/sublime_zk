@@ -121,6 +121,8 @@ This might reach a point where they might develop a consciensce of their own.
 As a consequence, they might turn evil and try to kill us all ........... [[201710282118]]
 ```
 
+**Note:** Only files ending with the extension specified in `sublime_zk.sublime-settings` (`.md` by default) will be listed in the popup list. If your files end with `.txt`, you need to change this setting.
+
 If you now click into `[[201710282118]]` and press `[ctrl]+[enter]`, the target note will be opened where you can read up on how AI is potentially going to kill us all.
 
 
