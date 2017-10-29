@@ -194,7 +194,7 @@ Credits, where credits are due:
 
 While we're at it, I highly recommend the following books (German); Google and Amazon are your friends:
 
-* "Das Zettelkastenprinzip" will blow your mind.
+* "Das Zettelkastenprinzip" / "How to take smart notes" will blow your mind.
 * "Die Zettelkastenmethode" from Sascha over at zettelkasten.de will also blow your mind and expand on the plain-text approach of using a digital Zettelkasten. 
 
 
