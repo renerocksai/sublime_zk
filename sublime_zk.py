@@ -27,9 +27,9 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
         self.view.sel().add(oldLocation)
 
         # search for file starting with text between the brackets (usually the ID)
-        the_file = directory+selected_text + '*'    
+        the_file = os.path.join(directory, selected_text + '*') 
         candidates = glob.glob(the_file)
-
+        print('Candidates: for glob {} : {}'.format(the_file, candidates))
         if len(candidates) > 0:
             the_file = candidates[0]
             #open the existing note.
