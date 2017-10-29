@@ -35,7 +35,7 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
             # "201710201631 my new note.md". we will also add a link "[[201710201631]] into the current document"
 
             new_id = timestamp()
-            the_file = directory + new_id + ' ' + selected_text + extension
+            the_file = os.path.join(directory, new_id + ' ' + selected_text + extension)
             self.view.replace(edit, location, new_id)
             # open(the_file, "a")   # un-comment if you want to create an empty file
             new_view = window.open_file(the_file)
@@ -51,7 +51,7 @@ class NewZettelCommand(sublime_plugin.WindowCommand):
         directory = os.path.expanduser(directory)
         extension = settings.get('wiki_extension')
 
-        the_file = directory + timestamp() + ' ' + input_text + extension
+        the_file = os.path.join(directory, timestamp() + ' ' + input_text + extension)
         #open(the_file, "a")
         new_view = self.window.open_file(the_file)
 
