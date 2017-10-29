@@ -5,6 +5,10 @@ import sublime, sublime_plugin, os, re, subprocess, glob, datetime
 def timestamp():
     return '{:%Y%m%d%H%M}'.format(datetime.datetime.now())
 
+def create_note(filn, title):
+    with open(filn, mode='w', encoding='utf-8') as f:
+        f.write(u'# {}\ntags = \n\n'.format(title))
+
 
 class FollowWikiLinkCommand(sublime_plugin.TextCommand):
 
@@ -37,7 +41,7 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
             new_id = timestamp()
             the_file = os.path.join(directory, new_id + ' ' + selected_text + extension)
             self.view.replace(edit, location, new_id)
-            # open(the_file, "a")   # un-comment if you want to create an empty file
+            create_note(the_file, selected_text)
             new_view = window.open_file(the_file)
 
 
@@ -52,7 +56,7 @@ class NewZettelCommand(sublime_plugin.WindowCommand):
         extension = settings.get('wiki_extension')
 
         the_file = os.path.join(directory, timestamp() + ' ' + input_text + extension)
-        #open(the_file, "a")
+        create_note(the_file, input_text)
         new_view = self.window.open_file(the_file)
 
 class GetWikiLinkCommand(sublime_plugin.TextCommand):
