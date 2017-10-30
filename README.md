@@ -38,19 +38,34 @@ The following steps cover all dependencies and prerequisites (package control to
 
 You should be all set.
 
-But to make sure the key-bindings will work, add those extra steps:
 
-* Open `Default (Windows).sublime-keymap` from your sublime_zk package folder (see step 6 above) and select all the text in there
+
+**NOTE**: Sometimes the key-bindings can be tricky. Check it by pressing 'shift+enter'. This should bring up a "New note:" prompt at the bottom of your SublimeText window. If you see it, press 'ESC' to make it go away. If it didn't work, then you can manualluy import the key bindings as follows:
+
+* Open `Default.sublime-keymap` from your sublime_zk package folder (see step 6 above) and select all the text in there
 * Go to Preferences - key bindings
 * Paste the text into your user key bindings
 * Save your key bindings
 
 ## Configuration
 
-Finally, you need to configure where your note archive is located:
+## Zettelkasten note folder
 
-* Open `sublime_zk.sublime-settings` from your sublime_zk package folder (see step 6 above)
-* Edit the path to your archive in the `"wiki_directory"` line. Windows and Mac/Linux examples are provided.
+No further configuration is necessary. This Zettelkasten package works with SublimeText Projects. It will use exactly the same directory where your SublimeText project file is located.
+
+### How do I create a project in SublimeText?
+
+That's easier than it might look. This is how I do it:
+
+* start with a fresh SublimeText window (no open files or projects).
+* Use the menu: "Projects" -> "Save Project As ..." and save this empty project into your desired Zettelkasten folder, giving the project file a name other than untitled if you like.
+* Now add the Zettelkasten folder to your project: "Project" -> "Add Folder To Project..." and select your Zettelkasten folder.
+* Done! :-)
+
+
+## Markdown filename extension
+By default, the extension `.md` is used for your notes. If that does not match your style, you can change it in the `sublime_zk.sublime-settings` file. Just replace `.md` with `.txt` or `.mdown` or whatever you like.
+
 
 ## Features
 

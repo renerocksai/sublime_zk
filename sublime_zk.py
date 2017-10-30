@@ -13,9 +13,8 @@ def create_note(filn, title):
 class FollowWikiLinkCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        settings = sublime.load_settings('MyWiki.sublime-settings')
-        directory = settings.get('wiki_directory')
-        directory = os.path.expanduser(directory)
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        directory = os.path.dirname(self.window.project_file_name())
         extension = settings.get('wiki_extension')
         window = self.view.window()
 
@@ -47,13 +46,16 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
 
 class NewZettelCommand(sublime_plugin.WindowCommand):
     def run(self):
-        self.window.show_input_panel('Neuer Zettel', '', self.on_done, None, None)
+        self.window.show_input_panel('New Note:', '', self.on_done, None, None)
 
     def on_done(self, input_text):
-        settings = sublime.load_settings('MyWiki.sublime-settings')
-        directory = settings.get('wiki_directory')
-        directory = os.path.expanduser(directory)
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        directory = os.path.dirname(self.window.project_file_name())
         extension = settings.get('wiki_extension')
+
+        print('Dir:', directory)
+        print('Ext:', extension)
+        print('Sel:', input_text)
 
         the_file = os.path.join(directory, timestamp() + ' ' + input_text + extension)
         create_note(the_file, input_text)
@@ -72,9 +74,8 @@ class GetWikiLinkCommand(sublime_plugin.TextCommand):
             {'text': '[['+self.modified_files[selection].split(' ', 1)[0]+']]'}})
 
     def run(self, edit):
-        settings = sublime.load_settings('MyWiki.sublime-settings')
-        directory = settings.get('wiki_directory')
-        directory = os.path.expanduser(directory)
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        directory = os.path.dirname(self.window.project_file_name())
         extension = settings.get('wiki_extension')
 
         self.outputText = '[['

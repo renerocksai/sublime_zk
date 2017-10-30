@@ -1,10 +1,4 @@
 {
-    // The directory in which your notes are stored.
-    // 
-    "wiki_directory": "/Users/rs/Dropbox/Zettelkasten",
-    // Windows Users:
-        // "wiki_directory": "C:\\Users\\rs\\DropBox\\Zettelkasten",
-
     // The preferred markdown extension
     "wiki_extension": ".md"
 }
