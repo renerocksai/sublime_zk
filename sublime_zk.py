@@ -14,13 +14,14 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         settings = sublime.load_settings('sublime_zk.sublime-settings')
-        directory = os.path.dirname(self.window.project_file_name())
+        directory = os.path.dirname(self.view.window().project_file_name())
         extension = settings.get('wiki_extension')
         window = self.view.window()
 
         oldLocation = self.view.sel()[0]
         self.view.run_command("bracketeer_select")
         location = self.view.sel()[0]
+
         selected_text = self.view.substr(location)
         self.view.sel().clear()
         self.view.sel().add(oldLocation)
@@ -53,10 +54,6 @@ class NewZettelCommand(sublime_plugin.WindowCommand):
         directory = os.path.dirname(self.window.project_file_name())
         extension = settings.get('wiki_extension')
 
-        print('Dir:', directory)
-        print('Ext:', extension)
-        print('Sel:', input_text)
-
         the_file = os.path.join(directory, timestamp() + ' ' + input_text + extension)
         create_note(the_file, input_text)
         new_view = self.window.open_file(the_file)
@@ -75,7 +72,7 @@ class GetWikiLinkCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         settings = sublime.load_settings('sublime_zk.sublime-settings')
-        directory = os.path.dirname(self.window.project_file_name())
+        directory = os.path.dirname(self.view.window().project_file_name())
         extension = settings.get('wiki_extension')
 
         self.outputText = '[['
