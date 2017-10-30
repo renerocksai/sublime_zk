@@ -49,7 +49,7 @@ You should be all set.
 
 ## Configuration
 
-## Zettelkasten note folder
+### Zettelkasten note folder
 
 No further configuration is necessary. This Zettelkasten package works with SublimeText Projects. It will use exactly the same directory where your SublimeText project file is located.
 
