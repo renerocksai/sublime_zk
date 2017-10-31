@@ -41,7 +41,8 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
         extension = settings.get('wiki_extension')
         window = self.view.window()
 
-        oldLocation = self.view.sel()[0]
+        location = self.select_link()
+        
         if location is None:
             # no link found, not between brackets   
             return
