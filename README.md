@@ -35,15 +35,6 @@ You should be all set.
 
 ## Configuration
 
-### Key bindings
-
-**NOTE**: Sometimes the key-bindings can be tricky. Check it by pressing 'shift+enter'. This should bring up a "New note:" prompt at the bottom of your SublimeText window. If you see it, press 'ESC' to make it go away. If it didn't work, then you can manualluy import the key bindings as follows:
-
-* Open `Default.sublime-keymap` from your sublime_zk package folder (see step 6 above) and select all the text in there
-* Go to Preferences - key bindings
-* Paste the text into your user key bindings
-* Save your key bindings
-
 
 ### Zettelkasten note folder
 
