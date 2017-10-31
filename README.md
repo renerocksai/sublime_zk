@@ -27,25 +27,11 @@ The following steps cover all dependencies and prerequisites (package control to
 1. Install [Sublime Text 3](http://www.sublimetext.com/3)
 2. Download the sublime_zk zip from [this repo](https://github.com/renerocksai/sublime_zk).
 3. Unzip the sublime_zk plugin. You should get a `sublime_zk` folder.
-4. Install Package Control from [packagecontrol.io](https://packagecontrol.io/installation#st3)
-5. Install the Bracketeer plugin via package control:
-	1. Go to preferences - package control - install packages
-	2. type in 'bracketeer'
-	3. select the Bracketeer plugin
-	4. hit enter to install
-6. Under Preferences, go to 'browse packages'. This opens the package location of SublimeText in your file browser.
-7. Copy the `sublime_zk` folder into the package location folder from the previous step.
+4. Under Preferences, go to 'browse packages'. This opens the package location of SublimeText in your file browser.
+5. Copy the `sublime_zk` folder into the package location folder from the previous step.
 
 You should be all set.
 
-
-
-**NOTE**: Sometimes the key-bindings can be tricky. Check it by pressing 'shift+enter'. This should bring up a "New note:" prompt at the bottom of your SublimeText window. If you see it, press 'ESC' to make it go away. If it didn't work, then you can manualluy import the key bindings as follows:
-
-* Open `Default.sublime-keymap` from your sublime_zk package folder (see step 6 above) and select all the text in there
-* Go to Preferences - key bindings
-* Paste the text into your user key bindings
-* Save your key bindings
 
 ## Configuration
 
@@ -73,7 +59,7 @@ By default, the extension `.md` is used for your notes. If that does not match y
 * Clicking such a link and pressing `[ctrl]+[enter]` will open the corresponding note.
 * Typing `[[` will open a list of existing notes so you can quickly link to existing notes.
 * Typing `[shift]+[enter]` lets you enter a name for a new note. The new note is then created with a new note ID.
-* Implicit note creation via links to non-existing notes's titles, see below.
+* Implicit note creation via links to non-existing notes' titles, see below.
 * The ID format is YYYYMMDDHHMM - eg: 201710282111
 
 

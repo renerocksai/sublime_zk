@@ -1,7 +1,6 @@
 import sublime, sublime_plugin, os, re, subprocess, glob, datetime
 
 
-
 def timestamp():
     return '{:%Y%m%d%H%M}'.format(datetime.datetime.now())
 
@@ -11,25 +10,48 @@ def create_note(filn, title):
 
 
 class FollowWikiLinkCommand(sublime_plugin.TextCommand):
+    def select_link(self):
+        region = self.view.sel()[0]
+
+        cursor_pos = region.begin()
+        line_region = self.view.line(cursor_pos)
+        line_start = line_region.begin()
+
+        linestart_till_cursor_str = self.view.substr(sublime.Region(line_start, cursor_pos))
+        full_line = self.view.substr(line_region)
+
+        # search backwards from the cursor until we find [[hello world]]
+        brackets_start = linestart_till_cursor_str.rfind('[[')
+        brackets_end_in_the_way = linestart_till_cursor_str.rfind(']]')
+        if brackets_end_in_the_way > brackets_start:
+            # we're behind closing brackets, finding the link would be unexpected
+            return
+        if brackets_start >= 0:
+            brackets_end = full_line[brackets_start:].find(']]')
+            if brackets_end >= 0:
+                link_region = sublime.Region(line_start + brackets_start+2, line_start + brackets_start + brackets_end)
+                return link_region
+        return
+
 
     def run(self, edit):
+
         settings = sublime.load_settings('sublime_zk.sublime-settings')
         directory = os.path.dirname(self.view.window().project_file_name())
         extension = settings.get('wiki_extension')
         window = self.view.window()
 
         oldLocation = self.view.sel()[0]
-        self.view.run_command("bracketeer_select")
-        location = self.view.sel()[0]
+        if location is None:
+            # no link found, not between brackets   
+            return
 
         selected_text = self.view.substr(location)
-        self.view.sel().clear()
-        self.view.sel().add(oldLocation)
 
         # search for file starting with text between the brackets (usually the ID)
         the_file = os.path.join(directory, selected_text + '*') 
-        candidates = glob.glob(the_file)
-        print('Candidates: for glob {} : {}'.format(the_file, candidates))
+        candidates = [f for f in glob.glob(the_file) if f.endswith(extension)]
+        # print('Candidates: for glob {} : {}'.format(the_file, candidates))
         if len(candidates) > 0:
             the_file = candidates[0]
             #open the existing note.
