@@ -39,7 +39,7 @@ You should be all set.
 
 No further configuration is necessary. This Zettelkasten package works with SublimeText Projects. It will use exactly the same directory where your SublimeText project file is located.
 
-### How do I create a project in SublimeText?
+#### How do I create a project in SublimeText?
 
 That's easier than it might look. This is how I do it:
 
@@ -49,8 +49,31 @@ That's easier than it might look. This is how I do it:
 * Done! :-)
 
 
-## Markdown filename extension
+### Markdown filename extension
 By default, the extension `.md` is used for your notes. If that does not match your style, you can change it in the `sublime_zk.sublime-settings` file. Just replace `.md` with `.txt` or `.mdown` or whatever you like.
+
+### IDs in titles of new notes
+When you create a new note, its title will automatically be inserted and an ID will be assigned to it (see "Creating a new note"). If you want the ID to be part of the title, change the setting `id_in_title` from `false` to `true`.
+
+Example for a note created with ID:
+
+```python
+# 201710310128 This is a note with its ID in the title
+tags= 
+
+The setting id_in_title is set to "true".
+```
+
+Example for a note created without ID:
+
+```python
+# A note without an ID
+tags =
+
+The setting id_in_title is set to "false"
+```
+
+You can find this setting in the file `sublime_zk.sublime-settings`.
 
 
 ## Features
