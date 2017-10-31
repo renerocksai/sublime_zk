@@ -35,7 +35,6 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
 
 
     def run(self, edit):
-
         settings = sublime.load_settings('sublime_zk.sublime-settings')
         directory = os.path.dirname(self.view.window().project_file_name())
         extension = settings.get('wiki_extension')
