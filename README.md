@@ -6,18 +6,19 @@ If you follow the (plain-text) Zettelkasten method (as proposed by [Zettelkasten
 
 In short, it helps you manage an archive of interlinked notes that look like this:
 
-```python
-# The rise of the machines
-tags = #AI #world-domination
+![screenshot](sublime_zk.png)
 
-Machines are becoming more and more intelligent and powerful.
+See the **Usage** section below to see how this package might support your workflow.
 
-This might reach a point where they might develop a consciensce of their own.
+## Features
 
-As a consequence, they might turn evil and try to kill us all ........... [[201710282118]]
-```
-
-See the **Feature** section below to see how this package might support your workflow.
+* This plugin enables you to place wiki style links like `[[this]]` into your notes to link to other notes in your note archive. 
+* Clicking such a link and pressing `[ctrl]+[enter]` will open the corresponding note.
+* Typing `[[` will open a list of existing notes so you can quickly link to existing notes.
+* Typing `[shift]+[enter]` lets you enter a name for a new note. The new note is then created with a new note ID.
+* Implicit note creation via links to non-existing notes' titles, see below.
+* The ID format is YYYYMMDDHHMM - eg: 201710282111
+* Highlighting of note links
 
 
 ## Installation
@@ -38,7 +39,7 @@ You should be all set.
 
 ### Zettelkasten note folder
 
-No further configuration is necessary. This Zettelkasten package works with SublimeText Projects. It will use exactly the same directory where your SublimeText project file is located.
+No further configuration is necessary. This Zettelkasten plugin works with SublimeText Projects. It will use exactly the same directory where your SublimeText project file is located.
 
 #### How do I create a project in SublimeText?
 
@@ -76,16 +77,26 @@ The setting id_in_title is set to "false"
 
 You can find this setting in the file `sublime_zk.sublime-settings`.
 
+### Highlight references to other notes
 
-## Features
+By default, this plugin highlights links to other notes by underlying them.
 
-* This package enables you to place wiki style links like `[[this]]` into your notes to link to other notes in your note archive. 
-* Clicking such a link and pressing `[ctrl]+[enter]` will open the corresponding note.
-* Typing `[[` will open a list of existing notes so you can quickly link to existing notes.
-* Typing `[shift]+[enter]` lets you enter a name for a new note. The new note is then created with a new note ID.
-* Implicit note creation via links to non-existing notes' titles, see below.
-* The ID format is YYYYMMDDHHMM - eg: 201710282111
+**Note:** This only applies to links containing an ID, like this one: [[201710290256]].
 
+It also shows a bookmark symbol in the gutter to the left of your text. These features can be controlled via the following settings in `sublime_zk.sublime-settings`:
+
+
+```json
+    // highlight links to other notes?
+    "highlight_note_links": "true",
+
+    // when highlighting: also show bookmark symbols in the gutter?
+    "show_bookmarks_in_gutter": "true"
+```
+
+
+
+## Usage
 
 ### Creating a new note
 
