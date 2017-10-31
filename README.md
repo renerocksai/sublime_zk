@@ -22,7 +22,7 @@ See the **Feature** section below to see how this package might support your wor
 
 ## Installation
 
-The following steps cover all dependencies and prerequisites (package control to install the Bracketeer plugin). Skip the steps you don't need:
+The following steps cover all dependencies and prerequisites. Skip the steps you don't need:
 
 1. Install [Sublime Text 3](http://www.sublimetext.com/3)
 2. Download the sublime_zk zip from [this repo](https://github.com/renerocksai/sublime_zk).
