@@ -1,4 +1,7 @@
 {
     // The preferred markdown extension
-    "wiki_extension": ".md"
+    "wiki_extension": ".md",
+
+    // when creating a new note, put id into title?
+    "id_in_title": "false"
 }

@@ -39,6 +39,8 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
         settings = sublime.load_settings('sublime_zk.sublime-settings')
         directory = os.path.dirname(self.view.window().project_file_name())
         extension = settings.get('wiki_extension')
+        id_in_title = settings.get('id_in_title', "false").lower() != "false"
+
         window = self.view.window()
 
         location = self.select_link()
@@ -64,6 +66,8 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
             new_id = timestamp()
             the_file = os.path.join(directory, new_id + ' ' + selected_text + extension)
             self.view.replace(edit, location, new_id)
+            if id_in_title:
+                selected_text = new_id + ' ' + selected_text
             create_note(the_file, selected_text)
             new_view = window.open_file(the_file)
 
@@ -76,8 +80,13 @@ class NewZettelCommand(sublime_plugin.WindowCommand):
         settings = sublime.load_settings('sublime_zk.sublime-settings')
         directory = os.path.dirname(self.window.project_file_name())
         extension = settings.get('wiki_extension')
+        id_in_title = settings.get('id_in_title', "false").lower() != "false"
 
-        the_file = os.path.join(directory, timestamp() + ' ' + input_text + extension)
+        new_id = timestamp()
+        the_file = os.path.join(directory,  new_id + ' ' + input_text + extension)
+
+        if id_in_title:
+            input_text = new_id + ' ' + input_text
         create_note(the_file, input_text)
         new_view = self.window.open_file(the_file)
 
