@@ -39,13 +39,13 @@ You should be all set.
 
 ### Zettelkasten note folder
 
-No further configuration is necessary. This Zettelkasten plugin works with SublimeText Projects. It will use exactly the same directory where your SublimeText project file is located.
+No further configuration is necessary. This Zettelkasten plugin works with SublimeText projects. It will use exactly the same directory where your SublimeText project file is located.
 
 #### How do I create a project in SublimeText?
 
 That's easier than it might look. This is how I do it:
 
-* start with a fresh SublimeText window (no open files or projects).
+* Start with a fresh SublimeText window (containing no open files or projects).
 * Use the menu: "Projects" -> "Save Project As ..." and save this empty project into your desired Zettelkasten folder, giving the project file a name other than untitled if you like.
 * Now add the Zettelkasten folder to your project: "Project" -> "Add Folder To Project..." and select your Zettelkasten folder.
 * Done! :-)
@@ -79,7 +79,7 @@ You can find this setting in the file `sublime_zk.sublime-settings`.
 
 ### Highlight references to other notes
 
-By default, this plugin highlights links to other notes by underlying them.
+By default, this plugin highlights links to other notes by underlining them.
 
 **Note:** This only applies to links containing an ID, like this one: [[201710290256]].
 
