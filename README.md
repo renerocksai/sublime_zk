@@ -1,6 +1,6 @@
 # Sublime ZK
 
-This is a small extension for SublimeText3 to enable ID-based, Wiki-style links in your documents.
+This is a plugin for SublimeText3 to enable ID-based, Wiki-style links in your documents.
 
 If you follow the (plain-text) Zettelkasten method (as proposed by [Zettelkasten.de](https://zettelkasten.de)), this might appeal to you.
 
@@ -11,8 +11,7 @@ In short, it helps you manage an archive of interlinked notes that look like thi
 See the [Usage](#usage) section below to see how this package might support your workflow.
 
 ## Features
-
-* This plugin enables you to place wiki style links like `[[this]]` into your notes to link to other notes in your note archive. 
+* This plugin enables you to place wiki style links like `[[this]]` into your notes to link to other notes in your note archive.
 * Clicking such a link and pressing `[ctrl]+[enter]` will open the corresponding note.
 * Typing `[[` will open a list of existing notes so you can quickly link to existing notes.
 * Typing `[shift]+[enter]` lets you enter a name for a new note. The new note is then created with a new note ID.
@@ -22,7 +21,6 @@ See the [Usage](#usage) section below to see how this package might support your
 
 
 ## Installation
-
 The following steps cover all dependencies and prerequisites. Skip the steps you don't need:
 
 1. Install [Sublime Text 3](http://www.sublimetext.com/3)
@@ -38,11 +36,9 @@ You should be all set.
 
 
 ### Zettelkasten note folder
-
 No further configuration is necessary. This Zettelkasten plugin works with SublimeText projects. It will use exactly the same directory where your SublimeText project file is located.
 
 #### How do I create a project in SublimeText?
-
 That's easier than it might look. This is how I do it:
 
 * Start with a fresh SublimeText window (containing no open files or projects).
@@ -61,7 +57,7 @@ Example for a note created with ID:
 
 ```markdown
 # 201710310128 This is a note with its ID in the title
-tags= 
+tags=
 
 The setting id_in_title is set to "true".
 ```
@@ -78,13 +74,9 @@ The setting id_in_title is set to "false"
 You can find this setting in the file `sublime_zk.sublime-settings`.
 
 ### Highlight references to other notes
-
 By default, this plugin highlights links to other notes by underlining them.
-
 **Note:** This only applies to links containing an ID, like this one: [[201710290256]].
-
 It also shows a bookmark symbol in the gutter to the left of your text. These features can be controlled via the following settings in `sublime_zk.sublime-settings`:
-
 
 ```json
     // highlight links to other notes?
@@ -94,13 +86,27 @@ It also shows a bookmark symbol in the gutter to the left of your text. These fe
     "show_bookmarks_in_gutter": "true"
 ```
 
+### Configuring SublimeText's line spacing
+When looking at the screenshot at the beginning of this document, you might have noticed the line spacing. I find it very pleasant to work with text this way. To configure SublimeText to use this line spacing:
+
+* use the menu: "Preferences" --> "Settings - Syntax specific"
+* SublimeText will show you two files side-by-side
+* change the one on the right side (also named `sublime_zk.sublime-settings`) as follows:
+
+```json
+// These settings override both User and Default settings for the sublime_zk syntax
+{
+	"line_padding_bottom": 3,
+	"line_padding_top": 3,
+}
+```
+**Note:** The above file is part of your "User" settings and will be created by SublimeText automatically. It is not the one you downloaded with this plugin. So please don't confuse the two :-)
 
 
 ## Usage
 
 ### Creating a new note
-
-* Press `[shift]+[enter]`. This will prompt you for the title of the new note at the bottom of your SublimeText window. 
+* Press `[shift]+[enter]`. This will prompt you for the title of the new note at the bottom of your SublimeText window.
 * Press `[ESC]` to cancel without creating a new note.
 * Enter the note title and press `[enter]`.
 
@@ -112,12 +118,11 @@ The new note will look like this:
 
 ```markdown
 # AI is going to kill us all
-tags = 
+tags =
 
 ```
 
-### Creating a link 
-
+### Creating a link
 Let's assume, you work in the note "201710282120 The rise of the machines":
 
 ```markdown
@@ -163,8 +168,7 @@ If you now click into `[[201710282118]]` and press `[ctrl]+[enter]`, the target 
 
 
 ### Implicitly creating a new note via a link
-
-There is another way to create a new note: Just create a link containing its title and follow the link. 
+There is another way to create a new note: Just create a link containing its title and follow the link.
 
 To showcase this, let's modify our example from above: Say, the "AI is going to kill us all" does **not** exist and you're in your "The rise of the machines" note.
 
@@ -217,14 +221,14 @@ The new note will be pre-filled with the following text:
 
 ```markdown
 # AI is going to kill us all
-tags = 
+tags =
 
 ```
 
 
 ## Credits
 
-Credits, where credits are due: 
+Credits, where credits are due:
 
 * I derived this work from Dan Sheffler's MyWiki code. [See his GitHub](https://github.com/dansheffler/MyWiki) and see the striking similarities ;-).
 * Thanks to [Niklas Luhmann](https://en.wikipedia.org/wiki/Niklas_Luhmann) for coming up with this unique way of using a Zettelkasten.
@@ -233,7 +237,7 @@ Credits, where credits are due:
 While we're at it, I highly recommend the following books (German); Google and Amazon are your friends:
 
 * "Das Zettelkastenprinzip" / "How to take smart notes" will blow your mind.
-* "Die Zettelkastenmethode" from Sascha over at zettelkasten.de will also blow your mind and expand on the plain-text approach of using a digital Zettelkasten. 
+* "Die Zettelkastenmethode" from Sascha over at zettelkasten.de will also blow your mind and expand on the plain-text approach of using a digital Zettelkasten.
 
 
 
