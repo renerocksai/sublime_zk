@@ -18,6 +18,8 @@ See the [Usage](#usage) section below to see how this package might support your
 * Implicit note creation via links to non-existing notes' titles, see below.
 * The ID format is YYYYMMDDHHMM - eg: 201710282111
 * Highlighting of note links
+* Highlighting of #tags
+* Highlighting of footnote references `[^like this one]`
 
 
 ## Installation
@@ -121,6 +123,10 @@ The new note will look like this:
 tags =
 
 ```
+
+### Syntax Coloring for #tags and footnotes
+To enable highlighting of #tags and footnotes in your newly created note, and for all your Zettelkasten notes, switch Sublime Text's syntax to `Markdown Zettelkasten`. You can use the menu: 'View' -> 'Syntax' -> 'Open all with current extension as...', and select 'Markdown Zettelkasten'.
+
 
 ### Creating a link
 Let's assume, you work in the note "201710282120 The rise of the machines":
