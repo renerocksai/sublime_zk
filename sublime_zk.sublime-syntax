@@ -19,3 +19,6 @@ contexts:
             '2': punctuation.separator.footnote.markdown
             '3': support.function.footnote.markdown
             '4': punctuation.definition.footnote.begin.markdown
+        - match: '( #[^ ]+)'
+          captures:
+            '1': markup.italic
