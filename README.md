@@ -118,6 +118,10 @@ tags =
 
 ```
 
+### Syntax Coloring for #tags and footnotes
+To enable highlighting of #tags and footnotes in your Zettelkasten notes, switch Sublime Text's syntax to `Markdown Zettelkasten`. You can use the menu: 'View' -> 'Syntax' -> 'Open all with current extension as...', and select 'Markdown Zettelkasten'.
+
+
 ### Creating a link 
 
 Let's assume, you work in the note "201710282120 The rise of the machines":
