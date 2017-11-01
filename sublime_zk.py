@@ -197,7 +197,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
 
         note_links = view.find_all(NoteLinkHighlighter.LINK_REGEX)
         # update the regions to ignore the brackets
-        note_links = [sublime.Region(n.a + 2, n.b - 2) for n in note_links]
+        # note_links = [sublime.Region(n.a, n.b) for n in note_links]
 
         # Avoid slowdowns for views with too many links
         n_links = len(note_links)
