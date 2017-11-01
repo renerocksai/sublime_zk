@@ -1,0 +1,21 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: Markdown Zettelkasten
+file_extensions:
+  - md
+  - mdown
+  - markdown
+  - markdn
+scope: text.html.markdown.custom
+contexts:
+  main:
+    - match: ''
+      push: scope:text.html.markdown
+      with_prototype:
+        - match: '(\[)(\^)([^]]*)(\])'
+          captures:
+            '1': punctuation.definition.footnote.begin.markdown
+            '2': punctuation.separator.footnote.markdown
+            '3': support.function.footnote.markdown
+            '4': punctuation.definition.footnote.begin.markdown
