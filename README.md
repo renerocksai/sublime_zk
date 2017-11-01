@@ -8,7 +8,7 @@ In short, it helps you manage an archive of interlinked notes that look like thi
 
 ![screenshot](sublime_zk.png)
 
-See the [Usage](#Usage) section below to see how this package might support your workflow.
+See the [Usage](#usage) section below to see how this package might support your workflow.
 
 ## Features
 
