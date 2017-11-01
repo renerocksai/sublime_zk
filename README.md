@@ -19,6 +19,8 @@ See the [Usage](#usage) section below to see how this package might support your
 * Implicit note creation via links to non-existing notes' titles, see below.
 * The ID format is YYYYMMDDHHMM - eg: 201710282111
 * Highlighting of note links
+* Highlighting of #tags
+* Highlighting of footnote references `[^like this one]`
 
 
 ## Installation
