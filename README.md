@@ -8,7 +8,7 @@ In short, it helps you manage an archive of interlinked notes that look like thi
 
 ![screenshot](sublime_zk.png)
 
-See the **Usage** section below to see how this package might support your workflow.
+See the [Usage](#Usage) section below to see how this package might support your workflow.
 
 ## Features
 
@@ -59,7 +59,7 @@ When you create a new note, its title will automatically be inserted and an ID w
 
 Example for a note created with ID:
 
-```python
+```markdown
 # 201710310128 This is a note with its ID in the title
 tags= 
 
@@ -68,7 +68,7 @@ The setting id_in_title is set to "true".
 
 Example for a note created without ID:
 
-```python
+```markdown
 # A note without an ID
 tags =
 
@@ -110,7 +110,7 @@ Example: Let's say you entered "AI is going to kill us all" as the note title, t
 
 The new note will look like this:
 
-```python
+```markdown
 # AI is going to kill us all
 tags = 
 
@@ -120,7 +120,7 @@ tags =
 
 Let's assume, you work in the note "201710282120 The rise of the machines":
 
-```python
+```markdown
 # The rise of the machines
 tags = #AI #world-domination
 
@@ -133,7 +133,7 @@ You figure, a link to the "AI is going to kill us all" note is a good fit to exp
 
 You start typing:
 
-```python
+```markdown
 # The rise of the machines
 tags = #AI #world-domination
 
@@ -146,7 +146,7 @@ As a consequence, they might turn evil and try to kill us all ........... [[
 
 The moment you type `[[`, a list pops up with all the notes in your archive. You enter "kill" to narrow down the selection list and select the target note. Voila! You have just placed a link into your note, which now looks like this:
 
-```python
+```markdown
 # The rise of the machines
 tags = #AI #world-domination
 
@@ -170,7 +170,7 @@ To showcase this, let's modify our example from above: Say, the "AI is going to 
 
 This is what it might look like:
 
-```python
+```markdown
 # The rise of the machines
 tags = #AI #world-domination
 
@@ -181,7 +181,7 @@ This might reach a point where they might develop a consciensce of their own.
 
 You now want to branch into the new thought you just had, that AI might potentially eventually be going to kill us all. You prepare for that by mentioning it and inserting a link, like this:
 
-```python
+```markdown
 # The rise of the machines
 tags = #AI #world-domination
 
@@ -200,7 +200,7 @@ And voila! A new note `201710282118 AI is going to kill us all.md` will be creat
 
 But the really cool thing is, that the link in the original note will be updated to the correct ID, so again you will end up with the following in the parent note:
 
-```python
+```markdown
 # The rise of the machines
 tags = #AI #world-domination
 
@@ -215,7 +215,7 @@ As a consequence, they might turn evil and try to kill us all ........... [[2017
 
 The new note will be pre-filled with the following text:
 
-```python
+```markdown
 # AI is going to kill us all
 tags = 
 
