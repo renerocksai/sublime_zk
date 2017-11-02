@@ -26,7 +26,7 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
         line_region = self.view.line(cursor_pos)
         line_start = line_region.begin()
 
-        linestart_till_cursor_str = self.view.substr(sublime.Region(line_start, 
+        linestart_till_cursor_str = self.view.substr(sublime.Region(line_start,
             cursor_pos))
         full_line = self.view.substr(line_region)
 
@@ -34,7 +34,7 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
         brackets_start = linestart_till_cursor_str.rfind(
             FollowWikiLinkCommand.Link_Prefix)
 
-        # search backwards from the cursor until we find ]] 
+        # search backwards from the cursor until we find ]]
         # finding ]] would mean that we are outside of the link, behind the ]]
         brackets_end_in_the_way = linestart_till_cursor_str.rfind(
             FollowWikiLinkCommand.Link_Postfix)
@@ -48,8 +48,8 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
                 FollowWikiLinkCommand.Link_Postfix)
 
             if brackets_end >= 0:
-                link_region = sublime.Region(line_start + brackets_start + 
-                    FollowWikiLinkCommand.Link_Prefix_Len, 
+                link_region = sublime.Region(line_start + brackets_start +
+                    FollowWikiLinkCommand.Link_Prefix_Len,
                     line_start + brackets_start + brackets_end)
                 return link_region
         return
@@ -63,16 +63,16 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
 
         window = self.view.window()
         location = self.select_link()
-        
+
         if location is None:
-            # no link found, not between brackets   
+            # no link found, not between brackets
             return
 
         selected_text = self.view.substr(location)
 
-        # search for file starting with text between the brackets (usually 
+        # search for file starting with text between the brackets (usually
         # the ID)
-        the_file = os.path.join(folder, selected_text + '*') 
+        the_file = os.path.join(folder, selected_text + '*')
         candidates = [f for f in glob.glob(the_file) if f.endswith(extension)]
         # print('Candidates: for glob {} : {}'.format(the_file, candidates))
 
@@ -80,8 +80,8 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
             the_file = candidates[0]
             new_view = window.open_file(the_file)
         else:
-            # suppose you have entered "[[my new note]]", then we are going to 
-            # create "201710201631 my new note.md". We will also add a link 
+            # suppose you have entered "[[my new note]]", then we are going to
+            # create "201710201631 my new note.md". We will also add a link
             # "[[201710201631]]" into the current document
             new_id = timestamp()
             the_file = new_id + ' ' + selected_text + extension
@@ -97,7 +97,7 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
 
 class NewZettelCommand(sublime_plugin.WindowCommand):
     """
-    Command that prompts for a note title and then creates a note with that 
+    Command that prompts for a note title and then creates a note with that
     title.
     """
     def run(self):
@@ -180,7 +180,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         self.update_note_link_highlights_async(view)
 
     def on_close(self, view):
-        for map in [self.note_links_for_view, self.scopes_for_view, 
+        for map in [self.note_links_for_view, self.scopes_for_view,
                     self.ignored_views]:
             if view.id() in map:
                 del map[view.id()]
@@ -227,7 +227,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         show_bookmarks = settings.get('show_bookmarks', 'True')
         show_bookmarks = show_bookmarks.lower() != "false"
 
-        # We need separate regions for each lexical scope for ST to use a 
+        # We need separate regions for each lexical scope for ST to use a
         # proper color for the underline
         scope_map = {}
         for note_link in note_links:
@@ -235,7 +235,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
             scope_map.setdefault(scope_name, []).append(note_link)
 
         for scope_name in scope_map:
-            self.underline_regions(view, scope_name, scope_map[scope_name], 
+            self.underline_regions(view, scope_name, scope_map[scope_name],
                 show_bookmarks)
 
         self.update_view_scopes(view, scope_map.keys())
@@ -256,7 +256,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
                   sublime.DRAW_NO_OUTLINE | sublime.DRAW_SOLID_UNDERLINE)
 
     """
-    Store new set of underlined scopes for view. 
+    Store new set of underlined scopes for view.
     Erase underlining from scopes that were once used but are not anymore.
     """
     def update_view_scopes(self, view, new_scopes):
