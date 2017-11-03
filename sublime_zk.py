@@ -109,11 +109,19 @@ class NewZettelCommand(sublime_plugin.WindowCommand):
         self.window.show_input_panel('New Note:', '', self.on_done, None, None)
 
     def on_done(self, input_text):
+        # sanity check: do we have a project
+        if not self.window.project_file_name():
+            # no project yet. try to create one
+            self.window.run_command('save_project_as')
+        if not self.window.project_file_name():
+            # we still don't have a project so save_project_as was canceled.
+            # I don't know how to save_as the file so there's nothing sane I can do here.
+            # Non-obtrusively warn the user that this failed
+            self.window.status_message('New note cannot be created without a project!')
+            return            
+        folder = os.path.dirname(self.window.project_file_name())
+        
         settings = sublime.load_settings('sublime_zk.sublime-settings')
-        if self.window.project_file_name():
-            folder = os.path.dirname(self.window.project_file_name())
-        else:
-            folder = os.path.abspath(self.window.folders()[0])
         extension = settings.get('wiki_extension')
         id_in_title = settings.get('id_in_title')
 
