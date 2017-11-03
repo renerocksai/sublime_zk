@@ -67,7 +67,7 @@ That's easier than it might look. This is how I do it:
 By default, the extension `.md` is used for your notes. If that does not match your style, you can change it in the `sublime_zk.sublime-settings` file. Just replace `.md` with `.txt` or `.mdown` or whatever you like.
 
 ### IDs in titles of new notes
-When you create a new note, its title will automatically be inserted and an ID will be assigned to it (see "Creating a new note"). If you want the ID to be part of the title, change the setting `id_in_title` from `false` to `true`.
+When you create a new note, its title will automatically be inserted and an ID will be assigned to it (see [Creating a new note](#creating-a-new-note)). If you want the ID to be part of the title, change the setting `id_in_title` from `false` to `true`.
 
 Example for a note created with ID:
 
