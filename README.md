@@ -75,7 +75,7 @@ Example for a note created with ID:
 # 201710310128 This is a note with its ID in the title
 tags=
 
-The setting id_in_title is set to "true".
+The setting id_in_title is set to true.
 ```
 
 Example for a note created without ID:
@@ -84,7 +84,7 @@ Example for a note created without ID:
 # A note without an ID
 tags =
 
-The setting id_in_title is set to "false"
+The setting id_in_title is set to false.
 ```
 
 You can find this setting in the file `sublime_zk.sublime-settings`.
