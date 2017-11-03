@@ -57,8 +57,13 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         settings = sublime.load_settings('sublime_zk.sublime-settings')
-        folder = os.path.dirname(self.view.window().project_file_name())
-        extension = settings.get('wiki_extension', '.md')
+        if self.view.window().project_file_name():
+            folder = os.path.dirname(self.view.window().project_file_name())
+        elif self.view.file_name():
+            folder = os.path.dirname(self.view.file_name())
+        else:
+            folder = os.path.abspath(self.view.window().folders()[0])
+        extension = settings.get('wiki_extension')
         id_in_title = settings.get('id_in_title')
 
         window = self.view.window()
@@ -105,8 +110,11 @@ class NewZettelCommand(sublime_plugin.WindowCommand):
 
     def on_done(self, input_text):
         settings = sublime.load_settings('sublime_zk.sublime-settings')
-        folder = os.path.dirname(self.window.project_file_name())
-        extension = settings.get('wiki_extension', '.md')
+        if self.window.project_file_name():
+            folder = os.path.dirname(self.window.project_file_name())
+        else:
+            folder = os.path.abspath(self.window.folders()[0])
+        extension = settings.get('wiki_extension')
         id_in_title = settings.get('id_in_title')
 
         new_id = timestamp()
@@ -138,8 +146,13 @@ class GetWikiLinkCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         settings = sublime.load_settings('sublime_zk.sublime-settings')
-        folder = os.path.dirname(self.view.window().project_file_name())
-        extension = settings.get('wiki_extension', '.md')
+        if self.view.window().project_file_name():
+            folder = os.path.dirname(self.view.window().project_file_name())
+        elif self.view.file_name():
+            folder = os.path.dirname(self.view.file_name())
+        else:
+            folder = os.path.abspath(self.view.window().folders()[0])
+        extension = settings.get('wiki_extension')
 
         self.outputText = '[['
         self.files = [f for f in os.listdir(folder) if f.endswith(extension)]
