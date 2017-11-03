@@ -14,6 +14,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * This plugin enables you to place wiki style links like `[[this]]` into your notes to link to other notes in your note archive.
 * Clicking such a link and pressing `[ctrl]+[enter]` will open the corresponding note.
 * Typing `[[` will open a list of existing notes so you can quickly link to existing notes.
+* Typing `[ctrl]+[space]` will trigger note-link auto-completion for even quicker insertion of links to other notes.
 * Typing `[shift]+[enter]` lets you enter a name for a new note. The new note is then created with a new note ID.
 * Implicit note creation via links to non-existing notes' titles, see below.
 * The ID format is YYYYMMDDHHMM - eg: 201710282111
@@ -192,6 +193,17 @@ As a consequence, they might turn evil and try to kill us all ........... [[2017
 
 If you now click into `[[201710282118]]` and press `[ctrl]+[enter]`, the target note will be opened where you can read up on how AI is potentially going to kill us all.
 
+
+### Using auto-completion to insert note-links
+A different way to insert a link to another note is via auto-completion. This differs from the previous one in the following ways:
+
+* auto-completion is triggered via [ctrl]+[space]
+* the list of notes is displayed at the location of your cursor
+* the font of the list is smaller, making it overall less obtrusive
+
+You can, just as before, narrow the list auf auto-completion suggestions down by just continuing typing. However, once you write something that does not match anything in your note-list, the suggestions disappear. This is just how auto-completion works: it doesn't want to get in your way when you type something new.
+
+Which ever method for link insertion you use is up to you.
 
 ### Implicitly creating a new note via a link
 There is another way to create a new note: Just create a link containing its title and follow the link.

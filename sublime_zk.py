@@ -40,7 +40,7 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
             FollowWikiLinkCommand.Link_Postfix)
 
         if brackets_end_in_the_way > brackets_start:
-            # we're behind closing brackets, finding the link would be unexpected
+            # behind closing brackets, finding the link would be unexpected
             return
 
         if brackets_start >= 0:
@@ -115,12 +115,13 @@ class NewZettelCommand(sublime_plugin.WindowCommand):
             self.window.run_command('save_project_as')
         if not self.window.project_file_name():
             # we still don't have a project so save_project_as was canceled.
-            # I don't know how to save_as the file so there's nothing sane I can do here.
-            # Non-obtrusively warn the user that this failed
-            self.window.status_message('New note cannot be created without a project!')
-            return            
+            # I don't know how to save_as the file so there's nothing sane I
+            # can do here. So: non-obtrusively warn the user that this failed
+            self.window.status_message(
+                'New note cannot be created without a project!')
+            return
         folder = os.path.dirname(self.window.project_file_name())
-        
+
         settings = sublime.load_settings('sublime_zk.sublime-settings')
         extension = settings.get('wiki_extension')
         id_in_title = settings.get('id_in_title')
@@ -180,7 +181,9 @@ class InsertWikiLinkCommand(sublime_plugin.TextCommand):
 
 class NoteLinkHighlighter(sublime_plugin.EventListener):
     """
-    Receives all updates to all views. Highlights [[201710310102]] style links.
+    Receives all updates to all views.
+    * Highlights [[201710310102]] style links.
+    * Enables word completion (ctrl + space) to insert links to notes
     """
     LINK_REGEX = r"(\[\[)[0-9]{12}(\]\])"
     DEFAULT_MAX_LINKS = 1000
@@ -189,6 +192,30 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
     scopes_for_view = {}
     ignored_views = []
     highlight_semaphore = threading.Semaphore()
+
+    def on_query_completions(self, view, prefix, locations):
+        """
+        Generate auto-completion entries for markdown files, based on
+        """
+        point = locations[0]
+        if view.match_selector(point, 'text.html.markdown') == 0:
+            return
+        if view.window().project_file_name():
+            folder = os.path.dirname(view.window().project_file_name())
+        elif view.file_name():
+            folder = os.path.dirname(view.file_name())
+        else:
+            return []
+
+        # we have a path and are in markdown!
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        extension = settings.get('wiki_extension')
+        completions = []
+        ids_and_names = [f.split(' ', 1) for f in os.listdir(folder)
+                                            if f.endswith(extension)]
+        for noteid, notename in ids_and_names:
+            completions.append([noteid + ' ' + notename, '[[' + noteid + ']]'])
+        return (completions, sublime.INHIBIT_WORD_COMPLETIONS)
 
     def on_activated(self, view):
         self.update_note_link_highlights(view)
@@ -217,7 +244,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
 
         note_links = view.find_all(NoteLinkHighlighter.LINK_REGEX)
         # update the regions to ignore the brackets
-        # note_links = [sublime.Region(n.a, n.b) for n in note_links]
+        note_links = [sublime.Region(n.a + 2, n.b - 2) for n in note_links]
 
         # Avoid slowdowns for views with too many links
         n_links = len(note_links)

@@ -12,5 +12,5 @@
 
     // when highlighting: also show bookmark symbols in the gutter?
     // false to disable
-    "show_bookmarks_in_gutter": true
+    "show_bookmarks_in_gutter": true,
 }
