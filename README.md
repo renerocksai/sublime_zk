@@ -96,10 +96,10 @@ It also shows a bookmark symbol in the gutter to the left of your text. These fe
 
 ```json
     // highlight links to other notes?
-    "highlight_note_links": "true",
+    "highlight_note_links": true,
 
     // when highlighting: also show bookmark symbols in the gutter?
-    "show_bookmarks_in_gutter": "true"
+    "show_bookmarks_in_gutter": true,
 ```
 
 ### Configuring SublimeText's line spacing
