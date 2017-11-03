@@ -196,6 +196,8 @@ As a consequence, they might turn evil and try to kill us all ........... [[2017
 
 If you now click into `[[201710282118]]` and press `[ctrl]+[enter]`, the target note will be opened where you can read up on how AI is potentially going to kill us all.
 
+Here you can see what the list of notes to choose from looks like:
+![screenshot2](https://user-images.githubusercontent.com/30892199/32399395-d4dffaf6-c0f5-11e7-8e1c-5a53fefb98a8.png)
 
 ### Using auto-completion to insert note-links
 A different way to insert a link to another note is via auto-completion. This differs from the previous one in the following ways:
@@ -207,6 +209,10 @@ A different way to insert a link to another note is via auto-completion. This di
 You can, just as before, narrow the list auf auto-completion suggestions down by just continuing typing. However, once you write something that does not match anything in your note-list, the suggestions disappear. This is just how auto-completion works: it doesn't want to get in your way when you type something new.
 
 Which ever method for link insertion you use is up to you.
+
+Here is a screenshot so you can compare:
+Below you can see what the list of notes to choose from looks like:
+![screenshot2](https://user-images.githubusercontent.com/30892199/32399400-da7cdcae-c0f5-11e7-88cf-c0b151c153b2.png)
 
 ### Implicitly creating a new note via a link
 There is another way to create a new note: Just create a link containing its title and follow the link.
