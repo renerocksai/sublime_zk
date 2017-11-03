@@ -59,7 +59,7 @@ No further configuration is necessary. This Zettelkasten plugin works with Subli
 That's easier than it might look. This is how I do it:
 
 ##### Automatic approach
-Just start working and [create a new note](creating-a-new-note)! Hit `shift+enter` in an empty SublimeText window with no project or file open. After entering the note's title, SublimeText will ask you where to save your new note and its corresponding project file. From then on, you'll be working in the very project directory that you just selected or created.
+Just start working and [create a new note](#creating-a-new-note)! Hit `shift+enter` in an empty SublimeText window with no project or file open. After entering the note's title, SublimeText will ask you where to save your new note and its corresponding project file. From then on, you'll be working in the very project directory that you just selected or created.
 
 ##### Manual approach
 If you want to create an empty project first and then start creating notes, here is what I would do:
