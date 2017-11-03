@@ -211,7 +211,6 @@ You can, just as before, narrow the list auf auto-completion suggestions down by
 Which ever method for link insertion you use is up to you.
 
 Here is a screenshot so you can compare:
-Below you can see what the list of notes to choose from looks like:
 ![screenshot2](https://user-images.githubusercontent.com/30892199/32399400-da7cdcae-c0f5-11e7-88cf-c0b151c153b2.png)
 
 ### Implicitly creating a new note via a link
