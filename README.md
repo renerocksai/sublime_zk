@@ -6,7 +6,7 @@ If you follow the (plain-text) Zettelkasten method (as proposed by [Zettelkasten
 
 In short, it helps you manage an archive of interlinked notes that look like this:
 
-![screenshot](https://user-images.githubusercontent.com/33335445/32364491-5cdd9946-c032-11e7-8573-c8a1a60e689f.png)
+![screenshot](https://user-images.githubusercontent.com/30892199/32398734-5b0f0b9e-c0f1-11e7-8012-85afefc8ba9b.png)
 
 See the [Usage](#usage) section below to see how this package might support your workflow.
 
