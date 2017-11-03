@@ -59,7 +59,7 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
         settings = sublime.load_settings('sublime_zk.sublime-settings')
         folder = os.path.dirname(self.view.window().project_file_name())
         extension = settings.get('wiki_extension', '.md')
-        id_in_title = settings.get('id_in_title', 'false').lower() != 'false'
+        id_in_title = settings.get('id_in_title')
 
         window = self.view.window()
         location = self.select_link()
@@ -107,7 +107,7 @@ class NewZettelCommand(sublime_plugin.WindowCommand):
         settings = sublime.load_settings('sublime_zk.sublime-settings')
         folder = os.path.dirname(self.window.project_file_name())
         extension = settings.get('wiki_extension', '.md')
-        id_in_title = settings.get('id_in_title', 'false').lower() != 'false'
+        id_in_title = settings.get('id_in_title')
 
         new_id = timestamp()
         the_file = os.path.join(folder,  new_id + ' ' + input_text + extension)
@@ -188,8 +188,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
     """The entry point. Find all LINKs in view, store and highlight them"""
     def update_note_link_highlights(self, view):
         settings = sublime.load_settings('sublime_zk.sublime-settings')
-        should_highlight = settings.get('highlight_note_links', 'True')
-        should_highlight = should_highlight.lower() != "false"
+        should_highlight = settings.get('highlight_note_links')
 
         max_note_link_limit = NoteLinkHighlighter.DEFAULT_MAX_LINKS
         if view.id() in NoteLinkHighlighter.ignored_views:
@@ -224,8 +223,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
     """
     def highlight_note_links(self, view, note_links):
         settings = sublime.load_settings('sublime_zk.sublime-settings')
-        show_bookmarks = settings.get('show_bookmarks', 'True')
-        show_bookmarks = show_bookmarks.lower() != "false"
+        show_bookmarks = settings.get('show_bookmarks_in_gutter')
 
         # We need separate regions for each lexical scope for ST to use a
         # proper color for the underline
@@ -241,7 +239,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         self.update_view_scopes(view, scope_map.keys())
 
     """Apply underlining to provided regions."""
-    def underline_regions(self, view, scope_name, regions, show_bookmarks=True):
+    def underline_regions(self, view, scope_name, regions, show_bookmarks):
         if show_bookmarks:
             symbol = 'bookmark'
         else:
