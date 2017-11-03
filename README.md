@@ -239,6 +239,8 @@ As a consequence, they might turn evil and try to kill us all ........... [[AI i
 
 **Note:** You will have to press `[ESC]` after typing `[[` to get out of the note selection that pops up, before entering the note title.
 
+**Note:** Of course this also works if you use a single quote link: `[AI is going to kill us all]`.
+
 Now, in order to actually create the new note and its link, all you have to do is to click inside the new note's title and press `[control]+[enter]`, just as you would if you wanted to open a regular linked note.
 
 And voila! A new note `201710282118 AI is going to kill us all.md` will be created and opened for you.
@@ -272,6 +274,7 @@ tags =
 Credits, where credits are due:
 
 * I derived this work from Dan Sheffler's MyWiki code. [See his GitHub](https://github.com/dansheffler/MyWiki) and see the striking similarities ;-).
+* (Of course it has evolved a lot since. A special shoutout to @toolboxen from the forum at zettelkasten.de for all the ideas, github issues, and pull requests!)
 * Thanks to [Niklas Luhmann](https://en.wikipedia.org/wiki/Niklas_Luhmann) for coming up with this unique way of using a Zettelkasten.
 * Thanks to the guys from [zettelkasten.de](https://zettelkasten.de) for their Zettelkasten related resources. There are not that many out there.
 
