@@ -6,7 +6,7 @@ If you follow the (plain-text) Zettelkasten method (as proposed by [Zettelkasten
 
 In short, it helps you manage an archive of interlinked notes that look like this:
 
-![screenshot](sublime_zk.png)
+![screenshot](https://user-images.githubusercontent.com/33335445/32364491-5cdd9946-c032-11e7-8573-c8a1a60e689f.png)
 
 See the [Usage](#usage) section below to see how this package might support your workflow.
 
