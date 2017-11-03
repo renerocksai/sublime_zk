@@ -2,6 +2,10 @@
     // The preferred markdown extension
     "wiki_extension": ".md",
 
+    // when creating a new link, use [[double brackets]]
+    // false to use [single brackets]
+    "double_brackets": true,
+
     // when creating a new note, put id into title?
      // false to disable
     "id_in_title": true,

@@ -15,9 +15,9 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
     """
     Command that opens the note corresponding to a link the cursor is placed in.
     """
-    Link_Prefix = '[['
+    Link_Prefix = '['
     Link_Prefix_Len = len(Link_Prefix)
-    Link_Postfix = ']]'
+    Link_Postfix = ']'
 
     def select_link(self):
         region = self.view.sel()[0]
@@ -148,8 +148,16 @@ class GetWikiLinkCommand(sublime_plugin.TextCommand):
                 'insert_wiki_link', {'args': {'text': '[['}})
             return
 
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        prefix = '[['
+        postfix = ']]'
+        if not settings.get('double_brackets', True):
+            prefix = '['
+            postfix = ']'
+
         # return only the id or whatever comes before the first blank
-        link_txt = '[[' + self.modified_files[selection].split(' ', 1)[0] + ']]'
+        link_txt = prefix + self.modified_files[selection].split(' ', 1)[0] \
+                                                                       + postfix
         self.view.run_command(
             'insert_wiki_link', {'args': {'text': link_txt}})
 
@@ -163,7 +171,6 @@ class GetWikiLinkCommand(sublime_plugin.TextCommand):
             folder = os.path.abspath(self.view.window().folders()[0])
         extension = settings.get('wiki_extension')
 
-        self.outputText = '[['
         self.files = [f for f in os.listdir(folder) if f.endswith(extension)]
         self.modified_files = [f.replace(extension, '') for f in self.files]
         self.view.window().show_quick_panel(self.modified_files, self.on_done)
@@ -185,7 +192,8 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
     * Highlights [[201710310102]] style links.
     * Enables word completion (ctrl + space) to insert links to notes
     """
-    LINK_REGEX = r"(\[\[)[0-9]{12}(\]\])"
+    # LINK_REGEX = r"(\[\[)[0-9]{12}(\]\])"
+    LINK_REGEX = r"(\[)[0-9]{12}(\])"
     DEFAULT_MAX_LINKS = 1000
 
     note_links_for_view = {}
@@ -209,12 +217,19 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
 
         # we have a path and are in markdown!
         settings = sublime.load_settings('sublime_zk.sublime-settings')
+        prefix = '[['
+        postfix = ']]'
+        if not settings.get('double_brackets', True):
+            prefix = '['
+            postfix = ']'
+
         extension = settings.get('wiki_extension')
         completions = []
         ids_and_names = [f.split(' ', 1) for f in os.listdir(folder)
                                             if f.endswith(extension)]
         for noteid, notename in ids_and_names:
-            completions.append([noteid + ' ' + notename, '[[' + noteid + ']]'])
+            completions.append([noteid + ' ' + notename,
+                prefix + noteid + postfix])
         return (completions, sublime.INHIBIT_WORD_COMPLETIONS)
 
     def on_activated(self, view):
@@ -244,7 +259,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
 
         note_links = view.find_all(NoteLinkHighlighter.LINK_REGEX)
         # update the regions to ignore the brackets
-        note_links = [sublime.Region(n.a + 2, n.b - 2) for n in note_links]
+        note_links = [sublime.Region(n.a + 1, n.b - 1) for n in note_links]
 
         # Avoid slowdowns for views with too many links
         n_links = len(note_links)

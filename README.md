@@ -11,7 +11,7 @@ In short, it helps you manage an archive of interlinked notes that look like thi
 See the [Usage](#usage) section below to see how this package might support your workflow.
 
 ## Features
-* This plugin enables you to place wiki style links like `[[this]]` into your notes to link to other notes in your note archive.
+* This plugin enables you to place wiki style links like `[[this]]` or `[this]` into your notes to link to other notes in your note archive.
 * Clicking such a link and pressing `[ctrl]+[enter]` will open the corresponding note.
 * Typing `[[` will open a list of existing notes so you can quickly link to existing notes.
 * Typing `[ctrl]+[space]` will trigger note-link auto-completion for even quicker insertion of links to other notes.
@@ -72,6 +72,9 @@ If you want to create an empty project first and then start creating notes, here
 
 ### Markdown filename extension
 By default, the extension `.md` is used for your notes. If that does not match your style, you can change it in the `sublime_zk.sublime-settings` file. Just replace `.md` with `.txt` or `.mdown` or whatever you like.
+
+### Single or double brackets
+Whether you want to use `[[this link style]]` or `[that link style]` is totally up to you. Both work. But you need to configure which style you prefer, so automatically inserted links will match your style. `[[double bracket]]` links are the default, and if you want to change that to single bracket links, set the `double_brackets` parameter to `false` in the `sublime_zk.sublime-settings`.
 
 ### IDs in titles of new notes
 When you create a new note, its title will automatically be inserted and an ID will be assigned to it (see [Creating a new note](#creating-a-new-note)). If you want the ID to be part of the title, change the setting `id_in_title` from `false` to `true`.
