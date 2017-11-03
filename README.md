@@ -6,7 +6,7 @@ If you follow the (plain-text) Zettelkasten method (as proposed by [Zettelkasten
 
 In short, it helps you manage an archive of interlinked notes that look like this:
 
-![screenshot](sublime_zk.png)
+![screenshot](https://user-images.githubusercontent.com/33335445/32364491-5cdd9946-c032-11e7-8573-c8a1a60e689f.png)
 
 See the [Usage](#usage) section below to see how this package might support your workflow.
 
@@ -23,12 +23,26 @@ See the [Usage](#usage) section below to see how this package might support your
 
 
 ## Installation
+
+### Automatic Installation & Updates
+
+Sublime Text comes with Package Control, a feature which allows you to easily install and update third party packages. You can use it to install this package and keep it up to date:
+
+1. Install [Sublime Text 3](http://www.sublimetext.com/3)
+2. Use the Command Palette (Tools > Command Palette...) and run **Install Package Control**. Sublime Text will alert you when the installation has finished.
+3. Use the Command Palette and run **Package Control: Add Repository**
+4. Add the URL of this repository `https://github.com/renerocksai/sublime_zk` into the panel that appears at the bottom of the window and press `Enter`.
+5. Use the Command Palette and run **Package Control: Install Package** and search for `sublime_zk` from the list of available packages. Select it and press `Enter` to install the package.
+6. You can keep your packages up to date by running **Package Control: Upgrade Package** from the Command Palette.
+
+### Manual Installation
+
 The following steps cover all dependencies and prerequisites. Skip the steps you don't need:
 
 1. Install [Sublime Text 3](http://www.sublimetext.com/3)
 2. Download the sublime_zk zip from [this repo](https://github.com/renerocksai/sublime_zk).
 3. Unzip the sublime_zk plugin. You should get a `sublime_zk` folder.
-4. Under Preferences, go to 'browse packages'. This opens the package location of SublimeText in your file browser.
+4. Under Preferences, go to 'Browse Packages...'. This opens the package location of SublimeText in your file browser.
 5. Copy the `sublime_zk` folder into the package location folder from the previous step.
 
 You should be all set.
