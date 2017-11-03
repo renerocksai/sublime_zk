@@ -1,0 +1,5 @@
+[
+    { "keys": ["shift+enter"], "command": "new_zettel"},
+    { "keys": ["ctrl+enter"], "command": "follow_wiki_link"},
+    { "keys": ["[", "["], "command": "get_wiki_link"}
+]

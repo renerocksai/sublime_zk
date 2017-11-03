@@ -3,14 +3,14 @@
     "wiki_extension": ".md",
 
     // when creating a new note, put id into title?
-     // "false" to disable
-    "id_in_title": "true",
+     // false to disable
+    "id_in_title": true,
 
     // highlight links to other notes?
-    // "false" to disable
-    "highlight_note_links": "true",
+    // false to disable
+    "highlight_note_links": true,
 
     // when highlighting: also show bookmark symbols in the gutter?
-    // "false" to disable
-    "show_bookmarks_in_gutter": "true"
+    // false to disable
+    "show_bookmarks_in_gutter": true
 }
