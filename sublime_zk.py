@@ -61,8 +61,10 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
             folder = os.path.dirname(self.view.window().project_file_name())
         elif self.view.file_name():
             folder = os.path.dirname(self.view.file_name())
-        else:
+        elif self.view.window().folders():
             folder = os.path.abspath(self.view.window().folders()[0])
+        else:
+            return
         extension = settings.get('wiki_extension')
         id_in_title = settings.get('id_in_title')
 
@@ -110,17 +112,21 @@ class NewZettelCommand(sublime_plugin.WindowCommand):
 
     def on_done(self, input_text):
         # sanity check: do we have a project
-        if not self.window.project_file_name():
-            # no project yet. try to create one
+        if self.window.project_file_name():
+            # yes we have a project!
+            folder = os.path.dirname(self.window.project_file_name())
+        # sanity check: do we have an open folder
+        elif self.window.folders():
+            # yes we have an open folder!
+            folder = os.path.abspath(self.window.folders()[0])
+        else:
+            # no folder or project. try to create one
             self.window.run_command('save_project_as')
-        if not self.window.project_file_name():
-            # we still don't have a project so save_project_as was canceled.
             # I don't know how to save_as the file so there's nothing sane I
             # can do here. So: non-obtrusively warn the user that this failed
             self.window.status_message(
-                'New note cannot be created without a project!')
+            'New note cannot be created without a project or an open folder!')
             return
-        folder = os.path.dirname(self.window.project_file_name())
 
         settings = sublime.load_settings('sublime_zk.sublime-settings')
         extension = settings.get('wiki_extension')
@@ -167,8 +173,10 @@ class GetWikiLinkCommand(sublime_plugin.TextCommand):
             folder = os.path.dirname(self.view.window().project_file_name())
         elif self.view.file_name():
             folder = os.path.dirname(self.view.file_name())
-        else:
+        elif self.view.window().folders():
             folder = os.path.abspath(self.view.window().folders()[0])
+        else:
+            return
         extension = settings.get('wiki_extension')
 
         self.files = [f for f in os.listdir(folder) if f.endswith(extension)]
