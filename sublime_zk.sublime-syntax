@@ -25,5 +25,5 @@ contexts:
         - match: '(\[)([0-9]{12})(\])'
           captures:
             '1': punctuation.definition.footnote.begin.markdown
-            '2': markup.zettel.link
+            '2': markup.zettel.link, keyword
             '3': punctuation.definition.footnote.begin.markdown
