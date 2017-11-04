@@ -250,7 +250,6 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
 
     """The entry point. Find all LINKs in view, store and highlight them"""
     def update_note_link_highlights(self, view):
-        return # DISABLED
         settings = sublime.load_settings('sublime_zk.sublime-settings')
         should_highlight = settings.get('highlight_note_links')
 
@@ -312,7 +311,8 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         view.add_regions(
             u'clickable-note_links ' + scope_name,
             regions,
-            "markup.bold",      # the scope name for forcing the underlining
+            # the scope name for nice links different from external links
+            "markup.zettel.link",
             symbol,
             flags=sublime.DRAW_NO_FILL |
                   sublime.DRAW_NO_OUTLINE | sublime.DRAW_SOLID_UNDERLINE)
