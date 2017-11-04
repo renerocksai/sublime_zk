@@ -233,7 +233,8 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         extension = settings.get('wiki_extension')
         completions = []
         ids_and_names = [f.split(' ', 1) for f in os.listdir(folder)
-                                            if f.endswith(extension)]
+                                            if f.endswith(extension)
+                                            and ' ' in f]
         for noteid, notename in ids_and_names:
             completions.append([noteid + ' ' + notename,
                 prefix + noteid + postfix])
