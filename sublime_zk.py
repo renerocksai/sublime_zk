@@ -10,6 +10,15 @@ def create_note(filn, title):
     with open(filn, mode='w', encoding='utf-8') as f:
         f.write(u'# {}\ntags = \n\n'.format(title))
 
+def get_path_for(view):
+    folder = None
+    if view.window().project_file_name():
+        folder = os.path.dirname(view.window().project_file_name())
+    elif view.file_name():
+        folder = os.path.dirname(view.file_name())
+    elif view.window().folders():
+        folder = os.path.abspath(view.window().folders()[0])
+    return folder
 
 class FollowWikiLinkCommand(sublime_plugin.TextCommand):
     """
@@ -54,17 +63,12 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
                 return link_region
         return
 
-
     def run(self, edit):
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
-        if self.view.window().project_file_name():
-            folder = os.path.dirname(self.view.window().project_file_name())
-        elif self.view.file_name():
-            folder = os.path.dirname(self.view.file_name())
-        elif self.view.window().folders():
-            folder = os.path.abspath(self.view.window().folders()[0])
-        else:
+        folder = get_path_for(self.view)
+        if not folder:
             return
+
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
         extension = settings.get('wiki_extension')
         id_in_title = settings.get('id_in_title')
 
@@ -168,15 +172,11 @@ class GetWikiLinkCommand(sublime_plugin.TextCommand):
             'insert_wiki_link', {'args': {'text': link_txt}})
 
     def run(self, edit):
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
-        if self.view.window().project_file_name():
-            folder = os.path.dirname(self.view.window().project_file_name())
-        elif self.view.file_name():
-            folder = os.path.dirname(self.view.file_name())
-        elif self.view.window().folders():
-            folder = os.path.abspath(self.view.window().folders()[0])
-        else:
+        folder = get_path_for(self.view)
+        if not folder:
             return
+
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
         extension = settings.get('wiki_extension')
 
         self.files = [f for f in os.listdir(folder) if f.endswith(extension)]
@@ -214,11 +214,9 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         point = locations[0]
         if view.match_selector(point, 'text.html.markdown') == 0:
             return
-        if view.window().project_file_name():
-            folder = os.path.dirname(view.window().project_file_name())
-        elif view.file_name():
-            folder = os.path.dirname(view.file_name())
-        else:
+
+        folder = get_path_for(view)
+        if not folder:
             return []
 
         # we have a path and are in markdown!
