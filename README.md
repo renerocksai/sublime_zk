@@ -21,6 +21,9 @@ See the [Usage](#usage) section below to see how this package might support your
 * Highlighting of note links
 * Highlighting of #tags
 * Highlighting of footnote references `[^like this one]`
+* **Experimental**: `[#]+[?]` opens up a list of all your #tags and lets you fuzzy search and select them (like note-links). 
+
+*Note*: Experimental features will not be really documented here. In the case of the tag selector: It's likely to be slow if you have many notes because it searches through all your notes every time. 
 
 
 ## Installation
@@ -294,6 +297,10 @@ tags =
 
 ```
 
+## Experimental tag overview / selector
+Press `[#]+[?]` to ask for a list of all tags used in your note archive. You can narrow down the search and finally pick the tag you like.
+
+![tagsel](https://user-images.githubusercontent.com/30892199/32405205-25f94bc0-c161-11e7-914a-1a82bdf9c2f9.png)
 
 ## Credits
 
