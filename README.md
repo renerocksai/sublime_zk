@@ -151,6 +151,27 @@ tags =
 ### Syntax Coloring for #tags and footnotes
 To enable highlighting of #tags and footnotes in your newly created note, and for all your Zettelkasten notes, switch Sublime Text's syntax to `Markdown Zettelkasten`. You can use the menu: 'View' -> 'Syntax' -> 'Open all with current extension as...', and select 'Markdown Zettelkasten'.
 
+This package uses a custom scope for note links. While underlining them is done in the plug-in, you have to manually tweak your color scheme. Google is your friend - here is an example that needs to be added to (a copy of) your favourite color scheme:
+
+```xml
+    <dict>
+      <key>name</key>
+      <string>Markup: Zettelkasten note link</string>
+      <key>scope</key>
+      <string>markup.zettel.link</string>
+      <key>settings</key>
+      <dict>
+        <key>fontStyle</key>
+        <string>underline</string>
+        <key>foreground</key>
+        <string>#6080ef</string>
+      </dict>
+    </dict>
+```
+
+To get you started, this package provides the color scheme "Monokai Extended - Zettelkasten". You can select it via the menu: Preferences -> Color Scheme... -> Monokai Extended - Zettelkasten.
+_(The original Monokai Extended for SublimeText has been created by [@jonschlinkert](https://github.com/jonschlinkert/sublime-monokai-extended))._
+
 
 ### Creating a link
 Let's assume, you work in the note "201710282120 The rise of the machines":
