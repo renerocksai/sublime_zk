@@ -173,8 +173,10 @@ class GetWikiLinkCommand(sublime_plugin.TextCommand):
             folder = os.path.dirname(self.view.window().project_file_name())
         elif self.view.file_name():
             folder = os.path.dirname(self.view.file_name())
-        else:
+        elif self.view.window().folders():
             folder = os.path.abspath(self.view.window().folders()[0])
+        else:
+            return
         extension = settings.get('wiki_extension')
 
         self.files = [f for f in os.listdir(folder) if f.endswith(extension)]
