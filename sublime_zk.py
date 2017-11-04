@@ -192,8 +192,6 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
     * Highlights [[201710310102]] style links.
     * Enables word completion (ctrl + space) to insert links to notes
     """
-    # LINK_REGEX = r"(\[\[)[0-9]{12}(\]\])"
-    LINK_REGEX = r"(\[)[0-9]{12}(\])"
     DEFAULT_MAX_LINKS = 1000
 
     note_links_for_view = {}
@@ -257,9 +255,9 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         if view.id() in NoteLinkHighlighter.ignored_views:
             return
 
-        note_links = view.find_all(NoteLinkHighlighter.LINK_REGEX)
+        note_links = view.find_by_selector('markup.zettel')
         # update the regions to ignore the brackets
-        note_links = [sublime.Region(n.a + 1, n.b - 1) for n in note_links]
+        note_links = [sublime.Region(n.a, n.b) for n in note_links]
 
         # Avoid slowdowns for views with too many links
         n_links = len(note_links)
