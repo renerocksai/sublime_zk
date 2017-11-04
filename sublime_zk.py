@@ -250,6 +250,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
 
     """The entry point. Find all LINKs in view, store and highlight them"""
     def update_note_link_highlights(self, view):
+        return # DISABLED
         settings = sublime.load_settings('sublime_zk.sublime-settings')
         should_highlight = settings.get('highlight_note_links')
 
