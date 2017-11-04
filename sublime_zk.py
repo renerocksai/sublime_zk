@@ -197,6 +197,50 @@ class InsertWikiLinkCommand(sublime_plugin.TextCommand):
 
 
 
+class ZkGetAllTagsCommand(sublime_plugin.TextCommand):
+    """
+    Command that lets you choose one of all your notes and inserts a link to
+    the chosen note.
+    """
+    def on_done(self, selection):
+        if selection == -1:
+            self.view.run_command(
+                'insert_wiki_link', {'args': {'text': '#'}})   # can be re-used
+            return
+
+        # return only the id or whatever comes before the first blank
+        tag_txt = self.tags[selection]
+        self.view.run_command(
+            'insert_wiki_link', {'args': {'text': tag_txt}})  # re-use of cmd
+
+    def run(self, edit):
+        folder = get_path_for(self.view)
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        extension = settings.get('wiki_extension')
+        if not folder:
+            return
+        self.files = [os.path.join(folder, f) for f in os.listdir(folder)
+                                                    if f.endswith(extension)]
+        tags = set()
+        for file in self.files:
+            tags |= self.extract_tags(file)
+        self.tags = list(tags)
+        self.view.window().show_quick_panel(self.tags, self.on_done)
+
+    @staticmethod
+    def extract_tags(file):
+        tags = set()
+        with open(file, mode='r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                for word in line.split():
+                    if word.startswith('#') and not word.endswith('#'):
+                        tags.add(word)
+        return tags
+
+
+
+
 class NoteLinkHighlighter(sublime_plugin.EventListener):
     """
     Receives all updates to all views.
