@@ -7,11 +7,11 @@ file_extensions:
   - mdown
   - markdown
   - markdn
-scope: text.html.markdown.custom
+scope: text.html.markdown.multimarkdown.custom
 contexts:
   main:
     - match: ''
-      push: scope:text.html.markdown
+      push: scope:text.html.markdown.multimarkdown
       with_prototype:
         - match: '(\[)(\^)([^]]*)(\])'
           captures:
