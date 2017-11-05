@@ -17,4 +17,7 @@
     // when highlighting: also show bookmark symbols in the gutter?
     // false to disable
     "show_bookmarks_in_gutter": true,
+
+    // should the tag list appear in a new pane right to the note?
+    "show_all_tags_in_new_pane": true,
 }

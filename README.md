@@ -21,9 +21,10 @@ See the [Usage](#usage) section below to see how this package might support your
 * Highlighting of note links
 * Highlighting of #tags
 * Highlighting of footnote references `[^like this one]`
-* **Experimental**: `[#]+[?]` opens up a list of all your #tags and lets you fuzzy search and select them (like note-links). 
+* Typing `[#][!]` will create a scratch file containing all your **#tags**, sorted
+* **Experimental**: `[#][?]` opens up a list of all your **#tags** and lets you fuzzy search and select them (like note-links).
 
-*Note*: Experimental features will not be really documented here. In the case of the tag selector: It's likely to be slow if you have many notes because it searches through all your notes every time. 
+*Note*: Experimental features will not be really documented here. In the case of the tag selector: It's likely to be slow if you have many notes because it searches through all your notes every time.
 
 
 ## Installation
@@ -296,17 +297,31 @@ The new note will be pre-filled with the following text:
 tags =
 
 ```
+## Working with tags
 
-## Experimental tag overview / selector
+### Getting an overview of all your tags
+Over time you might collect quite a number of **#tags** assigned to your notes. Sometimes it helps to get an overview of all of them, maybe to check for synonyms before creating a tag, etc.
+
+When you press `[#][!]` (that is the `#` key followed by the `!` key) quickly, a scratch file listing all your #tags will be created and showed right next to your text:
+
+![taglist](https://user-images.githubusercontent.com/30892199/32414889-2792394a-c230-11e7-98ce-a8d8dd665a39.png)
+
+**Note:** If you don't like splitting your window, set the parameter `show_all_tags_in_new_pane` to `false`.
+
+
+### Experimental tag overview / selector
 Press `[#]+[?]` to ask for a list of all tags used in your note archive. You can narrow down the search and finally pick the tag you like.
 
 ![tagsel](https://user-images.githubusercontent.com/30892199/32405205-25f94bc0-c161-11e7-914a-1a82bdf9c2f9.png)
+
+Why is this experimental? Because it needs to scan all your notes everytime you invoke it. This is probably not very efficient in large note archives, so I consider its implementation experimental.
+
 
 ## Credits
 
 Credits, where credits are due:
 
-* I derived this work from Dan Sheffler's MyWiki code. [See his GitHub](https://github.com/dansheffler/MyWiki) and see the striking similarities ;-).
+* I derived this work from Dan Sheffler's MyWiki code. [See his GitHub](https://github.com/dansheffler/MyWiki) and see some striking similarities ;-).
 * (Of course it has evolved a lot since. A special shoutout to @toolboxen from the forum at zettelkasten.de for all the ideas, github issues, and pull requests!)
 * Thanks to [Niklas Luhmann](https://en.wikipedia.org/wiki/Niklas_Luhmann) for coming up with this unique way of using a Zettelkasten.
 * Thanks to the guys from [zettelkasten.de](https://zettelkasten.de) for their Zettelkasten related resources. There are not that many out there.

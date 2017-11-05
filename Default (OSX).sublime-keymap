@@ -2,5 +2,6 @@
     { "keys": ["shift+enter"], "command": "new_zettel"},
     { "keys": ["ctrl+enter"], "command": "follow_wiki_link"},
     { "keys": ["[", "["], "command": "get_wiki_link"},
-    { "keys": ["#", "?"], "command": "zk_get_all_tags"}
+    { "keys": ["#", "?"], "command": "zk_tag_selector"},
+    { "keys": ["#", "!"], "command": "zk_show_all_tags"},
 ]

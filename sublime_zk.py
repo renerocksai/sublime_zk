@@ -20,6 +20,27 @@ def get_path_for(view):
         folder = os.path.abspath(view.window().folders()[0])
     return folder
 
+def extract_tags(file):
+    tags = set()
+    with open(file, mode='r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            for word in line.split():
+                if word.startswith('#') and not word.endswith('#'):
+                    tags.add(word)
+    return tags
+
+def get_all_notes_for(folder, extension):
+    return [os.path.join(folder, f) for f in os.listdir(folder)
+                                                    if f.endswith(extension)]
+
+def find_all_tags_in(folder, extension):
+    tags = set()
+    for file in get_all_notes_for(folder, extension):
+        tags |= extract_tags(file)
+    return list(tags)
+
+
 class FollowWikiLinkCommand(sublime_plugin.TextCommand):
     """
     Command that opens the note corresponding to a link the cursor is placed in.
@@ -197,7 +218,7 @@ class InsertWikiLinkCommand(sublime_plugin.TextCommand):
 
 
 
-class ZkGetAllTagsCommand(sublime_plugin.TextCommand):
+class ZkTagSelectorCommand(sublime_plugin.TextCommand):
     """
     Command that lets you choose one of all your notes and inserts a link to
     the chosen note.
@@ -215,29 +236,53 @@ class ZkGetAllTagsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         folder = get_path_for(self.view)
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
-        extension = settings.get('wiki_extension')
         if not folder:
             return
-        self.files = [os.path.join(folder, f) for f in os.listdir(folder)
-                                                    if f.endswith(extension)]
-        tags = set()
-        for file in self.files:
-            tags |= self.extract_tags(file)
-        self.tags = list(tags)
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        extension = settings.get('wiki_extension')
+        self.tags = find_all_tags_in(folder, extension)
         self.view.window().show_quick_panel(self.tags, self.on_done)
 
-    @staticmethod
-    def extract_tags(file):
-        tags = set()
-        with open(file, mode='r', encoding='utf-8') as f:
-            for line in f:
-                line = line.strip()
-                for word in line.split():
-                    if word.startswith('#') and not word.endswith('#'):
-                        tags.add(word)
-        return tags
 
+class ZkShowAllTagsCommand(sublime_plugin.WindowCommand):
+    """
+    Command that creates a new view containing a sorted list of all tags
+    in all notes
+    """
+    def run(self):
+        # sanity check: do we have a project
+        if self.window.project_file_name():
+            # yes we have a project!
+            folder = os.path.dirname(self.window.project_file_name())
+        # sanity check: do we have an open folder
+        elif self.window.folders():
+            # yes we have an open folder!
+            folder = os.path.abspath(self.window.folders()[0])
+        else:
+            # don't know where to grep
+            return
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        extension = settings.get('wiki_extension')
+        new_pane = settings.get('show_all_tags_in_new_pane')
+
+        tags = find_all_tags_in(folder, extension)
+        tags.sort()
+
+        if new_pane:
+            self.window.run_command('set_layout', {
+                'cols': [0.0, 0.5, 1.0],
+                'rows': [0.0, 1.0],
+                'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
+            })
+            # goto right-hand pane
+            self.window.focus_group(1)
+        tagview = self.window.new_file()
+        tagview.set_name('Tags')
+        tagview.set_scratch(True)
+        tagview.run_command("insert",{"characters": '\n'.join(tags)})
+        tagview.set_syntax_file('Packages/sublime_zk/sublime_zk.sublime-syntax')
+        # return back to note
+        self.window.focus_group(0)
 
 
 
