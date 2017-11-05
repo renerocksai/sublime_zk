@@ -16,15 +16,13 @@ See the [Usage](#usage) section below to see how this package might support your
 * Typing `[[` will open a list of existing notes so you can quickly link to existing notes.
 * Typing `[ctrl]+[space]` will trigger note-link auto-completion for even quicker insertion of links to other notes.
 * Typing `[shift]+[enter]` lets you enter a name for a new note. The new note is then created with a new note ID.
-* Implicit note creation via links to non-existing notes' titles, see below.
+* Implicit note creation via links to non-existing notes' titles, see [below](#implicitly-creating-a-new-note-via-a-link).
 * The ID format is YYYYMMDDHHMM - eg: 201710282111
 * Highlighting of note links
 * Highlighting of #tags
 * Highlighting of footnote references `[^like this one]`
 * Typing `[#][!]` will create a scratch file containing all your **#tags**, sorted
 * **Experimental**: `[#][?]` opens up a list of all your **#tags** and lets you fuzzy search and select them (like note-links).
-
-*Note*: Experimental features will not be really documented here. In the case of the tag selector: It's likely to be slow if you have many notes because it searches through all your notes every time.
 
 
 ## Installation
