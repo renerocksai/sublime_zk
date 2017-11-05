@@ -309,7 +309,7 @@ When you press `[#][!]` (that is the `#` key followed by the `!` key) quickly, a
 **Note:** If you don't like splitting your window, set the parameter `show_all_tags_in_new_pane` to `false`.
 
 
-### Experimental tag overview / selector
+### Experimental tag selector
 Press `[#]+[?]` to ask for a list of all tags used in your note archive. You can narrow down the search and finally pick the tag you like.
 
 ![tagsel](https://user-images.githubusercontent.com/30892199/32405205-25f94bc0-c161-11e7-914a-1a82bdf9c2f9.png)
