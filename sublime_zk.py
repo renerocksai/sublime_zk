@@ -63,7 +63,11 @@ def tag_at(text, pos=None):
             if c.isspace():
                 break
             end += 1
-        return text[inner:end], (inner, end)
+        tag = text[inner:end]
+
+        # test if it's just a `# heading` (resulting in `#`) or a real tag
+        if tag.replace('#', ''):
+            return text[inner:end], (inner, end)
     return ''
 
 
