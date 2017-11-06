@@ -303,7 +303,7 @@ Over time you might collect quite a number of **#tags** assigned to your notes. 
 
 When you press `[#][!]` (that is the `#` key followed by the `!` key) quickly, a scratch file listing all your #tags will be created and showed right next to your text:
 
-![taglist](https://user-images.githubusercontent.com/30892199/32414889-2792394a-c230-11e7-98ce-a8d8dd665a39.png)
+![taglist](https://user-images.githubusercontent.com/30892199/32422037-fd32b18e-c29d-11e7-85d0-2d008b07fe1d.png)
 
 **Note:** If you don't like splitting your window, set the parameter `show_all_tags_in_new_pane` to `false`.
 
