@@ -22,7 +22,7 @@ contexts:
         - match: '( #[^ ]+)'
           captures:
             '1': markup.italic
-        - match: '(\[)([0-9]{12})(\])'
+        - match: '([\[]?\[)([0-9]{12})(\][\]]?)'
           captures:
             '1': punctuation.definition.footnote.begin.markdown
             '2': markup.zettel.link
