@@ -68,7 +68,7 @@ def tag_at(text, pos=None):
         # test if it's just a `# heading` (resulting in `#`) or a real tag
         if tag.replace('#', ''):
             return text[inner:end], (inner, end)
-    return ''
+    return '', (None, None)
 
 
 class FollowWikiLinkCommand(sublime_plugin.TextCommand):
