@@ -1,7 +1,14 @@
+"""
+            ___.   .__  .__                            __
+  ________ _\_ |__ |  | |__| _____   ____      _______|  | __
+ /  ___/  |  \ __ \|  | |  |/     \_/ __ \     \___   /  |/ /
+ \___ \|  |  / \_\ \  |_|  |  Y Y  \  ___/      /    /|    <
+/____  >____/|___  /____/__|__|_|  /\___  >____/_____ \__|_ \
+     \/          \/              \/     \/_____/     \/    \/
+"""
 import sublime, sublime_plugin, os, re, subprocess, glob, datetime
-
-# for highlighting
 import threading
+
 
 def timestamp():
     return '{:%Y%m%d%H%M}'.format(datetime.datetime.now())
