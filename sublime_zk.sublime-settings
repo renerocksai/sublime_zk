@@ -20,4 +20,8 @@
 
     // should the tag list appear in a new pane right to the note?
     "show_all_tags_in_new_pane": true,
+
+    // show find results in a new tab?
+    // false to disable: then they will be displayed at the bottom of the window
+    "show_tag_search_results_in_new_tab": true,
 }

@@ -40,6 +40,32 @@ def find_all_tags_in(folder, extension):
         tags |= extract_tags(file)
     return list(tags)
 
+def tag_at(text, pos=None):
+    """
+    Searches for a ####tag inside of text.
+    If pos is given, searches for the tag at pos
+    """
+    if pos is None:
+        search_text = text
+    else:
+        search_text = text[:pos + 1]
+    # find first `#`
+    inner = search_text.rfind('#')
+    if inner >=0:
+        # find next consecutive `#`
+        for c in reversed(search_text[:inner]):
+            if c != '#':
+                break
+            inner -=1
+        # search end of tag
+        end = inner
+        for c in text[inner:]:
+            if c.isspace():
+                break
+            end += 1
+        return text[inner:end], (inner, end)
+    return ''
+
 
 class FollowWikiLinkCommand(sublime_plugin.TextCommand):
     """
@@ -82,6 +108,27 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
                     FollowWikiLinkCommand.Link_Prefix_Len,
                     line_start + brackets_start + brackets_end)
                 return link_region
+
+        # test if we are supposed to follow a tag
+        if '#' in linestart_till_cursor_str:
+            cursor_pos_in_line = cursor_pos - line_start
+            tag, (begin, end) = tag_at(full_line, cursor_pos_in_line)
+
+            settings = sublime.load_settings('sublime_zk.sublime-settings')
+            new_tab = settings.get('show_tag_search_results_in_new_tab')
+
+            # hack for the find in files panel: select tag in view, copy it
+            selection = self.view.sel()
+            selection.clear()
+            selection.add(sublime.Region(line_start + begin, line_start + end))
+            self.view.window().run_command("copy")
+            self.view.window().run_command("show_panel",
+                {"panel": "find_in_files",
+                "where": get_path_for(self.view),
+                "use_buffer": new_tab,})
+            # now paste the tag --> it will land in the "find" field
+            self.view.window().run_command("paste")
+
         return
 
     def run(self, edit):
@@ -279,7 +326,7 @@ class ZkShowAllTagsCommand(sublime_plugin.WindowCommand):
         tagview = self.window.new_file()
         tagview.set_name('Tags')
         tagview.set_scratch(True)
-        tagview.run_command("insert",{"characters": '\n'.join(tags)})
+        tagview.run_command("insert",{"characters": ' ' + '\n'.join(tags)})
         tagview.set_syntax_file('Packages/sublime_zk/sublime_zk.sublime-syntax')
         # return back to note
         self.window.focus_group(0)

@@ -23,6 +23,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * Highlighting of footnote references `[^like this one]`
 * Typing `[#][!]` will create a scratch file containing all your **#tags**, sorted
 * **Experimental**: `[#][?]` opens up a list of all your **#tags** and lets you fuzzy search and select them (like note-links).
+* Clicking a **#tag** and pressing `[ctrl]+[enter]` will open a _find-in-files_ panel pre-filled for searching for all notes containing this tag.
 
 
 ## Installation
@@ -314,6 +315,18 @@ Press `[#]+[?]` to ask for a list of all tags used in your note archive. You can
 
 Why is this experimental? Because it needs to scan all your notes everytime you invoke it. This is probably not very efficient in large note archives, so I consider its implementation experimental.
 
+### Searching for notes containing specific tags
+Like note-links, tags can also be "followed" by clicking them and pressing `[ctrl]+[enter]`. This will bring up a *find-in-files* panel, pre-filled with the clicked tag and your note archive folder.
+
+![tagsearch](https://user-images.githubusercontent.com/30892199/32421934-1e1411f0-c29d-11e7-8e08-7f7775e32542.png)
+
+Pressing `[enter]` will start the search and show the search results in a new tab.
+
+![tagresults](https://user-images.githubusercontent.com/30892199/32421958-52a9cdec-c29d-11e7-9240-1a229a82351e.png)
+
+**Note:** The *Find Results* tab will be re-used in subsequent searches. In the screen-shot above I have used a split layout; the results will always show up in the tab at the bottom.
+
+**Note:** If you set the parameter `show_tag_search_results_in_new_tab` to `false`, then no new tab will be created for search results. They will be displayed in a little sort of pop-up at the bottom of the window.
 
 ## Credits
 
