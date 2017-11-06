@@ -10,6 +10,15 @@ import sublime, sublime_plugin, os, re, subprocess, glob, datetime
 import threading
 
 
+class ZkConstants:
+    """
+    Some constants used over and over
+    """
+    Link_Prefix = '['
+    Link_Prefix_Len = len(Link_Prefix)
+    Link_Postfix = ']'
+
+
 def timestamp():
     return '{:%Y%m%d%H%M}'.format(datetime.datetime.now())
 
@@ -47,6 +56,7 @@ def find_all_tags_in(folder, extension):
         tags |= extract_tags(file)
     return list(tags)
 
+
 def tag_at(text, pos=None):
     """
     Searches for a ####tag inside of text.
@@ -78,47 +88,58 @@ def tag_at(text, pos=None):
     return '', (None, None)
 
 
+def select_link_in(view):
+    """
+    Used by different commands to select the link under the cursor, if
+    any.
+    """
+    region = view.sel()[0]
+
+    cursor_pos = region.begin()
+    line_region = view.line(cursor_pos)
+    line_start = line_region.begin()
+
+    linestart_till_cursor_str = view.substr(sublime.Region(line_start,
+        cursor_pos))
+    full_line = view.substr(line_region)
+
+    # search backwards from the cursor until we find [[
+    brackets_start = linestart_till_cursor_str.rfind(ZkConstants.Link_Prefix)
+
+    # search backwards from the cursor until we find ]]
+    # finding ]] would mean that we are outside of the link, behind the ]]
+    brackets_end_in_the_way = linestart_till_cursor_str.rfind(
+                                                    ZkConstants.Link_Postfix)
+
+    if brackets_end_in_the_way > brackets_start:
+        # behind closing brackets, finding the link would be unexpected
+        return
+
+    if brackets_start >= 0:
+        brackets_end = full_line[brackets_start:].find(ZkConstants.Link_Postfix)
+
+        if brackets_end >= 0:
+            link_region = sublime.Region(line_start + brackets_start +
+                ZkConstants.Link_Prefix_Len,
+                line_start + brackets_start + brackets_end)
+            return link_region
+    return
+
+
 class FollowWikiLinkCommand(sublime_plugin.TextCommand):
     """
-    Command that opens the note corresponding to a link the cursor is placed in.
+    Command that opens the note corresponding to a link the cursor is placed in
+    or a find-in-files for the tag the cursor is placed in.
     """
     Link_Prefix = '['
     Link_Prefix_Len = len(Link_Prefix)
     Link_Postfix = ']'
 
+
     def select_link(self):
-        region = self.view.sel()[0]
-
-        cursor_pos = region.begin()
-        line_region = self.view.line(cursor_pos)
-        line_start = line_region.begin()
-
-        linestart_till_cursor_str = self.view.substr(sublime.Region(line_start,
-            cursor_pos))
-        full_line = self.view.substr(line_region)
-
-        # search backwards from the cursor until we find [[
-        brackets_start = linestart_till_cursor_str.rfind(
-            FollowWikiLinkCommand.Link_Prefix)
-
-        # search backwards from the cursor until we find ]]
-        # finding ]] would mean that we are outside of the link, behind the ]]
-        brackets_end_in_the_way = linestart_till_cursor_str.rfind(
-            FollowWikiLinkCommand.Link_Postfix)
-
-        if brackets_end_in_the_way > brackets_start:
-            # behind closing brackets, finding the link would be unexpected
-            return
-
-        if brackets_start >= 0:
-            brackets_end = full_line[brackets_start:].find(
-                FollowWikiLinkCommand.Link_Postfix)
-
-            if brackets_end >= 0:
-                link_region = sublime.Region(line_start + brackets_start +
-                    FollowWikiLinkCommand.Link_Prefix_Len,
-                    line_start + brackets_start + brackets_end)
-                return link_region
+        link_region = select_link_in(self.view)
+        if link_region:
+            return link_region
 
         # test if we are supposed to follow a tag
         if '#' in linestart_till_cursor_str:
@@ -126,7 +147,7 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
             tag, (begin, end) = tag_at(full_line, cursor_pos_in_line)
 
             settings = sublime.load_settings('sublime_zk.sublime-settings')
-            new_tab = settings.get('show_tag_search_results_in_new_tab')
+            new_tab = settings.get('show_search_results_in_new_tab')
 
             # hack for the find in files panel: select tag in view, copy it
             selection = self.view.sel()
@@ -139,7 +160,6 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
                 "use_buffer": new_tab,})
             # now paste the tag --> it will land in the "find" field
             self.view.window().run_command("paste")
-
         return
 
     def run(self, edit):
@@ -183,6 +203,32 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
 
             create_note(the_file, selected_text)
             new_view = window.open_file(the_file)
+
+
+class ShowReferencingNotesCommand(sublime_plugin.TextCommand):
+    """
+    Command that opens a find-in-files for link under cursor.
+    """
+    def run(self, edit):
+        link_region = select_link_in(self.view)
+        if not link_region:
+            return
+
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        new_tab = settings.get('show_search_results_in_new_tab')
+
+        # hack for the find in files panel: select tag in view, copy it
+        selection = self.view.sel()
+        selection.clear()
+        selection.add(link_region)
+        self.view.window().run_command("copy")
+        self.view.window().run_command("show_panel",
+            {"panel": "find_in_files",
+            "where": get_path_for(self.view),
+            "use_buffer": new_tab,})
+        # now paste the note-id --> it will land in the "find" field
+        self.view.window().run_command("paste")
+        return
 
 
 class NewZettelCommand(sublime_plugin.WindowCommand):

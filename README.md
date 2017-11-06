@@ -13,6 +13,7 @@ See the [Usage](#usage) section below to see how this package might support your
 ## Features
 * This plugin enables you to place wiki style links like `[[this]]` or `[this]` into your notes to link to other notes in your note archive.
 * Clicking such a link and pressing `[ctrl]+[enter]` will open the corresponding note.
+* **New:** Clicking such a link and pressing `[alt]+[enter]` will open a _find-in-files_ panel pre-filled for searching all notes also referencing the linked note [('friend notes')](#searching-for-friends).
 * Typing `[[` will open a list of existing notes so you can quickly link to existing notes.
 * Typing `[ctrl]+[space]` will trigger note-link auto-completion for even quicker insertion of links to other notes.
 * Typing `[shift]+[enter]` lets you enter a name for a new note. The new note is then created with a new note ID.
@@ -296,9 +297,23 @@ The new note will be pre-filled with the following text:
 tags =
 
 ```
-## Working with tags
 
-### Getting an overview of all your tags
+### Searching for friends
+If you see a link in a note and wonder what **other** notes also reference this note, then that is easy enough to do: Just click inside the link and press `[alt]+[enter]`. This will bring up a _find-in-files_ panel, automatically pre-filled to search for the note-ID.
+
+![friend-search](https://user-images.githubusercontent.com/30892199/32442529-0aa52de8-c2fc-11e7-87fa-1f42b2a1c56b.png)
+
+Just press `[enter]` to start the search. The resulting notes will be displayed in a new tab "Find Results":
+
+![friend-results](https://user-images.githubusercontent.com/30892199/32442334-54ff1a76-c2fb-11e7-87ad-a551a9396f37.png)
+
+**Note:** The *Find Results* tab will be re-used in subsequent searches. In the screenshot above I have used a split layout; the results will always show up in the tab at the bottom.
+
+
+
+### Working with tags
+
+#### Getting an overview of all your tags
 Over time you might collect quite a number of **#tags** assigned to your notes. Sometimes it helps to get an overview of all of them, maybe to check for synonyms before creating a tag, etc.
 
 When you press `[#][!]` (that is the `#` key followed by the `!` key) quickly, a scratch file listing all your #tags will be created and showed right next to your text:
@@ -308,14 +323,14 @@ When you press `[#][!]` (that is the `#` key followed by the `!` key) quickly, a
 **Note:** If you don't like splitting your window, set the parameter `show_all_tags_in_new_pane` to `false`.
 
 
-### Experimental tag selector
+####Experimental tag selector
 Press `[#]+[?]` to ask for a list of all tags used in your note archive. You can narrow down the search and finally pick the tag you like.
 
 ![tagsel](https://user-images.githubusercontent.com/30892199/32405205-25f94bc0-c161-11e7-914a-1a82bdf9c2f9.png)
 
 Why is this experimental? Because it needs to scan all your notes everytime you invoke it. This is probably not very efficient in large note archives, so I consider its implementation experimental.
 
-### Searching for notes containing specific tags
+#### Searching for notes containing specific tags
 Like note-links, tags can also be "followed" by clicking them and pressing `[ctrl]+[enter]`. This will bring up a *find-in-files* panel, pre-filled with the clicked tag and your note archive folder.
 
 ![tagsearch](https://user-images.githubusercontent.com/30892199/32421934-1e1411f0-c29d-11e7-8e08-7f7775e32542.png)
@@ -326,7 +341,7 @@ Pressing `[enter]` will start the search and show the search results in a new ta
 
 **Note:** The *Find Results* tab will be re-used in subsequent searches. In the screen-shot above I have used a split layout; the results will always show up in the tab at the bottom.
 
-**Note:** If you set the parameter `show_tag_search_results_in_new_tab` to `false`, then no new tab will be created for search results. They will be displayed in a little sort of pop-up at the bottom of the window.
+**Note:** If you set the parameter `show_search_results_in_new_tab` to `false`, then no new tab will be created for search results. They will be displayed in a little sort of pop-up at the bottom of the window.
 
 ## Credits
 
