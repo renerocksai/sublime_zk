@@ -13,6 +13,7 @@ See the [Usage](#usage) section below to see how this package might support your
 ## Features
 * This plugin enables you to place wiki style links like `[[this]]` or `[this]` into your notes to link to other notes in your note archive.
 * Clicking such a link and pressing `[ctrl]+[enter]` will open the corresponding note.
+* Alternatively, double-clicking the link while holding the `[alt]` key down, will also open the corresponding note.
 * **New:** Clicking such a link and pressing `[alt]+[enter]` will open a _find-in-files_ panel pre-filled for searching all notes also referencing the linked note [('friend notes')](#searching-for-friends).
 * Typing `[[` will open a list of existing notes so you can quickly link to existing notes.
 * Typing `[ctrl]+[space]` will trigger note-link auto-completion for even quicker insertion of links to other notes.
@@ -25,6 +26,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * Typing `[#][!]` will create a scratch file containing all your **#tags**, sorted
 * **Experimental**: `[#][?]` opens up a list of all your **#tags** and lets you fuzzy search and select them (like note-links).
 * Clicking a **#tag** and pressing `[ctrl]+[enter]` will open a _find-in-files_ panel pre-filled for searching for all notes containing this tag.
+* Alternatively `[alt]` + double clicking the tag will do the same thing.
 
 
 ## Installation

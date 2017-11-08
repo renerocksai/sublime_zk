@@ -1,10 +1,10 @@
 """
-            ___.   .__  .__                            __
-  ________ _\_ |__ |  | |__| _____   ____      _______|  | __
- /  ___/  |  \ __ \|  | |  |/     \_/ __ \     \___   /  |/ /
- \___ \|  |  / \_\ \  |_|  |  Y Y  \  ___/      /    /|    <
-/____  >____/|___  /____/__|__|_|  /\___  >____/_____ \__|_ \
-     \/          \/              \/     \/_____/     \/    \/
+                  ___.   .__  .__                            __
+        ________ _\_ |__ |  | |__| _____   ____      _______|  | __
+       /  ___/  |  \ __ \|  | |  |/     \_/ __ \     \___   /  |/ /
+       \___ \|  |  / \_\ \  |_|  |  Y Y  \  ___/      /    /|    <
+      /____  >____/|___  /____/__|__|_|  /\___  >____/_____ \__|_ \
+           \/          \/              \/     \/_____/     \/    \/
 """
 import sublime, sublime_plugin, os, re, subprocess, glob, datetime
 import threading
@@ -113,7 +113,7 @@ def select_link_in(view):
 
     if brackets_end_in_the_way > brackets_start:
         # behind closing brackets, finding the link would be unexpected
-        return
+        return linestart_till_cursor_str, None
 
     if brackets_start >= 0:
         brackets_end = full_line[brackets_start:].find(ZkConstants.Link_Postfix)
@@ -122,8 +122,8 @@ def select_link_in(view):
             link_region = sublime.Region(line_start + brackets_start +
                 ZkConstants.Link_Prefix_Len,
                 line_start + brackets_start + brackets_end)
-            return link_region
-    return
+            return  linestart_till_cursor_str, link_region
+    return linestart_till_cursor_str, None
 
 
 class FollowWikiLinkCommand(sublime_plugin.TextCommand):
@@ -137,12 +137,17 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
 
 
     def select_link(self):
-        link_region = select_link_in(self.view)
+        linestart_till_cursor_str, link_region = select_link_in(self.view)
         if link_region:
             return link_region
 
         # test if we are supposed to follow a tag
         if '#' in linestart_till_cursor_str:
+            view = self.view
+            cursor_pos = view.sel()[0].begin()
+            line_region = view.line(cursor_pos)
+            line_start = line_region.begin()
+            full_line = view.substr(line_region)
             cursor_pos_in_line = cursor_pos - line_start
             tag, (begin, end) = tag_at(full_line, cursor_pos_in_line)
 
@@ -162,7 +167,7 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
             self.view.window().run_command("paste")
         return
 
-    def run(self, edit):
+    def run(self, edit, event=None):
         folder = get_path_for(self.view)
         if not folder:
             return
@@ -204,13 +209,16 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
             create_note(the_file, selected_text)
             new_view = window.open_file(the_file)
 
+    def want_event(self):
+        return True
+
 
 class ShowReferencingNotesCommand(sublime_plugin.TextCommand):
     """
     Command that opens a find-in-files for link under cursor.
     """
     def run(self, edit):
-        link_region = select_link_in(self.view)
+        linestart_till_cursor_str, link_region = select_link_in(self.view)
         if not link_region:
             return
 
@@ -449,8 +457,10 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
             if view.id() in map:
                 del map[view.id()]
 
-    """The entry point. Find all LINKs in view, store and highlight them"""
     def update_note_link_highlights(self, view):
+        """
+        The entry point. Find all LINKs in view, store and highlight them
+        """
         settings = sublime.load_settings('sublime_zk.sublime-settings')
         should_highlight = settings.get('highlight_note_links')
 
@@ -458,7 +468,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         if view.id() in NoteLinkHighlighter.ignored_views:
             return
 
-        note_links = view.find_by_selector('markup.zettel')
+        note_links = view.find_by_selector('markup.zettel.link')
         # update the regions to ignore the brackets
         note_links = [sublime.Region(n.a, n.b) for n in note_links]
 
@@ -481,11 +491,11 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         finally:
             NoteLinkHighlighter.highlight_semaphore.release()
 
-    """
-    Creates a set of regions from the intersection of note_links and scopes,
-    underlines all of them.
-    """
     def highlight_note_links(self, view, note_links):
+        """
+        Creates a set of regions from the intersection of note_links and scopes,
+        underlines all of them.
+        """
         settings = sublime.load_settings('sublime_zk.sublime-settings')
         show_bookmarks = settings.get('show_bookmarks_in_gutter')
 
@@ -502,8 +512,10 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
 
         self.update_view_scopes(view, scope_map.keys())
 
-    """Apply underlining to provided regions."""
     def underline_regions(self, view, scope_name, regions, show_bookmarks):
+        """
+        Apply underlining to provided regions.
+        """
         if show_bookmarks:
             symbol = 'bookmark'
         else:
@@ -518,11 +530,11 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
             flags=sublime.DRAW_NO_FILL |
                   sublime.DRAW_NO_OUTLINE | sublime.DRAW_SOLID_UNDERLINE)
 
-    """
-    Store new set of underlined scopes for view.
-    Erase underlining from scopes that were once used but are not anymore.
-    """
     def update_view_scopes(self, view, new_scopes):
+        """
+        Store new set of underlined scopes for view.
+        Erase underlining from scopes that were once used but are not anymore.
+        """
         old_scopes = NoteLinkHighlighter.scopes_for_view.get(view.id(), None)
         if old_scopes:
             unused_scopes = set(old_scopes) - set(new_scopes)

@@ -21,7 +21,7 @@ contexts:
             '4': punctuation.definition.footnote.begin.markdown
         - match: '( #[^ ]+)'
           captures:
-            '1': markup.italic
+            '1': markup.zettel.tag, markup.italic
         - match: '([\[]?\[)([0-9]{12})(\][\]]?)'
           captures:
             '1': punctuation.definition.footnote.begin.markdown

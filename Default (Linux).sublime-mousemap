@@ -1,0 +1,16 @@
+[
+
+	// Alt + Mouse 1 Column select
+	{
+		"button": "button1", "count": 2, "modifiers": ["alt"],
+		"press_command": "follow_wiki_link",
+		"context": [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "markup.zettel.link",
+                "match_all": true,
+            }
+        ]
+	},
+]
