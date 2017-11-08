@@ -150,6 +150,8 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
             full_line = view.substr(line_region)
             cursor_pos_in_line = cursor_pos - line_start
             tag, (begin, end) = tag_at(full_line, cursor_pos_in_line)
+            if not tag:
+                return
 
             settings = sublime.load_settings('sublime_zk.sublime-settings')
             new_tab = settings.get('show_search_results_in_new_tab')
