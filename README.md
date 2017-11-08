@@ -56,7 +56,7 @@ You should be all set.
 
 ### Installing The Silver Searcher
 
-This plugin can make use of `ag`, [The Silver Searcher](https://github.com/ggreer/the_silver_searcher), to dramatically speed up the [search for all tags](#getting-an-overview-of-all-your-tags) and the [tag selector](#experimental-tag-selector) features. According to its [Installation Instructions](https://github.com/ggreer/the_silver_searcher#installing), it is fairly easy to install on macOS and Linux:
+This plugin can make use of `ag`, [The Silver Searcher](https://github.com/ggreer/the_silver_searcher), to **dramatically speed up** and improve the [search for all tags](#getting-an-overview-of-all-your-tags), the [tag selector](#experimental-tag-selector), [tagged notes search](#searching-for-notes-containing-specific-tags), and [friend note search](#searching-for-friends) features. According to its [Installation Instructions](https://github.com/ggreer/the_silver_searcher#installing), it is fairly easy to install on macOS and Linux:
 
 ```bash
 # Mac OS X
