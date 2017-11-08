@@ -14,7 +14,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * This plugin enables you to place wiki style links like `[[this]]` or `[this]` into your notes to link to other notes in your note archive.
 * Clicking such a link and pressing `[ctrl]+[enter]` will open the corresponding note.
 * Alternatively, double-clicking the link while holding the `[alt]` key down, will also open the corresponding note.
-* Clicking such a link and pressing `[alt]+[enter]` will open a _find-in-files_ panel pre-filled for searching all notes also referencing the linked note [('friend notes')](#searching-for-friends).
+* Clicking such a link and pressing `[alt]+[enter]` will search for all notes also referencing the linked note [('friend notes')](#searching-for-friends).
 * Typing `[[` will open a list of existing notes so you can quickly link to existing notes.
 * Typing `[ctrl]+[space]` will trigger note-link auto-completion for even quicker insertion of links to other notes.
 * Typing `[shift]+[enter]` lets you enter a name for a new note. The new note is then created with a new note ID.
@@ -25,9 +25,9 @@ See the [Usage](#usage) section below to see how this package might support your
 * Highlighting of footnote references `[^like this one]`
 * Typing `[#][!]` will create a scratch file containing all your **#tags**, sorted
 * `[#][?]` opens up a list of all your **#tags** and lets you fuzzy search and select them (like note-links).
-* Clicking a **#tag** and pressing `[ctrl]+[enter]` will open a _find-in-files_ panel pre-filled for searching for all notes containing this tag.
+* Clicking a **#tag** and pressing `[ctrl]+[enter]` will search for all notes containing this tag.
 * Alternatively `[alt]` + double clicking the tag will do the same thing.
-* **New:** Initial support for `ag`, [The Silver Searcher](#installing-the-silver-searcher)
+* **New:** Support for `ag`, [The Silver Searcher](#installing-the-silver-searcher)
 
 ## Installation
 
