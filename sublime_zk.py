@@ -23,11 +23,22 @@ class ExternalSearch:
                 tags.add(line)
         return list(tags)
 
+    def search_tagged_notes(folder, extension, tag):
+        output = ExternalSearch.search_in(folder, tag, extension)
+        return output.split('\n')
+
+    def search_friend_notes(folder, extension, note_id):
+        regexp = '\[' + note_id + '\]'
+        output = ExternalSearch.search_in(folder, regexp, extension)
+        return output.split('\n')
+
     @staticmethod
     def search_in(folder, regexp, extension, tags=False):
-        args = [ExternalSearch.SEARCH_COMMAND]
+        args = [ExternalSearch.SEARCH_COMMAND, '--nocolor']
         if tags:
-            args.extend(['--nofilename', '--nonumbers', '-o', '--nocolor'])
+            args.extend(['--nofilename', '--nonumbers', '-o'])
+        else:
+            args.extend(['-l'])
         args.extend(['--silent', '--' + extension[1:], regexp,
             folder])
         output = b''
@@ -175,8 +186,18 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
     Link_Prefix_Len = len(Link_Prefix)
     Link_Postfix = ']'
 
+    def on_done(self, selection):
+        """
+        Called when the link was a tag, a tag picker was displayed, and a tag
+        was selected by the user.
+        """
+        if selection == -1:
+            return
+        the_file = os.path.join(self.folder, self.tagged_note_files[selection])
+        new_view = self.view.window().open_file(the_file)
 
     def select_link(self):
+        global F_EXT_SEARCH
         linestart_till_cursor_str, link_region = select_link_in(self.view)
         if link_region:
             return link_region
@@ -194,19 +215,33 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
                 return
 
             settings = sublime.load_settings('sublime_zk.sublime-settings')
-            new_tab = settings.get('show_search_results_in_new_tab')
 
-            # hack for the find in files panel: select tag in view, copy it
-            selection = self.view.sel()
-            selection.clear()
-            selection.add(sublime.Region(line_start + begin, line_start + end))
-            self.view.window().run_command("copy")
-            self.view.window().run_command("show_panel",
-                {"panel": "find_in_files",
-                "where": get_path_for(self.view),
-                "use_buffer": new_tab,})
-            # now paste the tag --> it will land in the "find" field
-            self.view.window().run_command("paste")
+            if F_EXT_SEARCH:
+                extension = settings.get('wiki_extension')
+                folder = get_path_for(self.view)
+                if not folder:
+                    return
+                self.folder = folder
+                self.tagged_note_files = ExternalSearch.search_tagged_notes(
+                    folder, extension, tag)
+                self.tagged_note_files = [os.path.basename(f) for f in
+                    self.tagged_note_files]
+                self.view.window().show_quick_panel(self.tagged_note_files,
+                    self.on_done)
+            else:
+                new_tab = settings.get('show_search_results_in_new_tab')
+
+                # hack for the find in files panel: select tag in view, copy it
+                selection = self.view.sel()
+                selection.clear()
+                selection.add(sublime.Region(line_start + begin, line_start + end))
+                self.view.window().run_command("copy")
+                self.view.window().run_command("show_panel",
+                    {"panel": "find_in_files",
+                    "where": get_path_for(self.view),
+                    "use_buffer": new_tab,})
+                # now paste the tag --> it will land in the "find" field
+                self.view.window().run_command("paste")
         return
 
     def run(self, edit, event=None):
@@ -258,26 +293,51 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
 class ShowReferencingNotesCommand(sublime_plugin.TextCommand):
     """
     Command that opens a find-in-files for link under cursor.
+    If ag is installed, it will show results in an overlay.
     """
+    def on_done(self, selection):
+        """
+        Called when a note was selected
+        """
+        if selection == -1:
+            return
+        the_file = os.path.join(self.folder, self.friend_note_files[selection])
+        new_view = self.view.window().open_file(the_file)
+
     def run(self, edit):
+        global F_EXT_SEARCH
         linestart_till_cursor_str, link_region = select_link_in(self.view)
         if not link_region:
             return
 
         settings = sublime.load_settings('sublime_zk.sublime-settings')
-        new_tab = settings.get('show_search_results_in_new_tab')
+        if F_EXT_SEARCH:
+            extension = settings.get('wiki_extension')
+            folder = get_path_for(self.view)
+            if not folder:
+                return
+            self.folder = folder
+            note_id = self.view.substr(link_region)
+            self.friend_note_files = ExternalSearch.search_friend_notes(
+                folder, extension, note_id)
+            self.friend_note_files = [os.path.basename(f) for f in
+                self.friend_note_files]
+            self.view.window().show_quick_panel(self.friend_note_files,
+                self.on_done)
+        else:
+            new_tab = settings.get('show_search_results_in_new_tab')
 
-        # hack for the find in files panel: select tag in view, copy it
-        selection = self.view.sel()
-        selection.clear()
-        selection.add(link_region)
-        self.view.window().run_command("copy")
-        self.view.window().run_command("show_panel",
-            {"panel": "find_in_files",
-            "where": get_path_for(self.view),
-            "use_buffer": new_tab,})
-        # now paste the note-id --> it will land in the "find" field
-        self.view.window().run_command("paste")
+            # hack for the find in files panel: select tag in view, copy it
+            selection = self.view.sel()
+            selection.clear()
+            selection.add(link_region)
+            self.view.window().run_command("copy")
+            self.view.window().run_command("show_panel",
+                {"panel": "find_in_files",
+                "where": get_path_for(self.view),
+                "use_buffer": new_tab,})
+            # now paste the note-id --> it will land in the "find" field
+            self.view.window().run_command("paste")
         return
 
 
@@ -374,8 +434,7 @@ class InsertWikiLinkCommand(sublime_plugin.TextCommand):
 
 class ZkTagSelectorCommand(sublime_plugin.TextCommand):
     """
-    Command that lets you choose one of all your notes and inserts a link to
-    the chosen note.
+    Command that lets you choose one of all your tags and inserts it.
     """
     def on_done(self, selection):
         if selection == -1:

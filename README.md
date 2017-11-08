@@ -325,7 +325,11 @@ tags =
 ```
 
 ### Searching for friends
-If you see a link in a note and wonder what **other** notes also reference this note, then that is easy enough to do: Just click inside the link and press `[alt]+[enter]`. This will bring up a _find-in-files_ panel, automatically pre-filled to search for the note-ID.
+If you see a link in a note and wonder what **other** notes also reference this note, then that is easy enough to do: Just click inside the link and press `[alt]+[enter]`.
+
+**Note:** If you have `ag` installed, the list of all referencing notes will pop up immediately, you can narrow it down by typing as usual, and select a note by pressing `[enter]` or clicking. The so-chosen note will then be opened.
+
+However, if `ag` is not installed, a _find-in-files_ panel will be opened, automatically pre-filled to search for the note-ID.
 
 ![friend-search](https://user-images.githubusercontent.com/30892199/32442529-0aa52de8-c2fc-11e7-87fa-1f42b2a1c56b.png)
 
@@ -358,7 +362,11 @@ Why is this experimental? Because it needs to scan all your notes everytime you 
 
 
 #### Searching for notes containing specific tags
-Like note-links, tags can also be "followed" by clicking them and pressing `[ctrl]+[enter]`. This will bring up a *find-in-files* panel, pre-filled with the clicked tag and your note archive folder.
+Like note-links, tags can also be "followed" by clicking them and pressing `[ctrl]+[enter]`.
+
+**Note:** If you have `ag` installed, the list of all referencing notes will pop up immediately, you can narrow it down by typing as usual, and select a note by pressing `[enter]` or clicking. The so-chosen note will then be opened.
+
+However, if `ag` is not installed, a _find-in-files_ panel will be opened, pre-filled with the clicked tag and your note archive folder.
 
 ![tagsearch](https://user-images.githubusercontent.com/30892199/32421934-1e1411f0-c29d-11e7-8e08-7f7775e32542.png)
 
