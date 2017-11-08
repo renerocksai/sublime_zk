@@ -10,6 +10,43 @@ import sublime, sublime_plugin, os, re, subprocess, glob, datetime
 import threading
 
 
+class ExternalSearch:
+    SEARCH_COMMAND = 'ag'
+    RE_TAGS = "(#+[^#\s]+)"
+    @staticmethod
+    def search_all_tags(folder, extension):
+        output = ExternalSearch.search_in(folder, ExternalSearch.RE_TAGS,
+            extension, tags=True)
+        tags = set()
+        for line in output.split('\n'):
+            if line:
+                tags.add(line)
+        return list(tags)
+
+    @staticmethod
+    def search_in(folder, regexp, extension, tags=False):
+        args = [ExternalSearch.SEARCH_COMMAND]
+        if tags:
+            args.extend(['--nofilename', '--nonumbers', '-o', '--nocolor'])
+        args.extend(['--silent', '--' + extension[1:], regexp,
+            folder])
+        output = b''
+        try:
+            output = subprocess.check_output(args, shell=False, timeout=10000)
+        except subprocess.CalledProcessError as e:
+            print('sublime_zk: search unsuccessful:')
+            print(e.returncode)
+            print(e.cmd)
+            for line in e.output.decode('utf-8').split('\n'):
+                print('    ', line)
+        except subprocess.TimeoutExpired:
+            print('sublime_zk: search timed out:', ' '.join(args))
+        return output.decode('utf-8')
+
+# global magic
+F_EXT_SEARCH = os.system('{} --help'.format(ExternalSearch.SEARCH_COMMAND)) == 0
+
+
 class ZkConstants:
     """
     Some constants used over and over
@@ -51,6 +88,9 @@ def get_all_notes_for(folder, extension):
                                                     if f.endswith(extension)]
 
 def find_all_tags_in(folder, extension):
+    global F_EXT_SEARCH
+    if F_EXT_SEARCH:
+        return ExternalSearch.search_all_tags(folder, extension)
     tags = set()
     for file in get_all_notes_for(folder, extension):
         tags |= extract_tags(file)
