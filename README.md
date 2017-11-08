@@ -14,7 +14,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * This plugin enables you to place wiki style links like `[[this]]` or `[this]` into your notes to link to other notes in your note archive.
 * Clicking such a link and pressing `[ctrl]+[enter]` will open the corresponding note.
 * Alternatively, double-clicking the link while holding the `[alt]` key down, will also open the corresponding note.
-* **New:** Clicking such a link and pressing `[alt]+[enter]` will open a _find-in-files_ panel pre-filled for searching all notes also referencing the linked note [('friend notes')](#searching-for-friends).
+* Clicking such a link and pressing `[alt]+[enter]` will open a _find-in-files_ panel pre-filled for searching all notes also referencing the linked note [('friend notes')](#searching-for-friends).
 * Typing `[[` will open a list of existing notes so you can quickly link to existing notes.
 * Typing `[ctrl]+[space]` will trigger note-link auto-completion for even quicker insertion of links to other notes.
 * Typing `[shift]+[enter]` lets you enter a name for a new note. The new note is then created with a new note ID.
@@ -24,10 +24,10 @@ See the [Usage](#usage) section below to see how this package might support your
 * Highlighting of #tags
 * Highlighting of footnote references `[^like this one]`
 * Typing `[#][!]` will create a scratch file containing all your **#tags**, sorted
-* **Experimental**: `[#][?]` opens up a list of all your **#tags** and lets you fuzzy search and select them (like note-links).
+* `[#][?]` opens up a list of all your **#tags** and lets you fuzzy search and select them (like note-links).
 * Clicking a **#tag** and pressing `[ctrl]+[enter]` will open a _find-in-files_ panel pre-filled for searching for all notes containing this tag.
 * Alternatively `[alt]` + double clicking the tag will do the same thing.
-
+* **New:** Initial support for `ag`, [The Silver Searcher](#installing-the-silver-searcher)
 
 ## Installation
 
@@ -54,6 +54,30 @@ The following steps cover all dependencies and prerequisites. Skip the steps you
 
 You should be all set.
 
+### Installing The Silver Searcher
+
+This plugin can make use of `ag`, [The Silver Searcher](https://github.com/ggreer/the_silver_searcher), to dramatically speed up the [search for all tags](#getting-an-overview-of-all-your-tags) and the [tag selector](#experimental-tag-selector) features. According to its [Installation Instructions](https://github.com/ggreer/the_silver_searcher#installing), it is fairly easy to install on macOS and Linux:
+
+```bash
+# Mac OS X
+brew install the_silver_searcher
+#  or
+port install the_silver_searcher
+
+#### linux
+
+# ubuntu
+apt-get install silversearcher-ag
+# fedora <= 21
+yum install the_silver_searcher
+# fedora >=22
+dnf install the_silver_searcher
+# openSUSE
+zypper install the_silver_searcher
+# ...
+```
+
+Unofficial third party binaries for Windows do [exist](https://github.com/k-takata/the_silver_searcher-win32/releases) but make sure: when you download them, you have to put them into a folder referenced by your `PATH` environment variable so they can be found by the plugin.
 
 ## Configuration
 
@@ -325,12 +349,13 @@ When you press `[#][!]` (that is the `#` key followed by the `!` key) quickly, a
 **Note:** If you don't like splitting your window, set the parameter `show_all_tags_in_new_pane` to `false`.
 
 
-####Experimental tag selector
+#### Experimental tag selector
 Press `[#]+[?]` to ask for a list of all tags used in your note archive. You can narrow down the search and finally pick the tag you like.
 
 ![tagsel](https://user-images.githubusercontent.com/30892199/32405205-25f94bc0-c161-11e7-914a-1a82bdf9c2f9.png)
 
-Why is this experimental? Because it needs to scan all your notes everytime you invoke it. This is probably not very efficient in large note archives, so I consider its implementation experimental.
+Why is this experimental? Because it needs to scan all your notes everytime you invoke it. This is probably not very efficient in large note archives, so I consider its implementation experimental. However, if you have `ag` [installed](#installing-the-silver-searcher), then you don't need to worry about that. _Ag_ will be detected and used automatically to speed things up a lot.
+
 
 #### Searching for notes containing specific tags
 Like note-links, tags can also be "followed" by clicking them and pressing `[ctrl]+[enter]`. This will bring up a *find-in-files* panel, pre-filled with the clicked tag and your note archive folder.
