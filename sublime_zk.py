@@ -57,8 +57,13 @@ class ExternalSearch:
             print('sublime_zk: search timed out:', ' '.join(args))
         return output.decode('utf-8')
 
+
 # global magic
 F_EXT_SEARCH = os.system('{} --help'.format(ExternalSearch.SEARCH_COMMAND)) == 0
+if F_EXT_SEARCH:
+    print('Sublime_ZK: Using ag!')
+else:
+    print('Sublime_ZK: Not using ag!')
 
 
 class ZkConstants:
