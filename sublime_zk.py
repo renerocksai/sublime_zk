@@ -41,7 +41,8 @@ class ExternalSearch:
             args.extend(['--nofilename', '--nonumbers', '-o'])
         else:
             args.extend(['-l'])
-        args.extend(['--silent', '--' + extension[1:], regexp,
+        # args.extend(['--silent', '--' + extension[1:], regexp,
+        args.extend(['--silent', '--markdown', regexp,
             folder])
         output = b''
         try:
