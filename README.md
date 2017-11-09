@@ -56,28 +56,15 @@ You should be all set.
 
 ### Installing The Silver Searcher
 
-This plugin can make use of `ag`, [The Silver Searcher](https://github.com/ggreer/the_silver_searcher), to **dramatically speed up** and improve the [search for all tags](#getting-an-overview-of-all-your-tags), the [tag selector](#experimental-tag-selector), [tagged notes search](#searching-for-notes-containing-specific-tags), and [friend note search](#searching-for-friends) features. According to its [Installation Instructions](https://github.com/ggreer/the_silver_searcher#installing), it is fairly easy to install on macOS and Linux:
+This plugin can make use of `ag`, [The Silver Searcher](https://github.com/ggreer/the_silver_searcher), to **dramatically speed up** and improve the [search for all tags](#getting-an-overview-of-all-your-tags), the [tag selector](#experimental-tag-selector), [tagged notes search](#searching-for-notes-containing-specific-tags), and [friend note search](#searching-for-friends) features. According to its [Installation Instructions](https://github.com/ggreer/the_silver_searcher#installing), it is fairly easy to install on macOS, Linux, BSD and Windows:
 
-```bash
-# Mac OS X
-brew install the_silver_searcher
-#  or
-port install the_silver_searcher
-
-#### linux
-
-# ubuntu
-apt-get install silversearcher-ag
-# fedora <= 21
-yum install the_silver_searcher
-# fedora >=22
-dnf install the_silver_searcher
-# openSUSE
-zypper install the_silver_searcher
-# ...
-```
-
-Unofficial third party binaries for Windows do [exist](https://github.com/k-takata/the_silver_searcher-win32/releases) but make sure: when you download them, you have to put them into a folder referenced by your `PATH` environment variable so they can be found by the plugin.
+- [macOS installation](https://github.com/ggreer/the_silver_searcher#macos)
+- [Linux installation](https://github.com/ggreer/the_silver_searcher#linux)
+- [BSD installation](https://github.com/ggreer/the_silver_searcher#bsd)
+- [Windows installation](https://github.com/ggreer/the_silver_searcher#windows)
+  - Alternate Windows installation using [Chocolatey](https://chocolatey.org/): `choco install ag`
+  - Alternate Windows installation using [Scoop](http://scoop.sh/): `scoop install ag`
+  - Note: If you use the [Unofficial daily builds](https://github.com/k-takata/the_silver_searcher-win32) make sure when you download them, to put them into a folder referenced by your PATH environment variable so they can be found by the plugin.
 
 ## Configuration
 
