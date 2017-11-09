@@ -23,10 +23,12 @@ class ExternalSearch:
                 tags.add(line)
         return list(tags)
 
+    @staticmethod
     def search_tagged_notes(folder, extension, tag):
         output = ExternalSearch.search_in(folder, tag, extension)
         return output.split('\n')
 
+    @staticmethod
     def search_friend_notes(folder, extension, note_id):
         regexp = '\[' + note_id + '\]'
         output = ExternalSearch.search_in(folder, regexp, extension)
