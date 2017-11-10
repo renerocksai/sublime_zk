@@ -20,7 +20,7 @@ class ZkConstants:
 
 
 class ExternalSearch:
-    SEARCH_COMMAND = 'ag'
+    SEARCH_COMMAND = 'agg'
     RE_TAGS = r"(?<=\s|^)(?<!`)(#+[^#\s.,\/!$%\^&\*;:{}\[\]'\"=`~()]+)"
     EXTERNALIZE = '.search_results.md'   # '' to skip
     @staticmethod
@@ -123,7 +123,14 @@ F_EXT_SEARCH = os.system('{} --help'.format(ExternalSearch.SEARCH_COMMAND)) == 0
 if F_EXT_SEARCH:
     print('Sublime_ZK: Using ag!')
 else:
-    print('Sublime_ZK: Not using ag!')
+    settings = sublime.load_settings('sublime_zk.sublime-settings')
+    ag = settings.get('path_to_ag')
+    if os.system(ag + ' --help') == 0:
+        ExternalSearch.SEARCH_COMMAND = ag
+        F_EXT_SEARCH = True
+        print('Sublime_ZK: Using ', ag)
+    else:
+        print('Sublime_ZK: Not using ag!')
 
 
 def timestamp():

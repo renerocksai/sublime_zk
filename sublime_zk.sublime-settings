@@ -24,4 +24,7 @@
     // show find results in a new tab?
     // false to disable: then they will be displayed at the bottom of the window
     "show_search_results_in_new_tab": true,
+
+    // fall-back: location of ag if it cannot be found in the PATH
+    "path_to_ag": "/usr/local/bin/ag",
 }
