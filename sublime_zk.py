@@ -13,7 +13,7 @@ import threading
 class ExternalSearch:
     SEARCH_COMMAND = 'ag'
     RE_TAGS = r"(?<=\s|^)(?<!`)(#+[^#\s.,\/!$%\^&\*;:{}\[\]'\"=`~()]+)"
-
+    EXTERNALIZE = '.search_results.md'   # '' to skip
     @staticmethod
     def search_all_tags(folder, extension):
         output = ExternalSearch.search_in(folder, ExternalSearch.RE_TAGS,
@@ -22,17 +22,24 @@ class ExternalSearch:
         for line in output.split('\n'):
             if line:
                 tags.add(line)
+        if ExternalSearch.EXTERNALIZE:
+            with open(ExternalSearch.external_file(folder), mode='w',
+                    encoding='utf-8') as f:
+                for tag in sorted(tags):
+                    f.write(u' {}\n'.format(tag))
         return list(tags)
 
     @staticmethod
     def search_tagged_notes(folder, extension, tag):
         output = ExternalSearch.search_in(folder, tag, extension)
+        ExternalSearch.externalize_note_links(output, folder)
         return output.split('\n')
 
     @staticmethod
     def search_friend_notes(folder, extension, note_id):
         regexp = '\[' + note_id + '\]'
         output = ExternalSearch.search_in(folder, regexp, extension)
+        ExternalSearch.externalize_note_links(output, folder)
         return output.split('\n')
 
     @staticmethod
@@ -45,6 +52,10 @@ class ExternalSearch:
         # args.extend(['--silent', '--' + extension[1:], regexp,
         args.extend(['--silent', '--markdown', regexp,
             folder])
+        return ExternalSearch.run(args, folder)
+
+    @staticmethod
+    def run(args, folder):
         output = b''
         try:
             output = subprocess.check_output(args, shell=False, timeout=10000)
@@ -57,6 +68,24 @@ class ExternalSearch:
         except subprocess.TimeoutExpired:
             print('sublime_zk: search timed out:', ' '.join(args))
         return output.decode('utf-8')
+
+    @staticmethod
+    def externalize_note_links(ag_out, folder):
+        if ExternalSearch.EXTERNALIZE:
+            with open(ExternalSearch.external_file(folder),
+                mode='w', encoding='utf-8') as f:
+                for line in ag_out.split('\n'):
+                    if not line.strip():
+                        continue
+                    note_id, title = line.split(' ', 1)
+                    note_id = os.path.basename(note_id)
+                    f.write(u'[[{}]] {}\n'.format(note_id, title))
+
+    @staticmethod
+    def external_file(folder):
+        return os.path.join(folder, ExternalSearch.EXTERNALIZE)
+
+
 
 
 # global magic
@@ -233,10 +262,14 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
                 self.folder = folder
                 self.tagged_note_files = ExternalSearch.search_tagged_notes(
                     folder, extension, tag)
-                self.tagged_note_files = [os.path.basename(f) for f in
-                    self.tagged_note_files]
-                self.view.window().show_quick_panel(self.tagged_note_files,
-                    self.on_done)
+                if ExternalSearch.EXTERNALIZE:
+                    self.view.window().open_file(ExternalSearch.external_file(
+                        folder))
+                else:
+                    self.tagged_note_files = [os.path.basename(f) for f in
+                        self.tagged_note_files]
+                    self.view.window().show_quick_panel(self.tagged_note_files,
+                        self.on_done)
             else:
                 new_tab = settings.get('show_search_results_in_new_tab')
 
@@ -331,8 +364,12 @@ class ShowReferencingNotesCommand(sublime_plugin.TextCommand):
                 folder, extension, note_id)
             self.friend_note_files = [os.path.basename(f) for f in
                 self.friend_note_files]
-            self.view.window().show_quick_panel(self.friend_note_files,
-                self.on_done)
+            if ExternalSearch.EXTERNALIZE:
+                self.view.window().open_file(ExternalSearch.external_file(
+                    folder))
+            else:
+                self.view.window().show_quick_panel(self.friend_note_files,
+                    self.on_done)
         else:
             new_tab = settings.get('show_search_results_in_new_tab')
 
@@ -488,23 +525,26 @@ class ZkShowAllTagsCommand(sublime_plugin.WindowCommand):
         new_pane = settings.get('show_all_tags_in_new_pane')
 
         tags = find_all_tags_in(folder, extension)
-        tags.sort()
-
-        if new_pane:
-            self.window.run_command('set_layout', {
-                'cols': [0.0, 0.5, 1.0],
-                'rows': [0.0, 1.0],
-                'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
-            })
-            # goto right-hand pane
-            self.window.focus_group(1)
-        tagview = self.window.new_file()
-        tagview.set_name('Tags')
-        tagview.set_scratch(True)
-        tagview.run_command("insert",{"characters": ' ' + '\n'.join(tags)})
-        tagview.set_syntax_file('Packages/sublime_zk/sublime_zk.sublime-syntax')
-        # return back to note
-        self.window.focus_group(0)
+        if ExternalSearch.EXTERNALIZE:
+            self.window.open_file(ExternalSearch.external_file(folder))
+        else:
+            tags.sort()
+            if new_pane:
+                self.window.run_command('set_layout', {
+                    'cols': [0.0, 0.5, 1.0],
+                    'rows': [0.0, 1.0],
+                    'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
+                })
+                # goto right-hand pane
+                self.window.focus_group(1)
+            tagview = self.window.new_file()
+            tagview.set_name('Tags')
+            tagview.set_scratch(True)
+            tagview.run_command("insert",{"characters": ' ' + '\n'.join(tags)})
+            tagview.set_syntax_file(
+                'Packages/sublime_zk/sublime_zk.sublime-syntax')
+            # return back to note
+            self.window.focus_group(0)
 
 
 
