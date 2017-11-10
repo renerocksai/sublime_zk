@@ -20,7 +20,7 @@ class ZkConstants:
 
 
 class ExternalSearch:
-    SEARCH_COMMAND = 'agg'
+    SEARCH_COMMAND = 'ag'
     RE_TAGS = r"(?<=\s|^)(?<!`)(#+[^#\s.,\/!$%\^&\*;:{}\[\]'\"=`~()]+)"
     EXTERNALIZE = '.search_results.md'   # '' to skip
     @staticmethod
