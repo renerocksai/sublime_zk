@@ -66,6 +66,13 @@ This plugin can make use of `ag`, [The Silver Searcher](https://github.com/ggree
   - Alternate Windows installation using [Scoop](http://scoop.sh/): `scoop install ag`
   - Note: If you use the [Unofficial daily builds](https://github.com/k-takata/the_silver_searcher-win32) make sure when you download them, to put them into a folder referenced by your PATH environment variable so they can be found by the plugin.
 
+**Note:** You **really want** to install _The Silver Searcher_. It makes this plugin much more useful. If `ag` is present, the plugin makes use of a permanent search results file that gets updated with the results of searches for tags, referencing notes, the tag list, etc. This really shines when [searching for tagged notes](#searching-for-notes-containing-specific-tags) and [searching for friend notes](#searching-for-friends).
+
+The permanent search results file is like a navigation-window and is especially useful when using a non-single layout, like in this screenshot:
+
+![silver-tags](https://user-images.githubusercontent.com/30892199/32641877-b27b28fc-c5d0-11e7-89ac-20f1f83db586.png)
+
+
 ## Configuration
 
 
@@ -314,7 +321,9 @@ tags =
 ### Searching for friends
 If you see a link in a note and wonder what **other** notes also reference this note, then that is easy enough to do: Just click inside the link and press `[alt]+[enter]`.
 
-**Note:** If you have `ag` installed, the list of all referencing notes will pop up immediately, you can narrow it down by typing as usual, and select a note by pressing `[enter]` or clicking. The so-chosen note will then be opened.
+**Note:** If you have `ag` installed, the list of all referencing notes will pop up immediately in the permanent search result file:
+
+![silver-friends](https://user-images.githubusercontent.com/30892199/32641876-b25dae12-c5d0-11e7-8e03-f9b204902771.png)
 
 However, if `ag` is not installed, a _find-in-files_ panel will be opened, automatically pre-filled to search for the note-ID.
 
@@ -339,6 +348,9 @@ When you press `[#][!]` (that is the `#` key followed by the `!` key) quickly, a
 
 **Note:** If you don't like splitting your window, set the parameter `show_all_tags_in_new_pane` to `false`.
 
+Of course, if you have `ag` installed, the permanent search file will be used to display all your tags:
+
+![silver-tags](https://user-images.githubusercontent.com/30892199/32641877-b27b28fc-c5d0-11e7-89ac-20f1f83db586.png)
 
 #### Experimental tag selector
 Press `[#]+[?]` to ask for a list of all tags used in your note archive. You can narrow down the search and finally pick the tag you like.
@@ -351,7 +363,9 @@ Why is this experimental? Because it needs to scan all your notes everytime you 
 #### Searching for notes containing specific tags
 Like note-links, tags can also be "followed" by clicking them and pressing `[ctrl]+[enter]`.
 
-**Note:** If you have `ag` installed, the list of all referencing notes will pop up immediately, you can narrow it down by typing as usual, and select a note by pressing `[enter]` or clicking. The so-chosen note will then be opened.
+**Note:** If you have `ag` installed, the list of all referencing notes will pop up immediately in the permanent search results file:
+
+![silver-follow-tag](https://user-images.githubusercontent.com/30892199/32641875-b241e6fa-c5d0-11e7-819a-4705396f633b.png)
 
 However, if `ag` is not installed, a _find-in-files_ panel will be opened, pre-filled with the clicked tag and your note archive folder.
 
@@ -361,7 +375,7 @@ Pressing `[enter]` will start the search and show the search results in a new ta
 
 ![tagresults](https://user-images.githubusercontent.com/30892199/32421958-52a9cdec-c29d-11e7-9240-1a229a82351e.png)
 
-**Note:** The *Find Results* tab will be re-used in subsequent searches. In the screen-shot above I have used a split layout; the results will always show up in the tab at the bottom.
+**Note:** The *Find Results* tab will be re-used in subsequent searches. In the screenshot above I have used a split layout; the results will always show up in the tab at the bottom.
 
 **Note:** If you set the parameter `show_search_results_in_new_tab` to `false`, then no new tab will be created for search results. They will be displayed in a little sort of pop-up at the bottom of the window.
 

@@ -10,6 +10,15 @@ import sublime, sublime_plugin, os, re, subprocess, glob, datetime
 import threading
 
 
+class ZkConstants:
+    """
+    Some constants used over and over
+    """
+    Link_Prefix = '['
+    Link_Prefix_Len = len(Link_Prefix)
+    Link_Postfix = ']'
+
+
 class ExternalSearch:
     SEARCH_COMMAND = 'ag'
     RE_TAGS = r"(?<=\s|^)(?<!`)(#+[^#\s.,\/!$%\^&\*;:{}\[\]'\"=`~()]+)"
@@ -32,14 +41,16 @@ class ExternalSearch:
     @staticmethod
     def search_tagged_notes(folder, extension, tag):
         output = ExternalSearch.search_in(folder, tag, extension)
-        ExternalSearch.externalize_note_links(output, folder)
+        prefix = 'Notes tagged with {}:'.format(tag)
+        ExternalSearch.externalize_note_links(output, folder, prefix)
         return output.split('\n')
 
     @staticmethod
     def search_friend_notes(folder, extension, note_id):
         regexp = '\[' + note_id + '\]'
         output = ExternalSearch.search_in(folder, regexp, extension)
-        ExternalSearch.externalize_note_links(output, folder)
+        prefix = 'Notes referencing [[{}]]:'.format(note_id)
+        ExternalSearch.externalize_note_links(output, folder, prefix)
         return output.split('\n')
 
     @staticmethod
@@ -70,13 +81,19 @@ class ExternalSearch:
         return output.decode('utf-8')
 
     @staticmethod
-    def externalize_note_links(ag_out, folder):
+    def externalize_note_links(ag_out, folder, prefix=None):
         if ExternalSearch.EXTERNALIZE:
+            settings = sublime.load_settings('sublime_zk.sublime-settings')
+            extension = settings.get('wiki_extension')
             with open(ExternalSearch.external_file(folder),
                 mode='w', encoding='utf-8') as f:
+                if prefix:
+                    f.write(u'{}\n\n'.format(prefix))
                 for line in ag_out.split('\n'):
                     if not line.strip():
                         continue
+                    if line.endswith(extension):
+                        line = line.replace(extension, '')
                     note_id, title = line.split(' ', 1)
                     note_id = os.path.basename(note_id)
                     f.write(u'[[{}]] {}\n'.format(note_id, title))
@@ -86,23 +103,12 @@ class ExternalSearch:
         return os.path.join(folder, ExternalSearch.EXTERNALIZE)
 
 
-
-
 # global magic
 F_EXT_SEARCH = os.system('{} --help'.format(ExternalSearch.SEARCH_COMMAND)) == 0
 if F_EXT_SEARCH:
     print('Sublime_ZK: Using ag!')
 else:
     print('Sublime_ZK: Not using ag!')
-
-
-class ZkConstants:
-    """
-    Some constants used over and over
-    """
-    Link_Prefix = '['
-    Link_Prefix_Len = len(Link_Prefix)
-    Link_Postfix = ']'
 
 
 def timestamp():
