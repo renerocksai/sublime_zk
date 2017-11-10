@@ -12,7 +12,8 @@ import threading
 
 class ExternalSearch:
     SEARCH_COMMAND = 'ag'
-    RE_TAGS = "(#+[^#\s]+)"
+    RE_TAGS = r"(?<=\s|^)(?<!`)(#+[^#\s.,\/!$%\^&\*;:{}\[\]'\"=`~()]+)"
+
     @staticmethod
     def search_all_tags(folder, extension):
         output = ExternalSearch.search_in(folder, ExternalSearch.RE_TAGS,
