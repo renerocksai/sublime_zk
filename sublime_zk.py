@@ -49,7 +49,14 @@ class ExternalSearch:
     def search_friend_notes(folder, extension, note_id):
         regexp = '\[' + note_id + '\]'
         output = ExternalSearch.search_in(folder, regexp, extension)
-        prefix = 'Notes referencing [[{}]]:'.format(note_id)
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        link_prefix = '[['
+        link_postfix = ']]'
+        if not settings.get('double_brackets', True):
+            link_prefix = '['
+            link_postfix = ']'
+        prefix = 'Notes referencing {}{}{}:'.format(link_prefix, note_id,
+            link_postfix)
         ExternalSearch.externalize_note_links(output, folder, prefix)
         return output.split('\n')
 
@@ -85,6 +92,12 @@ class ExternalSearch:
         if ExternalSearch.EXTERNALIZE:
             settings = sublime.load_settings('sublime_zk.sublime-settings')
             extension = settings.get('wiki_extension')
+            link_prefix = '[['
+            link_postfix = ']]'
+            if not settings.get('double_brackets', True):
+                link_prefix = '['
+                link_postfix = ']'
+
             with open(ExternalSearch.external_file(folder),
                 mode='w', encoding='utf-8') as f:
                 if prefix:
@@ -96,7 +109,9 @@ class ExternalSearch:
                         line = line.replace(extension, '')
                     note_id, title = line.split(' ', 1)
                     note_id = os.path.basename(note_id)
-                    f.write(u'[[{}]] {}\n'.format(note_id, title))
+
+                    f.write(u'{}{}{} {}\n'.format(link_prefix, note_id,
+                        link_postfix, title))
 
     @staticmethod
     def external_file(folder):
