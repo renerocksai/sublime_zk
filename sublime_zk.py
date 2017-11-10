@@ -124,7 +124,7 @@ if F_EXT_SEARCH:
     print('Sublime_ZK: Using ag!')
 else:
     settings = sublime.load_settings('sublime_zk.sublime-settings')
-    ag = settings.get('path_to_ag')
+    ag = settings.get('path_to_ag', '/usr/local/bin/ag')
     if os.system(ag + ' --help') == 0:
         ExternalSearch.SEARCH_COMMAND = ag
         F_EXT_SEARCH = True
