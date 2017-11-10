@@ -1,6 +1,6 @@
 # Sublime ZK
 
-This is a plugin for SublimeText3 to enable ID-based, Wiki-style links in your documents.
+This is a plugin for SublimeText3 to enable ID-based, Wiki-style links, and #tags in your documents.
 
 If you follow the (plain-text) Zettelkasten method (as proposed by [Zettelkasten.de](https://zettelkasten.de)), this might appeal to you.
 
