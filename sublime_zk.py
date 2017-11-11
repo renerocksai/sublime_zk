@@ -17,6 +17,7 @@ class ZkConstants:
     Link_Prefix = '['
     Link_Prefix_Len = len(Link_Prefix)
     Link_Postfix = ']'
+    Link_Matcher = re.compile('(\[+)([0-9]{12})(\]+)')
 
 
 class ExternalSearch:
@@ -150,6 +151,12 @@ def get_path_for(view):
         folder = os.path.abspath(view.window().folders()[0])
     return folder
 
+def note_file_by_id(note_id, folder, extension):
+    the_file = os.path.join(folder, note_id + '*')
+    candidates = [f for f in glob.glob(the_file) if f.endswith(extension)]
+    if len(candidates) > 0:
+        return candidates[0]
+
 def extract_tags(file):
     tags = set()
     with open(file, mode='r', encoding='utf-8') as f:
@@ -243,6 +250,119 @@ def select_link_in(view):
     return linestart_till_cursor_str, None
 
 
+class TextProduction:
+    """
+    §
+    Static class grouping functions for text production from overview notes.
+    """
+    @staticmethod
+    def read_full_note(note_id, folder, extension):
+        note_file = note_file_by_id(note_id, folder, extension)
+        if not note_file:
+            return None, None
+        with open(note_file, mode='r', encoding='utf-8') as f:
+            return note_file, f.read()
+
+    @staticmethod
+    def expand_links(text, folder, extension, replace_lines=False):
+        result_lines = []
+        for line in text.split('\n'):
+            link_results = ZkConstants.Link_Matcher.findall(line)
+            if link_results:
+                if not replace_lines:
+                    result_lines.append(line)
+                for pre, note_id, post in link_results:
+                    note_file, content = TextProduction.read_full_note(note_id,
+                        folder, extension)
+                    if not content:
+                        header = '\n<!-- Note not found: ' + note_id + ' -->'
+                    else:
+                        filename = os.path.basename(note_file).replace(
+                            extension, '')
+                        filename = filename.split(' ', 1)[1]
+                        header = pre + note_id + post + ' ' + filename
+                        header = '\n<!-- !    ' + header + '    -->'
+                        footer = '<!-- (End of note ' + note_id + ') -->'
+                        result_lines.append(header)
+                        result_lines.extend(content.split('\n'))
+                    result_lines.append(footer)
+            else:
+                result_lines.append(line)
+        return '\n'.join(result_lines)
+
+    def refresh_result(text, folder, extension):
+        result_lines = []
+        state = 'default'
+        note_id = pre = post = None
+
+        for line in text.split('\n'):
+            if state == 'skip_lines':
+                if not line.startswith('<!-- (End of note'):
+                    continue
+                # insert note
+                note_file, content = TextProduction.read_full_note(note_id,
+                    folder, extension)
+                if not content:
+                    header = '\n<!-- Note not found: ' + note_id + ' -->'
+                else:
+                    filename = os.path.basename(note_file).replace(
+                        extension, '')
+                    filename = filename.split(' ', 1)[1]
+                    header = pre + note_id + post + ' ' + filename
+                    header = '<!-- !    ' + header + '    -->'
+                    footer = '<!-- (End of note ' + note_id + ') -->'
+                    result_lines.append(header)
+                    result_lines.extend(content.split('\n'))
+                result_lines.append(footer)
+                state = 'default'
+                continue
+
+            if line.startswith('<!-- !'):
+                # get note id
+                note_links = ZkConstants.Link_Matcher.findall(line)
+                if note_links:
+                    pre, note_id, post = note_links[0]
+                    state = 'skip_lines'
+            else:
+                result_lines.append(line)
+        return '\n'.join(result_lines)
+
+
+class ExpandOverviewNoteCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        folder = get_path_for(self.view)
+        if not folder:
+            return
+
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        extension = settings.get('wiki_extension')
+
+        complete_text = self.view.substr(sublime.Region(0, self.view.size()))
+        result_text = TextProduction.expand_links(complete_text, folder,
+            extension, replace_lines=True)
+        new_view = self.view.window().new_file()
+        new_view.set_syntax_file(
+            'Packages/sublime_zk/sublime_zk.sublime-syntax')
+        new_view.run_command("insert", {"characters": result_text})
+
+
+class RefreshExpandedNoteCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        folder = get_path_for(self.view)
+        if not folder:
+            return
+
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        extension = settings.get('wiki_extension')
+        complete_region = sublime.Region(0, self.view.size())
+        complete_text = self.view.substr(complete_region)
+        result_text = TextProduction.refresh_result(complete_text, folder,
+            extension)
+        self.view.replace(edit, complete_region, result_text)
+
+
+
+
 class FollowWikiLinkCommand(sublime_plugin.TextCommand):
     """
     Command that opens the note corresponding to a link the cursor is placed in
@@ -334,12 +454,9 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
 
         # search for file starting with text between the brackets (usually
         # the ID)
-        the_file = os.path.join(folder, selected_text + '*')
-        candidates = [f for f in glob.glob(the_file) if f.endswith(extension)]
-        # print('Candidates: for glob {} : {}'.format(the_file, candidates))
+        the_file = note_file_by_id(selected_text, folder, extension)
 
-        if len(candidates) > 0:
-            the_file = candidates[0]
+        if the_file:
             new_view = window.open_file(the_file)
         else:
             # suppose you have entered "[[my new note]]", then we are going to
