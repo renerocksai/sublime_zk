@@ -2,7 +2,7 @@
 
 This is a plugin for SublimeText3 to enable ID-based, Wiki-style links, and #tags in your documents.
 
-If you follow the (plain-text) Zettelkasten method (as proposed by [Zettelkasten.de](https://zettelkasten.de) or [How to take smart notes](http://takesmartnotes.com/#moreinfo)), this might appeal to you.
+If you follow the (plain-text) Zettelkasten method (as proposed by [Zettelkasten.de](https://zettelkasten.de) or [takesmartnotes.com](http://takesmartnotes.com/#moreinfo)), this might appeal to you.
 
 In short, it helps you manage an archive of interlinked notes that look like this:
 
