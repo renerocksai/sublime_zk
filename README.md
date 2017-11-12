@@ -11,7 +11,7 @@ In short, it helps you manage an archive of interlinked notes that look like thi
 See the [Usage](#usage) section below to see how this package might support your workflow.
 
 ## Features
-* This plugin enables you to place wiki style links like `[[this]]` or `[this]` into your notes to link to other notes in your note archive.
+* This plugin enables you to place wiki style links like `[[this]]` or `[this]` (and old-school links like this `§201711111709`) into your notes to link to other notes in your note archive.
 * Clicking such a link and pressing `[ctrl]+[enter]` will open the corresponding note.
 * Alternatively, double-clicking the link while holding the `[alt]` key down, will also open the corresponding note.
 * Clicking such a link and pressing `[alt]+[enter]` will search for all notes also referencing the linked note [('friend notes')](#searching-for-friends).
