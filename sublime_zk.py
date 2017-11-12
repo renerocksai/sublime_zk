@@ -154,13 +154,15 @@ if F_EXT_SEARCH:
 else:
     settings = sublime.load_settings('sublime_zk.sublime-settings')
     ag = settings.get('path_to_ag', '/usr/local/bin/ag')
-    if os.system(ag + ' --help') == 0:
-        ExternalSearch.SEARCH_COMMAND = ag
-        F_EXT_SEARCH = True
-        print('Sublime_ZK: Using ', ag)
+    if ag:
+        if os.system(ag + ' --help') == 0:
+            ExternalSearch.SEARCH_COMMAND = ag
+            F_EXT_SEARCH = True
+            print('Sublime_ZK: Using ', ag)
+        else:
+            print('Sublime_ZK: Not using ag!')
     else:
         print('Sublime_ZK: Not using ag!')
-
 
 def timestamp():
     return '{:%Y%m%d%H%M}'.format(datetime.datetime.now())
