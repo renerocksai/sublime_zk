@@ -17,8 +17,10 @@ class ZkConstants:
     Link_Prefix = '['
     Link_Prefix_Len = len(Link_Prefix)
     Link_Postfix = ']'
-    P_Symbol = '§'
-    Link_Matcher = re.compile('(\[+)([0-9]{12})(\]+)')
+    Link_Matcher = re.compile('(\[+|§)([0-9]{12})(\]+|.)')
+    # Above RE doesn't really care about closing ] andymore
+    # This works in our favour so we support [[201711122259 This is a note]]
+    # when expanding overview notes
 
 
 class ExternalSearch:
@@ -62,7 +64,7 @@ class ExternalSearch:
         """
         Return a list of notes referencing note_id.
         """
-        regexp = '\[' + note_id + '\]'
+        regexp = '(\[' + note_id + '\])|(§' + note_id + ')'
         output = ExternalSearch.search_in(folder, regexp, extension)
         settings = sublime.load_settings('sublime_zk.sublime-settings')
         link_prefix = '[['
@@ -264,6 +266,7 @@ def select_link_in(view):
     """
     Used by different commands to select the link under the cursor, if
     any.
+    Return the
     """
     region = view.sel()[0]
 
@@ -276,7 +279,15 @@ def select_link_in(view):
     full_line = view.substr(line_region)
 
     # hack for § links
-    p_symbol_pos = linestart_till_cursor_str.rfind(ZkConstants.Link_Prefix)
+    p_symbol_pos = linestart_till_cursor_str.rfind('§')
+    if p_symbol_pos >= 0:
+        p_link_start = line_start + p_symbol_pos + 1
+        p_link_end = p_link_start + 12
+        # check if it's a numeric link
+        if re.match('§[0-9]{12}', full_line[p_symbol_pos:]):
+            return linestart_till_cursor_str, sublime.Region(p_link_start,
+                p_link_end)
+
     # search backwards from the cursor until we find [[
     brackets_start = linestart_till_cursor_str.rfind(ZkConstants.Link_Prefix)
 
@@ -435,10 +446,6 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
     Command that opens the note corresponding to a link the cursor is placed in
     or searches for the tag under the cursor.
     """
-    Link_Prefix = '['
-    Link_Prefix_Len = len(Link_Prefix)
-    Link_Postfix = ']'
-
     def on_done(self, selection):
         """
         Called when the link was a tag, a tag picker overlay was displayed, and
