@@ -400,9 +400,13 @@ class ExpandOverviewNoteCommand(sublime_plugin.TextCommand):
         result_text = TextProduction.expand_links(complete_text, folder,
             extension, replace_lines=True)
         new_view = self.view.window().new_file()
+
+        # don't: this causes auto-indent:
+        # new_view.run_command("insert", {"characters": result_text})
+        new_view.insert(edit, 0, result_text)   # no auto-indent
+        # set syntax late, seems to speed insertion up
         new_view.set_syntax_file(
             'Packages/sublime_zk/sublime_zk.sublime-syntax')
-        new_view.run_command("insert", {"characters": result_text})
 
 
 class RefreshExpandedNoteCommand(sublime_plugin.TextCommand):
