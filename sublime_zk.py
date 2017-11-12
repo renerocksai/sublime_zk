@@ -17,6 +17,7 @@ class ZkConstants:
     Link_Prefix = '['
     Link_Prefix_Len = len(Link_Prefix)
     Link_Postfix = ']'
+    P_Symbol = '§'
     Link_Matcher = re.compile('(\[+)([0-9]{12})(\]+)')
 
 
@@ -274,6 +275,8 @@ def select_link_in(view):
         cursor_pos))
     full_line = view.substr(line_region)
 
+    # hack for § links
+    p_symbol_pos = linestart_till_cursor_str.rfind(ZkConstants.Link_Prefix)
     # search backwards from the cursor until we find [[
     brackets_start = linestart_till_cursor_str.rfind(ZkConstants.Link_Prefix)
 

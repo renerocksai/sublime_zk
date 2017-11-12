@@ -28,3 +28,7 @@ contexts:
             '1': punctuation.definition.footnote.begin.markdown
             '2': markup.zettel.link
             '3': punctuation.definition.footnote.begin.markdown
+        - match: '(§)([0-9]{12})'
+          captures:
+            '1': punctuation.definition.footnote.begin.markdown
+            '2': markup.zettel.link
