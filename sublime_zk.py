@@ -21,11 +21,18 @@ class ZkConstants:
 
 
 class ExternalSearch:
+    """
+    Static class to group all external search related functions.
+    """
     SEARCH_COMMAND = 'ag'
     RE_TAGS = r"(?<=\s|^)(?<!`)(#+[^#\s.,\/!$%\^&\*;:{}\[\]'\"=`~()]+)"
     EXTERNALIZE = '.search_results.md'   # '' to skip
+
     @staticmethod
     def search_all_tags(folder, extension):
+        """
+        Create a list of all #tags of all notes in folder.
+        """
         output = ExternalSearch.search_in(folder, ExternalSearch.RE_TAGS,
             extension, tags=True)
         tags = set()
@@ -41,6 +48,9 @@ class ExternalSearch:
 
     @staticmethod
     def search_tagged_notes(folder, extension, tag):
+        """
+        Return a list of note files containing #tag.
+        """
         output = ExternalSearch.search_in(folder, tag, extension)
         prefix = 'Notes tagged with {}:'.format(tag)
         ExternalSearch.externalize_note_links(output, folder, prefix)
@@ -48,6 +58,9 @@ class ExternalSearch:
 
     @staticmethod
     def search_friend_notes(folder, extension, note_id):
+        """
+        Return a list of notes referencing note_id.
+        """
         regexp = '\[' + note_id + '\]'
         output = ExternalSearch.search_in(folder, regexp, extension)
         settings = sublime.load_settings('sublime_zk.sublime-settings')
@@ -63,6 +76,12 @@ class ExternalSearch:
 
     @staticmethod
     def search_in(folder, regexp, extension, tags=False):
+        """
+        Perform an external search for regexp in folder.
+
+        tags == True : only matching words are returned.
+        tags == False: only names of files with matches are returned.
+        """
         args = [ExternalSearch.SEARCH_COMMAND, '--nocolor']
         if tags:
             args.extend(['--nofilename', '--nonumbers', '-o'])
@@ -75,6 +94,10 @@ class ExternalSearch:
 
     @staticmethod
     def run(args, folder):
+        """
+        Execute ag to run a search, handle errors & timeouts.
+        Return output of stdout as string.
+        """
         output = b''
         try:
             output = subprocess.check_output(args, shell=False, timeout=10000)
@@ -90,6 +113,10 @@ class ExternalSearch:
 
     @staticmethod
     def externalize_note_links(ag_out, folder, prefix=None):
+        """
+        If enabled, write ag file name output into external search results file
+        in `[[note_id]] note title` style.
+        """
         if ExternalSearch.EXTERNALIZE:
             settings = sublime.load_settings('sublime_zk.sublime-settings')
             extension = settings.get('wiki_extension')
@@ -116,6 +143,7 @@ class ExternalSearch:
 
     @staticmethod
     def external_file(folder):
+        """ Return the name of the external search results file. """
         return os.path.join(folder, ExternalSearch.EXTERNALIZE)
 
 
@@ -142,6 +170,9 @@ def create_note(filn, title):
         f.write(u'# {}\ntags = \n\n'.format(title))
 
 def get_path_for(view):
+    """
+    Try to find out and return the note archive path of the given view.
+    """
     folder = None
     if view.window().project_file_name():
         folder = os.path.dirname(view.window().project_file_name())
@@ -152,12 +183,19 @@ def get_path_for(view):
     return folder
 
 def note_file_by_id(note_id, folder, extension):
+    """
+    Find the file for note_id.
+    """
     the_file = os.path.join(folder, note_id + '*')
     candidates = [f for f in glob.glob(the_file) if f.endswith(extension)]
     if len(candidates) > 0:
         return candidates[0]
 
 def extract_tags(file):
+    """
+    Extract #tags from file.
+    Returns all words starting with `#`.
+    """
     tags = set()
     with open(file, mode='r', encoding='utf-8') as f:
         for line in f:
@@ -168,10 +206,17 @@ def extract_tags(file):
     return tags
 
 def get_all_notes_for(folder, extension):
+    """
+    Return all files with extension in folder.
+    """
     return [os.path.join(folder, f) for f in os.listdir(folder)
                                                     if f.endswith(extension)]
 
 def find_all_tags_in(folder, extension):
+    """
+    Return a list of all #tags from all notes in folder using external search
+    if possible.
+    """
     global F_EXT_SEARCH
     if F_EXT_SEARCH:
         return ExternalSearch.search_all_tags(folder, extension)
@@ -183,7 +228,7 @@ def find_all_tags_in(folder, extension):
 
 def tag_at(text, pos=None):
     """
-    Searches for a ####tag inside of text.
+    Search for a ####tag inside of text.
     If pos is given, searches for the tag at pos
     """
     if pos is None:
@@ -252,11 +297,13 @@ def select_link_in(view):
 
 class TextProduction:
     """
-    §
     Static class grouping functions for text production from overview notes.
     """
     @staticmethod
     def read_full_note(note_id, folder, extension):
+        """
+        Return contents of note with ID note_id.
+        """
         note_file = note_file_by_id(note_id, folder, extension)
         if not note_file:
             return None, None
@@ -265,6 +312,9 @@ class TextProduction:
 
     @staticmethod
     def expand_links(text, folder, extension, replace_lines=False):
+        """
+        Expand all note-links in text, replacing their lines by note contents.
+        """
         result_lines = []
         for line in text.split('\n'):
             link_results = ZkConstants.Link_Matcher.findall(line)
@@ -291,6 +341,10 @@ class TextProduction:
         return '\n'.join(result_lines)
 
     def refresh_result(text, folder, extension):
+        """
+        Refresh the result of expand_links with current contents of referenced
+        notes.
+        """
         result_lines = []
         state = 'default'
         note_id = pre = post = None
@@ -329,6 +383,9 @@ class TextProduction:
 
 
 class ExpandOverviewNoteCommand(sublime_plugin.TextCommand):
+    """
+    Command for expanding overview notes.
+    """
     def run(self, edit):
         folder = get_path_for(self.view)
         if not folder:
@@ -347,6 +404,9 @@ class ExpandOverviewNoteCommand(sublime_plugin.TextCommand):
 
 
 class RefreshExpandedNoteCommand(sublime_plugin.TextCommand):
+    """
+    Command for refreshing expanded overview notes.
+    """
     def run(self, edit):
         folder = get_path_for(self.view)
         if not folder:
@@ -361,12 +421,10 @@ class RefreshExpandedNoteCommand(sublime_plugin.TextCommand):
         self.view.replace(edit, complete_region, result_text)
 
 
-
-
 class FollowWikiLinkCommand(sublime_plugin.TextCommand):
     """
     Command that opens the note corresponding to a link the cursor is placed in
-    or a find-in-files for the tag the cursor is placed in.
+    or searches for the tag under the cursor.
     """
     Link_Prefix = '['
     Link_Prefix_Len = len(Link_Prefix)
@@ -374,8 +432,8 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
 
     def on_done(self, selection):
         """
-        Called when the link was a tag, a tag picker was displayed, and a tag
-        was selected by the user.
+        Called when the link was a tag, a tag picker overlay was displayed, and
+        a tag was selected by the user.
         """
         if selection == -1:
             return
@@ -383,6 +441,14 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
         new_view = self.view.window().open_file(the_file)
 
     def select_link(self):
+        """
+        Select a note-link under the cursor.
+        If it's a tag, follow it by searching for tagged notes.
+        Search:
+        * via find-in-files if ag is not found
+        * results in external search results file if enabled
+        * else present overlay to pick a note
+        """
         global F_EXT_SEARCH
         linestart_till_cursor_str, link_region = select_link_in(self.view)
         if link_region:
@@ -424,7 +490,8 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
                 # hack for the find in files panel: select tag in view, copy it
                 selection = self.view.sel()
                 selection.clear()
-                selection.add(sublime.Region(line_start + begin, line_start + end))
+                line_region = sublime.Region(line_start +begin, line_start +end)
+                selection.add()
                 self.view.window().run_command("copy")
                 self.view.window().run_command("show_panel",
                     {"panel": "find_in_files",
@@ -435,6 +502,13 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
         return
 
     def run(self, edit, event=None):
+        """
+        Follow a note-link by:
+        * opening its corresponding note [[note_id]]
+        * creating a new note with [[title of new note]]
+        * searching for #tagged notes
+        depending on what's under the cursor
+        """
         folder = get_path_for(self.view)
         if not folder:
             return
@@ -474,17 +548,22 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
             new_view = window.open_file(the_file)
 
     def want_event(self):
+        # unused
         return True
 
 
 class ShowReferencingNotesCommand(sublime_plugin.TextCommand):
     """
-    Command that opens a find-in-files for link under cursor.
-    If ag is installed, it will show results in an overlay.
+    Command searching for notes referencing the note id under the cursor.
+    * if ag is not installed, opens a find-in-files for link under cursor.
+    * if ag is installed, it will show results:
+      * in an overlay if external search results are disabled
+      * else in the external search file
     """
     def on_done(self, selection):
         """
-        Called when a note was selected
+        Called when a note was selected from the overlay:
+        Open the selected note, if any.
         """
         if selection == -1:
             return
@@ -492,6 +571,9 @@ class ShowReferencingNotesCommand(sublime_plugin.TextCommand):
         new_view = self.view.window().open_file(the_file)
 
     def run(self, edit):
+        """
+        Try to select note link if present. Search for notes as described above.
+        """
         global F_EXT_SEARCH
         linestart_till_cursor_str, link_region = select_link_in(self.view)
         if not link_region:
@@ -575,7 +657,6 @@ class NewZettelCommand(sublime_plugin.WindowCommand):
         new_view = self.window.open_file(the_file)
 
 
-
 class GetWikiLinkCommand(sublime_plugin.TextCommand):
     """
     Command that lets you choose one of all your notes and inserts a link to
@@ -613,14 +694,12 @@ class GetWikiLinkCommand(sublime_plugin.TextCommand):
         self.view.window().show_quick_panel(self.modified_files, self.on_done)
 
 
-
 class InsertWikiLinkCommand(sublime_plugin.TextCommand):
     """
     Command that just inserts text, usually a link to a note.
     """
     def run(self, edit, args):
         self.view.insert(edit, self.view.sel()[0].begin(), args['text'])
-
 
 
 class ZkTagSelectorCommand(sublime_plugin.TextCommand):
@@ -690,7 +769,6 @@ class ZkShowAllTagsCommand(sublime_plugin.WindowCommand):
                 'Packages/sublime_zk/sublime_zk.sublime-syntax')
             # return back to note
             self.window.focus_group(0)
-
 
 
 class NoteLinkHighlighter(sublime_plugin.EventListener):
