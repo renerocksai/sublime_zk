@@ -19,7 +19,7 @@ contexts:
             '2': punctuation.separator.footnote.markdown
             '3': support.function.footnote.markdown
             '4': punctuation.definition.footnote.begin.markdown
-        - match: '(\s)(#+([^#\W]|[-])+)' # better real just tags matching
+        - match: '(\s)(#+([^#\W]|[-§])+)' # better real just tags matching
           captures:
             '1': markup.zettel.space
             '2': markup.zettel.tag, markup.italic
