@@ -741,7 +741,10 @@ class ZkTagSelectorCommand(sublime_plugin.TextCommand):
             return
         settings = sublime.load_settings('sublime_zk.sublime-settings')
         extension = settings.get('wiki_extension')
+        temp = ExternalSearch.EXTERNALIZE
+        ExternalSearch.EXTERNALIZE = False
         self.tags = find_all_tags_in(folder, extension)
+        ExternalSearch.EXTERNALIZE = temp
         self.view.window().show_quick_panel(self.tags, self.on_done)
 
 
