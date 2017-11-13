@@ -17,6 +17,8 @@ class ZkConstants:
     Link_Prefix = '['
     Link_Prefix_Len = len(Link_Prefix)
     Link_Postfix = ']'
+    Tag_Stops = '.,\/!$%\^&\*;:\{\}[]\'"=`~()<>\\'
+
     Link_Matcher = re.compile('(\[+|§)([0-9]{12})(\]+|.)')
     # Above RE doesn't really care about closing ] andymore
     # This works in our favour so we support [[201711122259 This is a note]]
@@ -28,7 +30,7 @@ class ExternalSearch:
     Static class to group all external search related functions.
     """
     SEARCH_COMMAND = 'ag'
-    RE_TAGS = r"(?<=\s|^)(?<!`)(#+[^#\s.,\/!$%\^&\*;:{}\[\]'\"=`~()]+)"
+    RE_TAGS = r"(?<=\s|^)(?<!`)(#+[^#\s.,\/!$%\^&\*;:{}\[\]'\"=`~()<>”\\]+)"
     EXTERNALIZE = '.search_results.md'   # '' to skip
 
     @staticmethod
@@ -251,7 +253,7 @@ def tag_at(text, pos=None):
         # search end of tag
         end = inner
         for c in text[inner:]:
-            if c.isspace():
+            if c.isspace() or c in ZkConstants.Tag_Stops:
                 break
             end += 1
         tag = text[inner:end]
