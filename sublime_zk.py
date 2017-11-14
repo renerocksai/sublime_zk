@@ -187,6 +187,11 @@ def get_path_for(view):
         folder = os.path.dirname(view.file_name())
     elif view.window().folders():
         folder = os.path.abspath(view.window().folders()[0])
+
+    if folder is None:
+        print('sublime_zk: could not deduce your note archive folder!')
+        view.window().status_message('Could not find the location of your note '
+            'archive! See the README for how to create a project!')
     return folder
 
 def note_file_by_id(note_id, folder, extension):
