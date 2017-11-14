@@ -25,7 +25,7 @@ class ZkConstants:
     RE_TAGS = r"(?<=\s|^)(?<!`)(#+[^#\s.,\/!$%\^&\*;:{}\[\]'\"=`~()<>”\\]+)"
 
     # match note links in text
-    Link_Matcher = re.compile('(\[+|§)([0-9]{12})(\]+|.)')
+    Link_Matcher = re.compile('(\[+|§)([0-9]{12})(\]+|.?)')
     # Above RE doesn't really care about closing ] andymore
     # This works in our favour so we support [[201711122259 This is a note]]
     # when expanding overview notes
