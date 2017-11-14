@@ -17,8 +17,14 @@ class ZkConstants:
     Link_Prefix = '['
     Link_Prefix_Len = len(Link_Prefix)
     Link_Postfix = ']'
+
+    # characters at which a #tag is cut off (#tag, -> #tag)
     Tag_Stops = '.,\/!$%\^&\*;:\{\}[]\'"=`~()<>\\'
 
+    # search for tags in files
+    RE_TAGS = r"(?<=\s|^)(?<!`)(#+[^#\s.,\/!$%\^&\*;:{}\[\]'\"=`~()<>”\\]+)"
+
+    # match note links in text
     Link_Matcher = re.compile('(\[+|§)([0-9]{12})(\]+|.)')
     # Above RE doesn't really care about closing ] andymore
     # This works in our favour so we support [[201711122259 This is a note]]
@@ -30,7 +36,6 @@ class ExternalSearch:
     Static class to group all external search related functions.
     """
     SEARCH_COMMAND = 'ag'
-    RE_TAGS = r"(?<=\s|^)(?<!`)(#+[^#\s.,\/!$%\^&\*;:{}\[\]'\"=`~()<>”\\]+)"
     EXTERNALIZE = '.search_results.md'   # '' to skip
 
     @staticmethod
@@ -38,7 +43,7 @@ class ExternalSearch:
         """
         Create a list of all #tags of all notes in folder.
         """
-        output = ExternalSearch.search_in(folder, ExternalSearch.RE_TAGS,
+        output = ExternalSearch.search_in(folder, ZkConstants.RE_TAGS,
             extension, tags=True)
         tags = set()
         for line in output.split('\n'):
