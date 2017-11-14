@@ -1,7 +1,7 @@
 [
-    { "caption": "ZK: New Zettel Note", "command": "new_zettel" },
+    { "caption": "ZK: New Zettel Note", "command": "zk_new_zettel" },
     { "caption": "ZK: Pick tag from list", "command": "zk_tag_selector" },
     { "caption": "ZK: Find all tags in archive", "command": "zk_show_all_tags" },
-    { "caption": "ZK: Expand Overview Note", "command": "expand_overview_note" },
-    { "caption": "ZK: Refresh Expanded Note", "command": "refresh_expanded_note" },
+    { "caption": "ZK: Expand Overview Note", "command": "zk_expand_overview_note" },
+    { "caption": "ZK: Refresh Expanded Note", "command": "zk_refresh_expanded_note" },
 ]

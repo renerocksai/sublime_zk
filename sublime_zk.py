@@ -405,7 +405,7 @@ class TextProduction:
         return '\n'.join(result_lines)
 
 
-class ExpandOverviewNoteCommand(sublime_plugin.TextCommand):
+class ZkExpandOverviewNoteCommand(sublime_plugin.TextCommand):
     """
     Command for expanding overview notes.
     """
@@ -430,7 +430,7 @@ class ExpandOverviewNoteCommand(sublime_plugin.TextCommand):
             'Packages/sublime_zk/sublime_zk.sublime-syntax')
 
 
-class RefreshExpandedNoteCommand(sublime_plugin.TextCommand):
+class ZkRefreshExpandedNoteCommand(sublime_plugin.TextCommand):
     """
     Command for refreshing expanded overview notes.
     """
@@ -448,7 +448,7 @@ class RefreshExpandedNoteCommand(sublime_plugin.TextCommand):
         self.view.replace(edit, complete_region, result_text)
 
 
-class FollowWikiLinkCommand(sublime_plugin.TextCommand):
+class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
     """
     Command that opens the note corresponding to a link the cursor is placed in
     or searches for the tag under the cursor.
@@ -575,7 +575,7 @@ class FollowWikiLinkCommand(sublime_plugin.TextCommand):
         return True
 
 
-class ShowReferencingNotesCommand(sublime_plugin.TextCommand):
+class ZkShowReferencingNotesCommand(sublime_plugin.TextCommand):
     """
     Command searching for notes referencing the note id under the cursor.
     * if ag is not installed, opens a find-in-files for link under cursor.
@@ -637,7 +637,7 @@ class ShowReferencingNotesCommand(sublime_plugin.TextCommand):
         return
 
 
-class NewZettelCommand(sublime_plugin.WindowCommand):
+class ZkNewZettelCommand(sublime_plugin.WindowCommand):
     """
     Command that prompts for a note title and then creates a note with that
     title.
@@ -680,7 +680,7 @@ class NewZettelCommand(sublime_plugin.WindowCommand):
         new_view = self.window.open_file(the_file)
 
 
-class GetWikiLinkCommand(sublime_plugin.TextCommand):
+class ZkGetWikiLinkCommand(sublime_plugin.TextCommand):
     """
     Command that lets you choose one of all your notes and inserts a link to
     the chosen note.
@@ -717,7 +717,7 @@ class GetWikiLinkCommand(sublime_plugin.TextCommand):
         self.view.window().show_quick_panel(self.modified_files, self.on_done)
 
 
-class InsertWikiLinkCommand(sublime_plugin.TextCommand):
+class ZkInsertWikiLinkCommand(sublime_plugin.TextCommand):
     """
     Command that just inserts text, usually a link to a note.
     """
