@@ -823,6 +823,11 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         if view.match_selector(point, 'text.html.markdown') == 0:
             return
 
+        # ignore completion upon <
+        word = view.substr(view.word(point))
+        if word.endswith('<'):
+            return
+
         folder = get_path_for(view)
         if not folder:
             return []
