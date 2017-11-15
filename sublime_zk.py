@@ -178,8 +178,18 @@ def timestamp():
     return '{:%Y%m%d%H%M}'.format(datetime.datetime.now())
 
 def create_note(filn, title):
+    params = {
+                'title': title,
+                'file': os.path.basename(filn),
+                'path': os.path.dirname(filn),
+                'id': os.path.basename(filn).split()[0]
+              }
+    settings = sublime.load_settings('sublime_zk.sublime-settings')
+    format_str = settings.get('new_note_template')
+    if not format_str:
+        format_str = u'# {title}\ntags = \n\n'
     with open(filn, mode='w', encoding='utf-8') as f:
-        f.write(u'# {}\ntags = \n\n'.format(title))
+        f.write(format_str.format(**params))
 
 def get_path_for(view):
     """
