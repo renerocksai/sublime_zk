@@ -16,7 +16,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * Alternatively, double-clicking the link while holding the `[alt]` key down, will also open the corresponding note.
 * Clicking such a link and pressing `[alt]+[enter]` will search for all notes also referencing the linked note [('friend notes')](#searching-for-friends).
 * Typing `[[` will open a list of existing notes so you can quickly link to existing notes.
-* Typing `[ctrl]+[space]` will trigger note-link auto-completion for even quicker insertion of links to other notes.
+* Typing `[ctrl]+[space]` (or `[alt]+[/]` on Linux) will trigger note-link auto-completion for even quicker insertion of links to other notes.
 * Typing `[shift]+[enter]` lets you enter a name for a new note. The new note is then created with a new note ID.
 * Implicit note creation via links to non-existing notes' titles, see [below](#implicitly-creating-a-new-note-via-a-link).
 * The ID format is YYYYMMDDHHMM - eg: 201710282111
@@ -248,7 +248,7 @@ Here you can see what the list of notes to choose from looks like:
 ### Using auto-completion to insert note-links
 A different way to insert a link to another note is via auto-completion. This differs from the previous one in the following ways:
 
-* auto-completion is triggered via [ctrl]+[space]
+* auto-completion is triggered via [ctrl]+[space] (or `[alt]+[/]` on Linux)
 * the list of notes is displayed at the location of your cursor
 * the font of the list is smaller, making it overall less obtrusive
 
