@@ -693,7 +693,7 @@ class ZkGetWikiLinkCommand(sublime_plugin.TextCommand):
     def on_done(self, selection):
         if selection == -1:
             self.view.run_command(
-                'insert_wiki_link', {'args': {'text': '[['}})
+                'zk_insert_wiki_link', {'args': {'text': '[['}})
             return
 
         settings = sublime.load_settings('sublime_zk.sublime-settings')
@@ -707,7 +707,7 @@ class ZkGetWikiLinkCommand(sublime_plugin.TextCommand):
         link_txt = prefix + self.modified_files[selection].split(' ', 1)[0] \
                                                                        + postfix
         self.view.run_command(
-            'insert_wiki_link', {'args': {'text': link_txt}})
+            'zk_insert_wiki_link', {'args': {'text': link_txt}})
 
     def run(self, edit):
         folder = get_path_for(self.view)
@@ -737,13 +737,13 @@ class ZkTagSelectorCommand(sublime_plugin.TextCommand):
     def on_done(self, selection):
         if selection == -1:
             self.view.run_command(
-                'insert_wiki_link', {'args': {'text': '#'}})   # can be re-used
+                'zk_insert_wiki_link', {'args': {'text': '#'}})   # can be re-used
             return
 
         # return only the id or whatever comes before the first blank
         tag_txt = self.tags[selection]
         self.view.run_command(
-            'insert_wiki_link', {'args': {'text': tag_txt}})  # re-use of cmd
+            'zk_insert_wiki_link', {'args': {'text': tag_txt}})  # re-use of cmd
 
     def run(self, edit):
         folder = get_path_for(self.view)
