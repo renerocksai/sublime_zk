@@ -1,8 +1,8 @@
 # Sublime ZK
 
-This is a plugin for SublimeText3 to enable ID-based, Wiki-style links in your documents.
+This is a plugin for SublimeText3 to enable ID-based, Wiki-style links, and #tags in your documents.
 
-If you follow the (plain-text) Zettelkasten method (as proposed by [Zettelkasten.de](https://zettelkasten.de)), this might appeal to you.
+If you follow the (plain-text) Zettelkasten method (as proposed by [Zettelkasten.de](https://zettelkasten.de) or [takesmartnotes.com](http://takesmartnotes.com/#moreinfo)), this might appeal to you.
 
 In short, it helps you manage an archive of interlinked notes that look like this:
 
@@ -11,7 +11,7 @@ In short, it helps you manage an archive of interlinked notes that look like thi
 See the [Usage](#usage) section below to see how this package might support your workflow.
 
 ## Features
-* This plugin enables you to place wiki style links like `[[this]]` or `[this]` into your notes to link to other notes in your note archive.
+* This plugin enables you to place wiki style links like `[[this]]` or `[this]` (and old-school links like this `§201711111709`) into your notes to link to other notes in your note archive.
 * Clicking such a link and pressing `[ctrl]+[enter]` will open the corresponding note.
 * Alternatively, double-clicking the link while holding the `[alt]` key down, will also open the corresponding note.
 * Clicking such a link and pressing `[alt]+[enter]` will search for all notes also referencing the linked note [('friend notes')](#searching-for-friends).
@@ -27,7 +27,8 @@ See the [Usage](#usage) section below to see how this package might support your
 * `[#][?]` opens up a list of all your **#tags** and lets you fuzzy search and select them (like note-links).
 * Clicking a **#tag** and pressing `[ctrl]+[enter]` will search for all notes containing this tag.
 * Alternatively `[alt]` + double clicking the tag will do the same thing.
-* **New:** Support for `ag`, [The Silver Searcher](#installing-the-silver-searcher)
+* Support for `ag`, [The Silver Searcher](#installing-the-silver-searcher)
+* **NEW**: [Expansion of overview notes with selective refresh](#expansion-of-overview-notes-with-selective-refresh)!!!
 
 ## Installation
 
@@ -379,6 +380,65 @@ Pressing `[enter]` will start the search and show the search results in a new ta
 
 **Note:** If you set the parameter `show_search_results_in_new_tab` to `false`, then no new tab will be created for search results. They will be displayed in a little sort of pop-up at the bottom of the window.
 
+
+### Expansion of overview notes with selective refresh
+
+#### Expansion of overview notes
+
+Let's say you have an overview note about a topic that links to specifics of that topic that looks like this:
+
+```markdown
+O - Text production
+
+This is an **overview note** about text production with the Zettelkasten method.
+
+A few general words about our tool: Sublime ZK
+[[201711111707]] Sublime ZK is awesome
+[[201711111708]] Sublime ZK is great
+
+Then we go more in-depth:
+[[201711111709]] The specifics of how we produce text with the plugin
+
+Cool!
+```
+
+This overview is just a collection of note links with brief descriptions and a bit of additional text.
+
+Now, if you wanted to turn this overview note into a text containing the contents of the linked notes instead of just the links, then you can *expand* the note like this:
+
+* bring up the command palette by pressing `[cmd]+[shift]+[p]` on macOS (`[ctrl]+[shift]+[p]` on Windows and Linux).
+* type `zk` to list the *Zettelkasten* commands.
+* select `ZK: Expand Overview Note`
+
+Et voila! Depending on your linked notes, the overview note will be expanded into a new unsaved tab, maybe looking like this:
+
+![expanded](https://user-images.githubusercontent.com/30892199/32693323-613c43fe-c729-11e7-8773-04a9e20034f7.png)
+
+As you can see, the lines containing note links are replaced by the contents of their notes, enclosed in comment lines. You can now edit and save this file to your liking.
+
+
+**Note**: If you want to refresh this expanded overview [(see below)](#refreshing-an-expanded-overview-note) later, then please leave those comments in!
+
+**Note:**: If you modify the text of a linked note (between comment lines), then remove the extra `!` to prevent your change to get overwritten when [refreshing](#refreshing-an-expanded-overview-note) this overview.
+
+
+#### Refreshing an expanded overview note
+
+It might happen that you change some notes that are already expanded into your new expanded overview note. If that happens and you have left the comments in, then you can refresh the expanded overview:
+
+* bring up the command palette by pressing `[cmd]+[shift]+[p]` on macOS (`[ctrl]+[shift]+[p]` on Windows and Linux).
+* type `zk` to list the *Zettelkasten* commands.
+* select `ZK: Refresh Expanded Note`
+
+**Note:** Only notes with comments starting with `<!-- !` will be considered for a refresh.
+
+**Tip:** That means: To keep your edits of specific expanded notes from being overwritten by a refresh, just delete the extra `!`, making the comment start with `<!-- `. Alternatively, you can, of course, delete the comment lines for parts you are sure will never need refreshing.
+
+The following animation illustrates expansion and refreshing:
+
+![overview-expansion](https://user-images.githubusercontent.com/30892199/32693096-f2c69ffe-c724-11e7-9c6a-d01857e86ce1.gif)
+
+
 ## Credits
 
 Credits, where credits are due:
@@ -390,7 +450,7 @@ Credits, where credits are due:
 
 While we're at it, I highly recommend the following books (German); Google and Amazon are your friends:
 
-* "Das Zettelkastenprinzip" / "How to take smart notes" will blow your mind.
+* "Das Zettelkastenprinzip" / "How to take smart notes" [(more info here...)](http://takesmartnotes.com/#moreinfo) will blow your mind.
 * "Die Zettelkastenmethode" from Sascha over at zettelkasten.de will also blow your mind and expand on the plain-text approach of using a digital Zettelkasten.
 
 

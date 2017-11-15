@@ -1,8 +1,8 @@
 [
-    { "keys": ["shift+enter"], "command": "new_zettel"},
-    { "keys": ["ctrl+enter"], "command": "follow_wiki_link"},
-    { "keys": ["alt+enter"], "command": "show_referencing_notes"},
-    { "keys": ["[", "["], "command": "get_wiki_link"},
+    { "keys": ["shift+enter"], "command": "zk_new_zettel"},
+    { "keys": ["ctrl+enter"], "command": "zk_follow_wiki_link"},
+    { "keys": ["alt+enter"], "command": "zk_show_referencing_notes"},
+    { "keys": ["[", "["], "command": "zk_get_wiki_link"},
     { "keys": ["#", "?"], "command": "zk_tag_selector"},
     { "keys": ["#", "!"], "command": "zk_show_all_tags"},
 ]
