@@ -29,6 +29,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * Alternatively `[alt]` + double clicking the tag will do the same thing.
 * Support for `ag`, [The Silver Searcher](#installing-the-silver-searcher)
 * **NEW**: [Expansion of overview notes with selective refresh](#expansion-of-overview-notes-with-selective-refresh)!!!
+* even **NEWER**: [Templates for new notes](#new-note-templates)
 
 ## Installation
 
@@ -123,6 +124,31 @@ The setting id_in_title is set to false.
 ```
 
 You can find this setting in the file `sublime_zk.sublime-settings`.
+
+### New Note templates
+
+If you need further customizing of how your new notes should look like, you can define your own template:
+
+In your package's settings (user) just put in a line like this:
+```
+  "new_note_template": "---\nuid: {id}\ntags: \n---\n",
+```
+
+To produce new notes like this:
+
+```
+---
+uid: 201711150402
+tags:
+---
+```
+The format string works like this:
+
+* `\n` creates a new line.
+* `{id}` : the note id like `201712241830`
+* `{title}` : note title like `Why we should celebrate Christmas`
+* `{file}` : the filename of the note like `201712241830 Why we should celebrate Christmas.md`
+* `{path}` : the path of the note like `/home/reschal/Dropbox/Zettelkasten`
 
 ### Highlight references to other notes
 By default, this plugin highlights links to other notes by underlining them.
