@@ -147,8 +147,11 @@ The format string works like this:
 * `\n` creates a new line.
 * `{id}` : the note id like `201712241830`
 * `{title}` : note title like `Why we should celebrate Christmas`
+* `{origin}` : the id of the note you came from when creating a new note
 * `{file}` : the filename of the note like `201712241830 Why we should celebrate Christmas.md`
 * `{path}` : the path of the note like `/home/reschal/Dropbox/Zettelkasten`
+
+`origin` might need a bit of explanation: When you are in note `201701010101` and create a new note via `[shift]+[enter]` or via `[[implicit note creation via title]]`, the new note will get a new id, maybe `201702020202`. Its `{id}` therefore will be `201702020202` and its `{origin}` will be `201701010101`.
 
 ### Highlight references to other notes
 By default, this plugin highlights links to other notes by underlining them.
