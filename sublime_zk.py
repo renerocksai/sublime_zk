@@ -592,7 +592,17 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
             new_id = timestamp()
             the_file = new_id + ' ' + selected_text + extension
             the_file = os.path.join(folder, the_file)
-            self.view.replace(edit, location, new_id)
+
+            replace_str = new_id
+            do_insert_title = settings.get('insert_links_with_titles', False)
+            if do_insert_title:
+                postfix = ']]'
+                if not settings.get('double_brackets', True):
+                    postfix = ']'
+                location.b += len(postfix)   # we have to replace that, too
+                replace_str += postfix + ' ' + selected_text
+
+            self.view.replace(edit, location, replace_str)
 
             if id_in_title:
                 selected_text = new_id + ' ' + selected_text
@@ -736,9 +746,12 @@ class ZkGetWikiLinkCommand(sublime_plugin.TextCommand):
             prefix = '['
             postfix = ']'
 
-        # return only the id or whatever comes before the first blank
-        link_txt = prefix + self.modified_files[selection].split(' ', 1)[0] \
-                                                                       + postfix
+        note_id, title = self.modified_files[selection].split(' ', 1)
+        link_txt = prefix + note_id + postfix
+        do_insert_title = settings.get('insert_links_with_titles', False)
+        if do_insert_title:
+            link_txt += ' ' + title
+
         self.view.run_command(
             'zk_insert_wiki_link', {'args': {'text': link_txt}})
 
@@ -773,7 +786,6 @@ class ZkTagSelectorCommand(sublime_plugin.TextCommand):
                 'zk_insert_wiki_link', {'args': {'text': '#'}})   # can be re-used
             return
 
-        # return only the id or whatever comes before the first blank
         tag_txt = self.tags[selection]
         self.view.run_command(
             'zk_insert_wiki_link', {'args': {'text': tag_txt}})  # re-use of cmd
@@ -878,9 +890,12 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         ids_and_names = [f.split(' ', 1) for f in os.listdir(folder)
                                             if f.endswith(extension)
                                             and ' ' in f]
+        do_insert_title = settings.get('insert_links_with_titles', False)
         for noteid, notename in ids_and_names:
-            completions.append([noteid + ' ' + notename,
-                prefix + noteid + postfix])
+            completion_str = prefix + noteid + postfix
+            if do_insert_title:
+                completion_str += ' ' + notename.replace(extension, '')
+            completions.append([noteid + ' ' + notename, completion_str])
         return (completions, sublime.INHIBIT_WORD_COMPLETIONS)
 
     def on_activated(self, view):
