@@ -526,7 +526,7 @@ This might reach a point where they might develop a consciensce of their own.
 
 As a consequence, they might turn evil and try to kill us all ........... [[201710282118]]
 
-<!-- !    [[201710282118]] Migrationsplan    -->
+<!-- !    [[201710282118]] AI is going to kill us all    -->
 # AI is going to kill us all
 tags =
 
