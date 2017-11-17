@@ -5,4 +5,5 @@
     { "keys": ["[", "["], "command": "zk_get_wiki_link"},
     { "keys": ["#", "?"], "command": "zk_tag_selector"},
     { "keys": ["#", "!"], "command": "zk_show_all_tags"},
+    { "keys": ["ctrl+."], "command": "zk_expand_link"},
 ]
