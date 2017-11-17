@@ -393,6 +393,7 @@ class TextProduction:
                 result_lines.append(line)
         return '\n'.join(result_lines)
 
+    @staticmethod
     def refresh_result(text, folder, extension):
         """
         Refresh the result of expand_links with current contents of referenced
@@ -433,6 +434,56 @@ class TextProduction:
             else:
                 result_lines.append(line)
         return '\n'.join(result_lines)
+
+    @staticmethod
+    def expand_link_in(view, edit, folder, extension):
+        """
+        Expand note-link under cursor inside the current view
+        """
+        linestart_till_cursor_str, link_region = select_link_in(view)
+        if not link_region:
+            return
+        note_id = view.substr(link_region)
+        cursor_pos = view.sel()[0].begin()
+        line_region = view.line(cursor_pos)
+
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        pre = '[['
+        post = ']]'
+        if not settings.get('double_brackets', True):
+            pre = '['
+            post = ']'
+
+        result_lines = []
+
+        note_file, content = TextProduction.read_full_note(note_id, folder,
+            extension)
+        if not content:
+            header = '\n<!-- Note not found: ' + note_id + ' -->'
+        else:
+            filename = os.path.basename(note_file).replace(extension, '')
+            filename = filename.split(' ', 1)[1]
+            header = pre + note_id + post + ' ' + filename
+            header = '\n<!-- !    ' + header + '    -->'
+            footer = '<!-- (End of note ' + note_id + ') -->'
+            result_lines.append(header)
+            result_lines.extend(content.split('\n'))
+        result_lines.append(footer)
+        view.insert(edit, line_region.b, '\n' + '\n'.join(result_lines))
+
+
+class ZkExpandLinkCommand(sublime_plugin.TextCommand):
+    """
+    Command for expanding overview notes.
+    """
+    def run(self, edit):
+        folder = get_path_for(self.view)
+        if not folder:
+            return
+
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        extension = settings.get('wiki_extension')
+        TextProduction.expand_link_in(self.view, edit, folder, extension)
 
 
 class ZkExpandOverviewNoteCommand(sublime_plugin.TextCommand):

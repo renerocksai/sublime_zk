@@ -28,9 +28,10 @@ See the [Usage](#usage) section below to see how this package might support your
 * Clicking a **#tag** and pressing `[ctrl]+[enter]` will search for all notes containing this tag.
 * Alternatively `[alt]` + double clicking the tag will do the same thing.
 * Support for `ag`, [The Silver Searcher](#installing-the-silver-searcher)
-* **NEW**: [Expansion of overview notes with selective refresh](#expansion-of-overview-notes-with-selective-refresh)!!!
-* **EVEN NEWER**: [Templates for new notes](#new-note-templates)
-* **NEWEST**: [Optional](#insert-links-with-or-without-titles) insertion of `[[links]] WITH note titles` instead of just `[[links]]`
+* [Expansion of overview notes with selective refresh](#expansion-of-overview-notes-with-selective-refresh)!!!
+* [Templates for new notes](#new-note-templates)
+* **NEW**: [Optional](#insert-links-with-or-without-titles) insertion of `[[links]] WITH note titles` instead of just `[[links]]`
+* **EVEN NEWER**: Inline [expansion](#inline-expansion-of-note-links) of note links via `[ctrl]+[.]`
 
 ## Installation
 
@@ -494,12 +495,57 @@ The following animation illustrates expansion and refreshing:
 
 ![overview-expansion](https://user-images.githubusercontent.com/30892199/32693096-f2c69ffe-c724-11e7-9c6a-d01857e86ce1.gif)
 
+### Inline expansion of note-links
+
+Overview note expansion is cool, but there are situations where you might not want to expand all links of a note but just a few. Also, since expansion does not descend into links of expanded notes, you might want to manually expand those.
+
+Manually expanding a note link is easy: You must have your cursor over ("in") a note link, obiously. The key combination `[ctrl]+[.]` or `ZK: Expand Link inline` from the command palette will then trigger the expansion. In contrast to the expansion method for overview notes in the previous section, the line containing the link will be preserved.
+
+Here is an example using the already well-known AI notes: Let's start with our first note:
+
+```markdown
+# The rise of the machines
+tags = #AI #world-domination
+
+Machines are becoming more and more intelligent and powerful.
+
+This might reach a point where they might develop a consciensce of their own.
+
+As a consequence, they might turn evil and try to kill us all ........... [[201710282118]]
+```
+
+Now if you put your cursor inside the `[[201710282118]]` link and press `[ctrl]+[.]`, the text will change into this:
+
+```markdown
+# The rise of the machines
+tags = #AI #world-domination
+
+Machines are becoming more and more intelligent and powerful.
+
+This might reach a point where they might develop a consciensce of their own.
+
+As a consequence, they might turn evil and try to kill us all ........... [[201710282118]]
+
+<!-- !    [[201710282118]] Migrationsplan    -->
+# AI is going to kill us all
+tags =
+
+<!-- (End of note 201710282118) -->
+```
+
+*(We've never actually written anything into the linked note. Usually there would be lots of text)*
+
+**Note:** To remember `[ctrl]+[.]`: I wanted to use `...` as shortcut for expansion but it didn't work out :smile:
+
+**Hint:** If, after expansion, you don't like what you see, just undo! :smile:
+
+**Note:** Use this at your own risk when **ever** planning on refreshing an overview note. You are going to have nested expansions and precisely those will get overwritten when the parent note is refreshed.
 
 ## Credits
 
 Credits, where credits are due:
 
-* I derived this work from Dan Sheffler's MyWiki code. [See his GitHub](https://github.com/dansheffler/MyWiki) and see some striking similarities ;-).
+* I derived parts of this work from Dan Sheffler's MyWiki code. [See his GitHub](https://github.com/dansheffler/MyWiki) and see some striking similarities ;-).
 * (Of course it has evolved a lot since. A special shoutout to @toolboxen from the forum at zettelkasten.de for all the ideas, github issues, and pull requests!)
 * Thanks to [Niklas Luhmann](https://en.wikipedia.org/wiki/Niklas_Luhmann) for coming up with this unique way of using a Zettelkasten.
 * Thanks to the guys from [zettelkasten.de](https://zettelkasten.de) for their Zettelkasten related resources. There are not that many out there.
