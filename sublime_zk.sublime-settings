@@ -6,6 +6,9 @@
     // false to use [single brackets]
     "double_brackets": true,
 
+    // links like "[[199901012359]] and note title" instead of "[[199901012359]]"
+    "insert_links_with_titles": false,
+
     // when creating a new note, put id into title?
      // false to disable
     "id_in_title": true,

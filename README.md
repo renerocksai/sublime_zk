@@ -29,7 +29,8 @@ See the [Usage](#usage) section below to see how this package might support your
 * Alternatively `[alt]` + double clicking the tag will do the same thing.
 * Support for `ag`, [The Silver Searcher](#installing-the-silver-searcher)
 * **NEW**: [Expansion of overview notes with selective refresh](#expansion-of-overview-notes-with-selective-refresh)!!!
-* even **NEWER**: [Templates for new notes](#new-note-templates)
+* **EVEN NEWER**: [Templates for new notes](#new-note-templates)
+* **NEWEST**: [Optional](#insert-links-with-or-without-titles) insertion of `[[links]] WITH note titles` instead of just `[[links]]`
 
 ## Installation
 
@@ -101,6 +102,26 @@ By default, the extension `.md` is used for your notes. If that does not match y
 
 ### Single or double brackets
 Whether you want to use `[[this link style]]` or `[that link style]` is totally up to you. Both work. But you need to configure which style you prefer, so automatically inserted links will match your style. `[[double bracket]]` links are the default, and if you want to change that to single bracket links, set the `double_brackets` parameter to `false` in the `sublime_zk.sublime-settings`.
+
+### Insert links with or without titles
+There are numerous times where the plugin inserts a `[[link]]` to a note into your text on your behalf. You may not only choose the single or double-bracketness of the links, you may also choose whether the **note title** should follow the inserted link.
+
+The setting `"insert_links_with_titles"` takes care of that and is set to `false` by default:
+```
+// links like "[[199901012359]] and note title" instead of "[[199901012359]]"
+"insert_links_with_titles": false,
+```
+
+Examples how inserted links might look like depending on this setting:
+
+```markdown
+`insert_links_with_titles` is `true`:
+[[199901012359]] and note title
+
+
+`insert_links_with_titles` is `false`:
+[[199901012359]]
+```
 
 ### IDs in titles of new notes
 When you create a new note, its title will automatically be inserted and an ID will be assigned to it (see [Creating a new note](#creating-a-new-note)). If you want the ID to be part of the title, change the setting `id_in_title` from `false` to `true`.
@@ -269,6 +290,8 @@ As a consequence, they might turn evil and try to kill us all ........... [[2017
 
 **Note:** Only files ending with the extension specified in `sublime_zk.sublime-settings` (`.md` by default) will be listed in the popup list. If your files end with `.txt`, you need to change this setting.
 
+**Note:** With [this setting](#insert-links-with-or-without-titles) you can have the note's title inserted right after the link as well: `[[201710282118]] AI is going to kill us all`
+
 If you now click into `[[201710282118]]` and press `[ctrl]+[enter]`, the target note will be opened where you can read up on how AI is potentially going to kill us all.
 
 Here you can see what the list of notes to choose from looks like:
@@ -287,6 +310,8 @@ Which ever method for link insertion you use is up to you.
 
 Here is a screenshot so you can compare:
 ![screenshot2](https://user-images.githubusercontent.com/30892199/32403199-260fb374-c134-11e7-99ad-59e22852a095.png)
+
+**Note:** With [this setting](#insert-links-with-or-without-titles) you can have the note's title inserted right after the link as well, like in : `[[201710282118]] AI is going to kill us all`
 
 ### Implicitly creating a new note via a link
 There is another way to create a new note: Just create a link containing its title and follow the link.
@@ -339,6 +364,8 @@ As a consequence, they might turn evil and try to kill us all ........... [[2017
 ```
 
 **Note** how the note title "AI is going to kill us all" has been replaced by the note's ID "201710282118".
+
+**Note:** With [this setting](#insert-links-with-or-without-titles) you can have the note's title inserted right after the link as well, like in : `[[201710282118]] AI is going to kill us all`
 
 The new note will be pre-filled with the following text:
 
