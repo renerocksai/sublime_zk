@@ -19,10 +19,10 @@ class ZkConstants:
     Link_Postfix = ']'
 
     # characters at which a #tag is cut off (#tag, -> #tag)
-    Tag_Stops = '.,\/!$%\^&\*;:\{\}[]\'"=`~()<>\\'
+    Tag_Stops = '.,\/!$%\^&\*;\{\}[]\'"=`~()<>\\'
 
     # search for tags in files
-    RE_TAGS = r"(?<=\s|^)(?<!`)(#+[^#\s.,\/!$%\^&\*;:{}\[\]'\"=`~()<>”\\]+)"
+    RE_TAGS = r"(?<=\s|^)(?<!`)(#+([^#\s.,\/!$%\^&\*;{}\[\]'\"=`~()<>”\\]|:[a-zA-Z0-9])+)"
 
     # match note links in text
     Link_Matcher = re.compile('(\[+|§)([0-9]{12})(\]+|.?)')
@@ -273,11 +273,23 @@ def tag_at(text, pos=None):
             inner -=1
         # search end of tag
         end = inner
+        mode = ''
         for c in text[inner:]:
+            if mode == ':':
+                if (c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z') \
+                    or (c >= '0' and c <= '9'):
+                    pass
+                else:
+                    end -= 1
+                    break
             if c.isspace() or c in ZkConstants.Tag_Stops:
                 break
+            mode = c
             end += 1
         tag = text[inner:end]
+        if tag.endswith(':'):
+            tag = tag[:-1]
+            end -= 1
 
         # test if it's just a `# heading` (resulting in `#`) or a real tag
         if tag.replace('#', ''):
@@ -595,7 +607,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
                 selection = self.view.sel()
                 selection.clear()
                 line_region = sublime.Region(line_start +begin, line_start +end)
-                selection.add()
+                selection.add(line_region)
                 self.view.window().run_command("copy")
                 self.view.window().run_command("show_panel",
                     {"panel": "find_in_files",
