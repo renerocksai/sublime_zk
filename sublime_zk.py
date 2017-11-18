@@ -7,6 +7,7 @@
            \/          \/              \/     \/_____/     \/    \/
 """
 import sublime, sublime_plugin, os, re, subprocess, glob, datetime
+from collections import defaultdict
 import threading
 
 
@@ -57,6 +58,28 @@ class ExternalSearch:
         return list(tags)
 
     @staticmethod
+    def notes_and_tags_in(folder, extension):
+        """
+        Return a dict {note_id: tags}.
+        """
+        args = [ExternalSearch.SEARCH_COMMAND, '--nocolor']
+        args.extend(['--nonumbers', '-o', '--silent', '--markdown',
+            ZkConstants.RE_TAGS, folder])
+        ag_out = ExternalSearch.run(args, folder)
+        if not ag_out:
+            return {}
+        note_tags = defaultdict(list)
+        note_id = None
+        # ag output different to terminal output
+        for line in ag_out.split('\n'):
+            if not ':' in line:
+                continue
+            filn, tag = line.rsplit(':', 1)
+            note_id = get_note_id_of_file(filn)
+            note_tags[note_id].append(tag)
+        return note_tags
+
+    @staticmethod
     def search_tagged_notes(folder, extension, tag):
         """
         Return a list of note files containing #tag.
@@ -94,7 +117,7 @@ class ExternalSearch:
         """
         args = [ExternalSearch.SEARCH_COMMAND, '--nocolor']
         if tags:
-            args.extend(['--nofilename', '--nonumbers', '-o'])
+            args.extend(['--nofilename', '--nonumbers', '--only-matching'])
         else:
             args.extend(['-l'])
         # args.extend(['--silent', '--' + extension[1:], regexp,
@@ -109,6 +132,9 @@ class ExternalSearch:
         Return output of stdout as string.
         """
         output = b''
+        verbose = True
+        if verbose:
+            print('cmd:', ' '.join(args))
         try:
             output = subprocess.check_output(args, shell=False, timeout=10000)
         except subprocess.CalledProcessError as e:
@@ -119,6 +145,8 @@ class ExternalSearch:
                 print('    ', line)
         except subprocess.TimeoutExpired:
             print('sublime_zk: search timed out:', ' '.join(args))
+        if verbose:
+            print(output.decode('utf-8'))
         return output.decode('utf-8')
 
     @staticmethod
@@ -174,6 +202,7 @@ else:
     else:
         print('Sublime_ZK: Not using ag!')
 
+
 def timestamp():
     return '{:%Y%m%d%H%M}'.format(datetime.datetime.now())
 
@@ -225,12 +254,13 @@ def extract_tags(file):
     Returns all words starting with `#`.
     """
     tags = set()
+    # un-require line-start, sublimetext python's RE doesn't like this
+    RE_TAGS = r"(?<=\s)(?<!`)(#+([^#\s.,\/!$%\^&\*;{}\[\]'\"=`~()<>”\\]|:[a-zA-Z0-9])+)"
     with open(file, mode='r', encoding='utf-8') as f:
         for line in f:
             line = line.strip()
-            for word in line.split():
-                if word.startswith('#') and not word.endswith('#'):
-                    tags.add(word)
+            for tag in re.findall(RE_TAGS, line):
+                tags.add(tag[0])
     return tags
 
 def get_all_notes_for(folder, extension):
@@ -252,6 +282,48 @@ def find_all_tags_in(folder, extension):
     for file in get_all_notes_for(folder, extension):
         tags |= extract_tags(file)
     return list(tags)
+
+
+def find_all_notes_all_tags_in(folder, extension):
+    """
+    Manual and ag implementation to get a dict mapping note_ids to tags
+    """
+    global F_EXT_SEARCH
+    if F_EXT_SEARCH:
+        return ExternalSearch.notes_and_tags_in(folder, extension)
+    # manual implementation
+    ret = {}
+    for filn in get_all_notes_for(folder, extension):
+        note_id = get_note_id_of_file(filn)
+        if not note_id:
+            continue
+        tags = list(extract_tags(filn))
+        if tags:
+            ret[note_id] = tags
+    return ret
+
+
+def advanced_tag_search(search_spec, folder, extension):
+    """
+    Return ids of all notes matching the search spec.
+    Search spec is a string consisting of #tags and !#tags.
+    notes containing #tags will be considered unless they contain !#tags
+    """
+    good_tags = set()
+    bad_tags = set()
+    for tagspec in search_spec.split():
+        if tagspec.startswith('!'):
+            bad_tags.add(tagspec[1:])
+        else:
+            good_tags.add(tagspec)
+    note_tag_map = find_all_notes_all_tags_in(folder, extension)
+    matching_note_ids = []
+    for note_id, tags in note_tag_map.items():
+        tags = set(tags)
+        if tags & good_tags:
+            if not tags & bad_tags:
+                matching_note_ids.append(note_id)
+    return matching_note_ids
 
 
 def tag_at(text, pos=None):
@@ -346,18 +418,28 @@ def select_link_in(view):
     return linestart_till_cursor_str, None
 
 
+
+def get_note_id_of_file(filn):
+    """
+    Return the note id of the file named filn or None.
+    """
+    settings = sublime.load_settings('sublime_zk.sublime-settings')
+    extension = settings.get('wiki_extension')
+    if filn.endswith(extension):
+        # we have a markdown file
+        note_id = re.findall('[0-9]{12}', os.path.basename(filn))
+        if note_id:
+            note_id = note_id[0]
+            if os.path.basename(filn).startswith(note_id):
+                return note_id
+
 def get_note_id_of(view):
+    """
+    Return the note id of the given view.
+    """
     filn = view.file_name()
     if filn:
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
-        extension = settings.get('wiki_extension')
-        if filn.endswith(extension):
-            # we have a markdown file
-            note_id = re.findall('[0-9]{12}', os.path.basename(filn))
-            if note_id:
-                note_id = note_id[0]
-                if os.path.basename(filn).startswith(note_id):
-                    return note_id
+        return get_note_id_of_file(filn)
 
 
 class TextProduction:
@@ -904,6 +986,72 @@ class ZkShowAllTagsCommand(sublime_plugin.WindowCommand):
             tagview.set_name('Tags')
             tagview.set_scratch(True)
             tagview.run_command("insert",{"characters": ' ' + '\n'.join(tags)})
+            tagview.set_syntax_file(
+                'Packages/sublime_zk/sublime_zk.sublime-syntax')
+            # return back to note
+            self.window.focus_group(0)
+
+
+class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
+    """
+    Command that creates a new view containing a sorted list of all tags
+    in all notes
+    """
+    def run(self):
+        # sanity check: do we have a project
+        if self.window.project_file_name():
+            # yes we have a project!
+            folder = os.path.dirname(self.window.project_file_name())
+        # sanity check: do we have an open folder
+        elif self.window.folders():
+            # yes we have an open folder!
+            folder = os.path.abspath(self.window.folders()[0])
+        else:
+            # don't know where to grep
+            return
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        extension = settings.get('wiki_extension')
+        self.folder = folder
+        self.extension = extension
+        self.window.show_input_panel('#tags and not !#tags:', '', self.on_done, None, None)
+
+    def on_done(self, input_text):
+        note_ids = advanced_tag_search(input_text, self.folder, self.extension)
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        new_pane = settings.get('show_all_tags_in_new_pane')
+        link_prefix = '[['
+        link_postfix = ']]'
+        if not settings.get('double_brackets', True):
+            link_prefix = '['
+            link_postfix = ']'
+
+        lines = ['Notes matching tagspec ' + input_text + '\n']
+
+        for note_id in note_ids:
+            filn = note_file_by_id(note_id, self.folder, self.extension)
+            if filn:
+                title = os.path.basename(filn).split(' ', 1)[1]
+                line = link_prefix + note_id + link_postfix + ' '
+                line += title
+                lines.append(line)
+        if ExternalSearch.EXTERNALIZE:
+            with open(ExternalSearch.external_file(self.folder), mode='w',
+                encoding='utf-8') as f:
+                f.write('\n'.join(lines))
+            self.window.open_file(ExternalSearch.external_file(self.folder))
+        else:
+            if new_pane:
+                self.window.run_command('set_layout', {
+                    'cols': [0.0, 0.5, 1.0],
+                    'rows': [0.0, 1.0],
+                    'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
+                })
+                # goto right-hand pane
+                self.window.focus_group(1)
+            tagview = self.window.new_file()
+            tagview.set_name('Tag-search')
+            tagview.set_scratch(True)
+            tagview.run_command("insert",{"characters": '\n'.join(lines)})
             tagview.set_syntax_file(
                 'Packages/sublime_zk/sublime_zk.sublime-syntax')
             # return back to note

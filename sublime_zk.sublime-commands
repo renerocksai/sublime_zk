@@ -5,4 +5,5 @@
     { "caption": "ZK: Expand Overview Note", "command": "zk_expand_overview_note" },
     { "caption": "ZK: Refresh Expanded Note", "command": "zk_refresh_expanded_note" },
     { "caption": "ZK: Expand Link inline", "command": "zk_expand_link" },
+    { "caption": "ZK: Search for tag combination", "command": "zk_multi_tag_search" },
 ]
