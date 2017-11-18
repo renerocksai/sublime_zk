@@ -23,7 +23,8 @@ class ZkConstants:
     Tag_Stops = '.,\/!$%\^&\*;\{\}[]\'"=`~()<>\\'
 
     # search for tags in files
-    RE_TAGS = r"(?<=\s|^)(?<!`)(#+([^#\s.,\/!$%\^&\*;{}\[\]'\"=`~()<>”\\]|:[a-zA-Z0-9])+)"
+    RE_TAGS = r"(?<=\s|^)(?<!`)(#+([^#\s.,\/!$%\^&\*;{}\[\]'\"=`~()<>”\\]" \
+                                                             r"|:[a-zA-Z0-9])+)"
 
     # match note links in text
     Link_Matcher = re.compile('(\[+|§)([0-9]{12})(\]+|.?)')
@@ -132,7 +133,7 @@ class ExternalSearch:
         Return output of stdout as string.
         """
         output = b''
-        verbose = True
+        verbose = False
         if verbose:
             print('cmd:', ' '.join(args))
         try:
@@ -255,7 +256,8 @@ def extract_tags(file):
     """
     tags = set()
     # un-require line-start, sublimetext python's RE doesn't like this
-    RE_TAGS = r"(?<=\s)(?<!`)(#+([^#\s.,\/!$%\^&\*;{}\[\]'\"=`~()<>”\\]|:[a-zA-Z0-9])+)"
+    RE_TAGS = r"(?<=\s)(?<!`)(#+([^#\s.,\/!$%\^&\*;{}\[\]'\"=`~()<>”\\]" \
+                                                             r"|:[a-zA-Z0-9])+)"
     with open(file, mode='r', encoding='utf-8') as f:
         for line in f:
             line = line.strip()
@@ -854,9 +856,9 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
             folder = os.path.dirname(self.window.project_file_name())
             if not folder:
                 # I don't know how to save_as the file so there's nothing sane I
-                # can do here. So: non-obtrusively warn the user that this failed
+                # can do here. Non-obtrusively warn the user that this failed
                 self.window.status_message(
-                'New note cannot be created without a project or an open folder!')
+                'Note cannot be created without a project or an open folder!')
                 return
 
         settings = sublime.load_settings('sublime_zk.sublime-settings')
@@ -928,7 +930,7 @@ class ZkTagSelectorCommand(sublime_plugin.TextCommand):
     def on_done(self, selection):
         if selection == -1:
             self.view.run_command(
-                'zk_insert_wiki_link', {'args': {'text': '#'}})   # can be re-used
+                'zk_insert_wiki_link', {'args': {'text': '#'}})   # re-used
             return
 
         tag_txt = self.tags[selection]
@@ -1013,7 +1015,8 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
         extension = settings.get('wiki_extension')
         self.folder = folder
         self.extension = extension
-        self.window.show_input_panel('#tags and not !#tags:', '', self.on_done, None, None)
+        self.window.show_input_panel('#tags and not !#tags:', '', self.on_done,
+            None, None)
 
     def on_done(self, input_text):
         note_ids = advanced_tag_search(input_text, self.folder, self.extension)
