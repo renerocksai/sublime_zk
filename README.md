@@ -34,6 +34,42 @@ See the [Usage](#usage) section below to see how this package might support your
 * **EVEN NEWER**: Inline [expansion](#inline-expansion-of-note-links) of note links via `[ctrl]+[.]`
 * **TOTALLY NEW**: [Searching for advanced tag combinations](#advanced-tag-search)
 
+## Contents
+* [Installation](#installation)
+    * [Automatic Installation & Updates](#automatic-installation-updates)
+    * [Manual Installation](#manual-installation)
+    * [Installing The Silver Searcher](#installing-the-silver-searcher)
+* [Configuration](#configuration)
+    * [Zettelkasten note folder](#zettelkasten-note-folder)
+        * [How do I create a project in SublimeText?](#how-do-i-create-a-project-in-sublimetext)
+            * [Automatic approach](#automatic-approach)
+            * [Manual approach](#manual-approach)
+    * [Markdown filename extension](#markdown-filename-extension)
+    * [Single or double brackets](#single-or-double-brackets)
+    * [Insert links with or without titles](#insert-links-with-or-without-titles)
+    * [IDs in titles of new notes](#ids-in-titles-of-new-notes)
+    * [New Note templates](#new-note-templates)
+    * [Highlight references to other notes](#highlight-references-to-other-notes)
+    * [Configuring SublimeText's line spacing](#configuring-sublimetexts-line-spacing)
+* [Usage](#usage)
+    * [Creating a new note](#creating-a-new-note)
+    * [Syntax Coloring for #tags and footnotes](#syntax-coloring-for-tags-and-footnotes)
+    * [Creating a link](#creating-a-link)
+    * [Using auto-completion to insert note-links](#using-auto-completion-to-insert-note-links)
+    * [Implicitly creating a new note via a link](#implicitly-creating-a-new-note-via-a-link)
+    * [Searching for friends](#searching-for-friends)
+    * [Working with tags](#working-with-tags)
+        * [Getting an overview of all your tags](#getting-an-overview-of-all-your-tags)
+        * [Experimental tag selector](#experimental-tag-selector)
+        * [Searching for notes containing specific tags](#searching-for-notes-containing-specific-tags)
+        * [Advanced Tag Search](#advanced-tag-search)
+    * [Expansion of overview notes with selective refresh](#expansion-of-overview-notes-with-selective-refresh)
+        * [Expansion of overview notes](#expansion-of-overview-notes)
+        * [Refreshing an expanded overview note](#refreshing-an-expanded-overview-note)
+        * [Inline expansion of note-links](#inline-expansion-of-note-links)
+* [Credits](#credits)
+
+
 ## Installation
 
 ### Automatic Installation & Updates
