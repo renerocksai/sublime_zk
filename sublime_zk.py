@@ -1031,6 +1031,7 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
             filn = note_file_by_id(note_id, self.folder, self.extension)
             if filn:
                 title = os.path.basename(filn).split(' ', 1)[1]
+                title = title.replace(self.extension, '')
                 line = link_prefix + note_id + link_postfix + ' '
                 line += title
                 lines.append(line)
