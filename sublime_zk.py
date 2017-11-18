@@ -320,6 +320,10 @@ def advanced_tag_search(search_spec, folder, extension):
             good_tags.add(tagspec)
     note_tag_map = find_all_notes_all_tags_in(folder, extension)
     matching_note_ids = []
+    verbose = False
+    if verbose:
+        import pprint
+        pprint.pprint(note_tag_map)
     for note_id, tags in note_tag_map.items():
         tags = set(tags)
         if tags & good_tags:
@@ -1029,8 +1033,7 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
             link_postfix = ']'
 
         lines = ['Notes matching tagspec ' + input_text + '\n']
-
-        for note_id in note_ids:
+        for note_id in [n for n in note_ids if n]:  # Strip the None
             filn = note_file_by_id(note_id, self.folder, self.extension)
             if filn:
                 title = os.path.basename(filn).split(' ', 1)[1]
