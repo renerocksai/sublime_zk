@@ -32,6 +32,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * [Templates for new notes](#new-note-templates)
 * **NEW**: [Optional](#insert-links-with-or-without-titles) insertion of `[[links]] WITH note titles` instead of just `[[links]]`
 * **EVEN NEWER**: Inline [expansion](#inline-expansion-of-note-links) of note links via `[ctrl]+[.]`
+* **TOTALLY NEW**: [Searching for advanced tag combinations](#advanced-tag-search)
 
 ## Installation
 
@@ -437,6 +438,22 @@ Pressing `[enter]` will start the search and show the search results in a new ta
 
 **Note:** If you set the parameter `show_search_results_in_new_tab` to `false`, then no new tab will be created for search results. They will be displayed in a little sort of pop-up at the bottom of the window.
 
+#### Advanced Tag Search
+
+To search for more sophisticated tag combinations, use the command `ZK: Search for tag combination` from the command palette.
+
+It will prompt you for the tags you want to search for and understands the following syntax:
+
+* `#normal #tags` will be searched for
+* `!#but !#not !#these` - notes containing tags prefixed with an `!` will be ignored
+
+The following screen-shot illustrates this in action:
+
+* at the top right the results for `##AI !#world-domination` are shown: only one note matches
+* at the bottom right the results for `##AI` are shown
+* the left side shows both notes containing `##AI`
+
+![adv_tag_search](https://user-images.githubusercontent.com/30892199/32980898-2224ec2a-cc6f-11e7-8e8b-a146145af853.png)
 
 ### Expansion of overview notes with selective refresh
 
