@@ -11,6 +11,8 @@ In short, it helps you manage an archive of interlinked notes that look like thi
 See the [Usage](#usage) section below to see how this package might support your workflow.
 
 ## Features
+*(This package is still in active development. If you like, stay up to date with latest developments at: [Its dedicated Zettelkasten.de Forum Thread](https://forum.zettelkasten.de/discussion/77/renes-sublimetext-for-zettelkasten-package-talk-and-more#latest))*
+
 * This plugin enables you to place wiki style links like `[[this]]` or `[this]` (and old-school links like this `§201711111709`) into your notes to link to other notes in your note archive.
 * Clicking such a link and pressing `[ctrl]+[enter]` will open the corresponding note.
 * Alternatively, double-clicking the link while holding the `[alt]` key down, will also open the corresponding note.
