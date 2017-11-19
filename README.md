@@ -22,7 +22,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * The ID format is YYYYMMDDHHMM - eg: 201710282111
 * Highlighting of note links
 * Highlighting of #tags
-* Highlighting of footnote references `[^like this one]`
+* Highlighting of footnote references `[^like this one]` and `[@pandoc]` references.
 * Typing `[#][!]` will create a scratch file containing all your **#tags**, sorted
 * `[#][?]` opens up a list of all your **#tags** and lets you fuzzy search and select them (like note-links).
 * Clicking a **#tag** and pressing `[ctrl]+[enter]` will search for all notes containing this tag.
@@ -51,7 +51,7 @@ See the [Usage](#usage) section below to see how this package might support your
     * [New Note templates](#new-note-templates)
     * [Highlight references to other notes](#highlight-references-to-other-notes)
     * [Configuring SublimeText's line spacing](#configuring-sublimetexts-line-spacing)
-    * [Syntax Coloring for #tags and footnotes](#syntax-coloring-for-tags-and-footnotes)
+    * [Syntax Coloring for #tags, footnotes, and pandoc references](#syntax-coloring-for-tags-and-footnotes)
 * [Usage](#usage)
     * [Creating a new note](#creating-a-new-note)
     * [Creating a link](#creating-a-link)
@@ -261,8 +261,8 @@ tags =
 
 ```
 
-### Syntax Coloring for #tags and footnotes
-To enable highlighting of #tags and footnotes in your newly created note, and for all your Zettelkasten notes, switch Sublime Text's syntax to `Markdown Zettelkasten`. You can use the menu: 'View' -> 'Syntax' -> 'Open all with current extension as...', and select 'Markdown Zettelkasten'.
+### Syntax Coloring for #tags, footnotes, and pandoc references
+To enable highlighting of #tags, footnotes, and pandoc references in your newly created note, and for all your Zettelkasten notes, switch Sublime Text's syntax to `Markdown Zettelkasten`. You can use the menu: 'View' -> 'Syntax' -> 'Open all with current extension as...', and select 'Markdown Zettelkasten'.
 
 This package uses a custom scope for note links. While underlining them is done in the plug-in, you have to manually tweak your color scheme. Google is your friend - here is an example that needs to be added to (a copy of) your favourite color scheme:
 
