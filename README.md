@@ -22,7 +22,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * The ID format is YYYYMMDDHHMM - eg: 201710282111
 * Highlighting of note links
 * Highlighting of #tags
-* Highlighting of footnote references `[^like this one]` and `[@pandoc]` references.
+* Highlighting of footnote references `[^like this one]` and `[ref. @pandoc]` references.
 * Typing `[#][!]` will create a scratch file containing all your **#tags**, sorted
 * `[#][?]` opens up a list of all your **#tags** and lets you fuzzy search and select them (like note-links).
 * Clicking a **#tag** and pressing `[ctrl]+[enter]` will search for all notes containing this tag.
