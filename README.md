@@ -51,7 +51,7 @@ See the [Usage](#usage) section below to see how this package might support your
     * [New Note templates](#new-note-templates)
     * [Highlight references to other notes](#highlight-references-to-other-notes)
     * [Configuring SublimeText's line spacing](#configuring-sublimetexts-line-spacing)
-    * [Syntax Coloring for #tags, footnotes, and pandoc references](#syntax-coloring-for-tags-and-footnotes)
+    * [Syntax Coloring for #tags, footnotes, and pandoc references](#syntax-coloring-for-tags-footnotes-and-pandoc-references)
 * [Usage](#usage)
     * [Creating a new note](#creating-a-new-note)
     * [Creating a link](#creating-a-link)
