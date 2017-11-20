@@ -1087,9 +1087,9 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
             return
 
         # ignore completion upon <
-        word = view.substr(view.word(point))
+        word = view.substr(view.word(point)).strip()
         if word.endswith('<'):
-            return
+            return []
 
         folder = get_path_for(view)
         if not folder:
