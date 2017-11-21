@@ -208,7 +208,8 @@ The format string works like this:
 * `\n` creates a new line.
 * `{id}` : the note id like `201712241830`
 * `{title}` : note title like `Why we should celebrate Christmas`
-* `{origin}` : the id of the note you came from when creating a new note
+* `{origin_id}` : the id of the note you came from when creating a new note
+* `{origin_title}` : the title of the note you came from when creating a new note
 * `{file}` : the filename of the note like `201712241830 Why we should celebrate Christmas.md`
 * `{path}` : the path of the note like `/home/reschal/Dropbox/Zettelkasten`
 

@@ -207,13 +207,16 @@ else:
 def timestamp():
     return '{:%Y%m%d%H%M}'.format(datetime.datetime.now())
 
-def create_note(filn, title, origin=None):
+def create_note(filn, title, origin_id=None, origin_title=None):
     params = {
                 'title': title,
                 'file': os.path.basename(filn),
                 'path': os.path.dirname(filn),
                 'id': os.path.basename(filn).split()[0],
-                'origin': origin
+                'origin_id': origin_id,
+                'origin_title': origin_title,
+                # don't break legacy
+                'origin': origin_id,
               }
     settings = sublime.load_settings('sublime_zk.sublime-settings')
     format_str = settings.get('new_note_template')
@@ -424,7 +427,6 @@ def select_link_in(view):
     return linestart_till_cursor_str, None
 
 
-
 def get_note_id_of_file(filn):
     """
     Return the note id of the file named filn or None.
@@ -439,13 +441,21 @@ def get_note_id_of_file(filn):
             if os.path.basename(filn).startswith(note_id):
                 return note_id
 
-def get_note_id_of(view):
+
+def get_note_id_and_title_of(view):
     """
-    Return the note id of the given view.
+    Return the note id  and title of the given view.
     """
     filn = view.file_name()
+    origin_id = None
+    origin_title = None
     if filn:
-        return get_note_id_of_file(filn)
+        origin_id = get_note_id_of_file(filn)
+        origin_title = ''
+        if origin_id:
+            # split off title and replace extension
+            origin_title = filn.rsplit(origin_id)[1].strip().rsplit('.')[0]
+    return origin_id, origin_title
 
 
 class TextProduction:
@@ -759,8 +769,8 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
                 selected_text = new_id + ' ' + selected_text
 
             # try to find out our own note id
-            origin = get_note_id_of(self.view)
-            create_note(the_file, selected_text, origin)
+            origin_id, origin_title = get_note_id_and_title_of(self.view)
+            create_note(the_file, selected_text, origin_id, origin_title)
             new_view = window.open_file(the_file)
 
     def want_event(self):
@@ -838,10 +848,11 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
     def run(self):
         # try to find out if we come from a zettel
         self.origin = None
+        self.o_title = None
         view = self.window.active_view()
         if view:
             filn = view.file_name()
-            self.origin = get_note_id_of(view)
+            self.origin, self.o_title = get_note_id_and_title_of(view)
         self.window.show_input_panel('New Note:', '', self.on_done, None, None)
 
     def on_done(self, input_text):
@@ -875,7 +886,7 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
         if id_in_title:
             input_text = new_id + ' ' + input_text
 
-        create_note(the_file, input_text, self.origin)
+        create_note(the_file, input_text, self.origin, self.o_title)
         new_view = self.window.open_file(the_file)
 
 
