@@ -33,6 +33,35 @@ class ZkConstants:
     # when expanding overview notes
 
 
+class Autobib:
+    """
+    Static class to group all auto-bibliography functions.
+    """
+    citekey_matcher = re.compile('^@.*{([^,]*)[,]?')
+
+    @staticmethod
+    def extract_all_citekeys(bibfile):
+        """
+        Parse the bibfile and return all citekeys.
+        """
+        bibs = ''
+        citekeys = set()
+        with open(bibfile, mode='r', encoding='utf-8') as f:
+            for line in f:
+                print(line)
+                match = Autobib.citekey_matcher.findall(line)
+                if not match:
+                    continue
+                citekeys.add(match[0])
+        return citekeys
+
+    def create_bibliography(text, bibfile, pandoc='pandoc'):
+        """
+        Create a bibliography for all citations in text.
+        """
+        pass
+
+
 class ExternalSearch:
     """
     Static class to group all external search related functions.
@@ -1125,6 +1154,17 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
             if do_insert_title:
                 completion_str += ' ' + notename.replace(extension, '')
             completions.append([noteid + ' ' + notename, completion_str])
+
+        # now come the citekeys
+        bibfile = settings.get('bibfile', None)
+        if bibfile:
+            if os.path.exists(bibfile):
+                citekeys = Autobib.extract_all_citekeys(bibfile)
+                for citekey in citekeys:
+                    citekey = '@' + citekey
+                    completions.append([citekey, '[' + citekey + ']'])
+            else:
+                print('bibfile not found:', bibfile)
         return (completions, sublime.INHIBIT_WORD_COMPLETIONS)
 
     def on_activated(self, view):
