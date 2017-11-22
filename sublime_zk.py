@@ -76,7 +76,7 @@ class Autobib:
         """
         citekeys = Autobib.extract_all_citekeys(bibfile)
         if not citekeys:
-            return
+            return {}
         citekeys = Autobib.find_citations(text, citekeys)
         citekey2bib = {}
         for citekey in citekeys:
