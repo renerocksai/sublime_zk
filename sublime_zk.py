@@ -91,7 +91,14 @@ class Autobib:
         """
         Splits pandoc output into citation and bib part
         """
-        citation, bib, _ = pandoc_out.split('\n\n')
+        print('pandoc_out:', repr(pandoc_out))
+        pdsplit = pandoc_out.split('\n\n')
+        citation = '(no citation generated)'
+        bib =  '(no bib generated)'
+        if len(pdsplit) >= 1:
+            citation = pdsplit[0]
+        if len(pdsplit) >= 2:
+            bib = pdsplit[1]
         citation = citation.replace('\n', ' ')
         bib = bib.replace('\n', ' ')
         return citation, bib
@@ -101,6 +108,7 @@ class Autobib:
         args = [pandoc_bin, '-t', 'plain', '--bibliography', bibfile]
         p = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate(bytes(stdin, 'utf-8'))
+        print('pandoc says:', stderr.decode('utf-8'))
         return stdout.decode('utf-8')
 
 
