@@ -32,9 +32,10 @@ See the [Usage](#usage) section below to see how this package might support your
 * Support for `ag`, [The Silver Searcher](#installing-the-silver-searcher)
 * [Expansion of overview notes with selective refresh](#expansion-of-overview-notes-with-selective-refresh)!!!
 * [Templates for new notes](#new-note-templates)
-* **NEW**: [Optional](#insert-links-with-or-without-titles) insertion of `[[links]] WITH note titles` instead of just `[[links]]`
-* **EVEN NEWER**: Inline [expansion](#inline-expansion-of-note-links) of note links via `[ctrl]+[.]`
-* **TOTALLY NEW**: [Searching for advanced tag combinations](#advanced-tag-search)
+* [Optional](#insert-links-with-or-without-titles) insertion of `[[links]] WITH note titles` instead of just `[[links]]`
+* **NEW**: Inline [expansion](#inline-expansion-of-note-links) of note links via `[ctrl]+[.]`
+* **EVEN NEWER**: [Searching for advanced tag combinations](#advanced-tag-search)
+* **TOTALLY NEW**: [Automatic Bibliographies](#automatic-bibliographies) and [auto-completion for citekeys](#auto-completion-for-citekeys)
 
 ## Contents
 * [Installation](#installation)
@@ -54,6 +55,7 @@ See the [Usage](#usage) section below to see how this package might support your
     * [Highlight references to other notes](#highlight-references-to-other-notes)
     * [Configuring SublimeText's line spacing](#configuring-sublimetexts-line-spacing)
     * [Syntax Coloring for #tags, footnotes, and pandoc references](#syntax-coloring-for-tags-footnotes-and-pandoc-references)
+    * [Location of your .bib file](#location-of-your-bib-file)
 * [Usage](#usage)
     * [Creating a new note](#creating-a-new-note)
     * [Creating a link](#creating-a-link)
@@ -69,6 +71,9 @@ See the [Usage](#usage) section below to see how this package might support your
         * [Expansion of overview notes](#expansion-of-overview-notes)
         * [Refreshing an expanded overview note](#refreshing-an-expanded-overview-note)
         * [Inline expansion of note-links](#inline-expansion-of-note-links)
+    * [Working with Bibliographies](#working-with-bibliographies)
+        * [Auto-Completion for citekeys](#auto-completion-for-citekeys)
+        * [Automatic Bibliographies](#automatic-bibliographies)
 * [Credits](#credits)
 
 
@@ -244,6 +249,12 @@ When looking at the screenshot at the beginning of this document, you might have
 ```
 **Note:** The above file is part of your "User" settings and will be created by SublimeText automatically. It is not the one you downloaded with this plugin. So please don't confuse the two :-)
 
+### Location of your .bib file
+If you [work with bibliographies](#working-with-bibliographies), then you can tell this plugin the location of your `.bib` file. This will enable [auto-completion](#auto-completion-for-citekeys) for `@citekeys` and [automatic creation of bibliographies](#automatic-bibliographies) in your notes. In your settings, add a line like this:
+
+```
+    "bibfile": "/path/to/zotero.bib",
+```
 
 ## Usage
 
@@ -596,6 +607,46 @@ tags =
 **Hint:** If, after expansion, you don't like what you see, just undo! :smile:
 
 **Note:** Use this at your own risk when **ever** planning on refreshing an overview note. You are going to have nested expansions and precisely those will get overwritten when the parent note is refreshed.
+
+### Working with Bibliographies
+
+#### Auto-Completion for @citekeys
+If you [configured](#location-of-your-bib-file) a `.bib` file, then the auto-completion suggestions you get via `[ctrl]+[space]` (or `[alt]+[/]` on Linux) will also contain your cite-keys, marked by a starting `@` symbol. Pressing `[enter]` will insert a pandoc citation like this: `[@citekey]`.
+
+**Note:** Never actually press the `@` key when searching for cite-keys. At least on my system SublimeText will always insert the current suggestion when pressing `@` :(.
+
+#### Automatic Bibliographies
+It is common practice to keep local bibliographies in your notes. This makes each note self-contained and independent of `.bib` files. Manually maintaining a list of all your cited sources can be tedious and error-prone, especially in the case of long notes with many citations. Provided you have [configured](#location-of-your-bib-file) a `.bib` file, then this plugin can take care of all your citations for you.
+
+In any note with citations:
+
+* just bring up the command palette with `[ctrl]+[shift]+[p]` (or `[cmd]+[shift]+[p]` on macOS)
+* type `zk` to see all the Zettelkasten commands
+* and select `ZK: Auto-Bib`
+
+This will add a long comment to your note in the following format *(line wrapping added for github manually)*:
+
+```markdown
+<!-- references (auto)
+
+[@AhrensHowTakeSmart2017]: Ahrens, Sönke. 2017. _How to Take Smart Notes: One Simple Technique
+to Boost Writing, Learning and Thinking for Students, Academics and Nonfiction Book Writers_. 1st ed.
+CreateSpace Independent Publishing Platform.
+
+[@FastZettelkastenmethodeKontrollieredein2015]: Fast, Sascha, and Christian Tietze. 2015.
+_Die Zettelkastenmethode: Kontrolliere dein Wissen_. CreateSpace Independent Publishing Platform.
+
+-->
+```
+
+The animation below shows how handy this is :smile:
+
+![autobib](https://user-images.githubusercontent.com/30892199/33105451-6851a402-cf2d-11e7-8b5a-3d869a269aa0.gif)
+
+**Note:** You don't have to cite in the `[@pandoc]` notation. If a cite-key is in your text, it will get picked up. However, the generated references section will use the `[@pandoc]` notation.
+
+**WARNING**: Do not write below the generated bibliography. Everything after `<!-- references (auto)` will be replaced when you re-run the command!
+
 
 ## Credits
 
