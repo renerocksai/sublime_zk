@@ -7,4 +7,6 @@
     { "caption": "ZK: Expand Link inline", "command": "zk_expand_link" },
     { "caption": "ZK: Search for tag combination", "command": "zk_multi_tag_search" },
     { "caption": "ZK: Auto-Bib", "command": "zk_auto_bib" },
+    { "caption": "ZK: Show Images", "command": "zk_show_images" },
+    { "caption": "ZK: Hide Images", "command": "zk_hide_images" },
 ]

@@ -11,6 +11,8 @@ from collections import defaultdict
 import threading
 import io
 from subprocess import Popen, PIPE
+import struct
+import imghdr
 
 
 
@@ -35,6 +37,87 @@ class ZkConstants:
     # This works in our favour so we support [[201711122259 This is a note]]
     # when expanding overview notes
 
+
+class ImageHandler:
+    """
+    Static class to bundle image handling.
+    """
+
+    FMT = '<img src="file://{}" width="{}" height="{}">'
+    Phantoms = defaultdict(set)
+
+    @staticmethod
+    def show_images(view, max_width=1024):
+        """
+        markup.underline.link.image.markdown
+        """
+        img_regs = view.find_by_selector('markup.underline.link.image.markdown')
+        folder = get_path_for(view)
+        if not folder:
+            return
+        for region in img_regs:
+            rel_p = view.substr(region)
+            img = os.path.join(folder, rel_p)
+            size  = get_image_size(img)
+            if not size:
+                continue
+            w, h = size
+            if w > max_width:
+                m = max_width / w
+                h *= m
+                w = max_width
+
+            print(str(region))
+            view.erase_phantoms(str(region))
+            view.add_phantom(str(region), region, ImageHandler.FMT.format(img, w, h),
+                sublime.LAYOUT_BLOCK)
+            ImageHandler.Phantoms[view.id()].add(str(region))
+
+    @staticmethod
+    def hide_images(view):
+        """
+        Hide all imgs; use buffered identifiers
+        """
+        for rel_p in ImageHandler.Phantoms[view.id()]:
+            view.erase_phantoms(rel_p)
+        del ImageHandler.Phantoms[view.id()]
+
+    @staticmethod
+    def get_image_size(img):
+        """
+        Determine the image type of img and return its size.
+        """
+        with open(img, 'rb') as f:
+            head = f.read(24)
+            if len(head) != 24:
+                return
+            if imghdr.what(img) == 'png':
+                check = struct.unpack('>i', head[4:8])[0]
+                if check != 0x0d0a1a0a:
+                    return
+                width, height = struct.unpack('>ii', head[16:24])
+            elif imghdr.what(img) == 'gif':
+                width, height = struct.unpack('<HH', head[6:10])
+            elif imghdr.what(img) == 'jpeg':
+                try:
+                    f.seek(0) # Read 0xff next
+                    size = 2
+                    ftype = 0
+                    while not 0xc0 <= ftype <= 0xcf:
+                        f.seek(size, 1)
+                        byte = f.read(1)
+                        while ord(byte) == 0xff:
+                            byte = f.read(1)
+                        ftype = ord(byte)
+                        size = struct.unpack('>H', f.read(2))[0] - 2
+                    # SOFn block
+                    f.seek(1, 1)  # skip precision byte.
+                    height, width = struct.unpack('>HH', f.read(4))
+                except Exception:
+                    return
+            else:
+                return
+            return width, height
 
 class Autobib:
     """
@@ -1212,6 +1295,27 @@ class ZkAutoBibCommand(sublime_plugin.TextCommand):
             complete_region = sublime.Region(0, self.view.size())
             self.view.replace(edit, complete_region, result_text)
 
+
+class ZkShowImagesCommand(sublime_plugin.TextCommand):
+    """
+    Show local images inline.
+    """
+    def run(self, edit):
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        max_width = settings.get('img_maxwidth', None)
+        if not max_width:
+            max_width = 1024
+        if max_width < 0:
+            max_width = 1024
+        ImageHandler.show_images(self.view, max_width)
+
+
+class ZkHideImagesCommand(sublime_plugin.TextCommand):
+    """
+    Hide all shown images.
+    """
+    def run(self, edit):
+        ImageHandler.hide_images(self.view)
 
 
 class NoteLinkHighlighter(sublime_plugin.EventListener):
