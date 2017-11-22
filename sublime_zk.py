@@ -130,10 +130,16 @@ class Autobib:
     @staticmethod
     def run(pandoc_bin, bibfile, stdin):
         args = [pandoc_bin, '-t', 'plain', '--bibliography', bibfile]
+        # using universal_newlines here gets us into decoding troubles as the
+        # encoding then is guessed and can be ascii which can't deal with
+        # unicode characters. hence, we handle \r ourselves
         p = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate(bytes(stdin, 'utf-8'))
-        print('pandoc says:', stderr.decode('utf-8'))
-        return stdout.decode('utf-8')
+        # make me windows-safe
+        stdout = stdout.decode('utf-8').replace('\r', '')
+        stderr = stderr.decode('utf-8').replace('\r', '')
+        print('pandoc says:', stderr)
+        return stdout
 
 
 class ExternalSearch:
@@ -1202,7 +1208,7 @@ class ZkAutoBibCommand(sublime_plugin.TextCommand):
                     break
                 new_lines.append(line)
             result_text = '\n'.join(new_lines)
-            result_text += '\n' + '\n'.join(bib_lines)
+            result_text += '\n' + '\n'.join(bib_lines) + '\n'
             complete_region = sublime.Region(0, self.view.size())
             self.view.replace(edit, complete_region, result_text)
 
