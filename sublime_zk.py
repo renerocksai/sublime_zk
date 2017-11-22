@@ -43,6 +43,30 @@ class Autobib:
     citekey_matcher = re.compile('^@.*{([^,]*)[,]?')
 
     @staticmethod
+    def look_for_bibfile(view, settings):
+        """
+        Look for a bib file in the view's folder.
+        If no bib file there, then query the setting.
+        """
+        folder = get_path_for(view)
+        if folder:
+            pattern = os.path.join(folder, '*.bib')
+            bibs = glob.glob(pattern)
+            if bibs:
+                print('Using local', bibs[0])
+                return bibs[0]
+        # try the setting
+        bibfile = settings.get('bibfile', None)
+        if bibfile:
+            if os.path.exists(bibfile):
+                print('Using global', bibfile)
+                return bibfile
+            else:
+                print('bibfile not found:', bibfile)
+                return None
+
+
+    @staticmethod
     def extract_all_citekeys(bibfile):
         """
         Parse the bibfile and return all citekeys.
@@ -1161,7 +1185,7 @@ class ZkAutoBibCommand(sublime_plugin.TextCommand):
     """
     def run(self, edit):
         settings = sublime.load_settings('sublime_zk.sublime-settings')
-        bibfile = settings.get('bibfile', None)
+        bibfile = Autobib.look_for_bibfile(self.view, settings)
         if bibfile:
             text = self.view.substr(sublime.Region(0, self.view.size()))
             ck2bib = Autobib.create_bibliography(text, bibfile, pandoc='pandoc')
@@ -1235,7 +1259,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
             completions.append([noteid + ' ' + notename, completion_str])
 
         # now come the citekeys
-        bibfile = settings.get('bibfile', None)
+        bibfile = Autobib.look_for_bibfile(view, settings)
         if bibfile:
             citekeys = Autobib.extract_all_citekeys(bibfile)
             for citekey in citekeys:
