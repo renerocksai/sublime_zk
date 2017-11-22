@@ -250,11 +250,19 @@ When looking at the screenshot at the beginning of this document, you might have
 **Note:** The above file is part of your "User" settings and will be created by SublimeText automatically. It is not the one you downloaded with this plugin. So please don't confuse the two :-)
 
 ### Location of your .bib file
-If you [work with bibliographies](#working-with-bibliographies), then you can tell this plugin the location of your `.bib` file. This will enable [auto-completion](#auto-completion-for-citekeys) for `@citekeys` and [automatic creation of bibliographies](#automatic-bibliographies) in your notes. In your settings, add a line like this:
+If you [work with bibliographies](#working-with-bibliographies), this plugin can make use of your `.bib` files to enable [auto-completion](#auto-completion-for-citekeys) for `@citekeys` and [automatic creation of bibliographies](#automatic-bibliographies) inside of your notes.
+
+**Note:** If a `.bib` file resides in your note archive folder then the plugin will find it automatically. No configuration needed!
+
+**Hint:** If you happen to work with multiple note archives, each requiring its own `.bib` file, it makes sense to make the `.bib` files part of their corresponding note archives.
+
+However, if you maintain your `.bib` file outside of your note archive then you can configure its location in the plugin's settings; just add a line like this:
 
 ```
     "bibfile": "/path/to/zotero.bib",
 ```
+
+In cases where both a bibfile setting is present *and* an actual `.bib` file is found in your note archive, the one in the note archive will be used.
 
 ## Usage
 
@@ -611,14 +619,14 @@ tags =
 ### Working with Bibliographies
 
 #### Auto-Completion for @citekeys
-If you [configured](#location-of-your-bib-file) a `.bib` file, then the auto-completion suggestions you get via `[ctrl]+[space]` (or `[alt]+[/]` on Linux) will also contain your cite-keys, marked by a starting `@` symbol. Pressing `[enter]` will insert a pandoc citation like this: `[@citekey]`.
+If your note archive contains one or you [configured](#location-of-your-bib-file) a `.bib` file, then the auto-completion suggestions you get via `[ctrl]+[space]` (or `[alt]+[/]` on Linux) will also contain your cite-keys, marked by a starting `@` symbol. Pressing `[enter]` will insert a pandoc citation like this: `[@citekey]`.
 
 **Note:** Never actually press the `@` key when searching for cite-keys. At least on my system SublimeText will always insert the current suggestion when pressing `@` :(.
 
 #### Automatic Bibliographies
-It is common practice to keep local bibliographies in your notes. This makes each note self-contained and independent of `.bib` files. Manually maintaining a list of all your cited sources can be tedious and error-prone, especially in the case of long notes with many citations. Provided you have [configured](#location-of-your-bib-file) a `.bib` file, then this plugin can take care of all your citations for you.
+It is common practice to keep local bibliographies in your notes. This makes each note self-contained and independent of `.bib` files. Manually maintaining a list of all your cited sources can be tedious and error-prone, especially in the case of long notes with many citations. Provided a `.bib` file is part of your note archive or you have [configured](#location-of-your-bib-file) one, then this plugin can take care of all your citations for you.
 
-**Note:** This will only work if you have the `pandoc` utility installed in a location that is referenced by your `PATH` environment variable!
+**Note:** This will only work if you have `pandoc` and its companion `pandoc-citeproc` installed in a location that is referenced by your `PATH` environment variable!
 
 In any note with citations:
 
