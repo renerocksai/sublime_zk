@@ -618,6 +618,8 @@ If you [configured](#location-of-your-bib-file) a `.bib` file, then the auto-com
 #### Automatic Bibliographies
 It is common practice to keep local bibliographies in your notes. This makes each note self-contained and independent of `.bib` files. Manually maintaining a list of all your cited sources can be tedious and error-prone, especially in the case of long notes with many citations. Provided you have [configured](#location-of-your-bib-file) a `.bib` file, then this plugin can take care of all your citations for you.
 
+**Note:** This will only work if you have the `pandoc` utility installed in a location that is referenced by your `PATH` environment variable!
+
 In any note with citations:
 
 * just bring up the command palette with `[ctrl]+[shift]+[p]` (or `[cmd]+[shift]+[p]` on macOS)
