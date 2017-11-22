@@ -9,6 +9,9 @@
 import sublime, sublime_plugin, os, re, subprocess, glob, datetime
 from collections import defaultdict
 import threading
+import io
+from subprocess import Popen, PIPE
+
 
 
 class ZkConstants:
@@ -46,20 +49,59 @@ class Autobib:
         """
         bibs = ''
         citekeys = set()
+        if not os.path.exists(bibfile):
+            print('bibfile not found:', bibfile)
+            return
         with open(bibfile, mode='r', encoding='utf-8') as f:
             for line in f:
-                print(line)
                 match = Autobib.citekey_matcher.findall(line)
                 if not match:
                     continue
                 citekeys.add(match[0])
         return citekeys
 
+    @staticmethod
+    def find_citations(text, citekeys):
+        """
+        Find all mentioned citekeys in text
+        """
+        founds = re.findall('|'.join(list(citekeys)), text)
+        founds = set(founds)
+        return founds
+
+    @staticmethod
     def create_bibliography(text, bibfile, pandoc='pandoc'):
         """
-        Create a bibliography for all citations in text.
+        Create a bibliography for all citations in text in form of a dictionary.
         """
-        pass
+        citekeys = Autobib.extract_all_citekeys(bibfile)
+        if not citekeys:
+            return
+        citekeys = Autobib.find_citations(text, citekeys)
+        citekey2bib = {}
+        for citekey in citekeys:
+            pandoc_input = '@' + citekey
+            pandoc_out = Autobib.run(pandoc, bibfile, pandoc_input)
+            citation, bib = Autobib.parse_pandoc_out(pandoc_out)
+            citekey2bib[citekey] = bib
+        return citekey2bib
+
+    @staticmethod
+    def parse_pandoc_out(pandoc_out):
+        """
+        Splits pandoc output into citation and bib part
+        """
+        citation, bib, _ = pandoc_out.split('\n\n')
+        citation = citation.replace('\n', ' ')
+        bib = bib.replace('\n', ' ')
+        return citation, bib
+
+    @staticmethod
+    def run(pandoc_bin, bibfile, stdin):
+        args = [pandoc_bin, '-t', 'plain', '--bibliography', bibfile]
+        p = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        stdout, stderr = p.communicate(bytes(stdin, 'utf-8'))
+        return stdout.decode('utf-8')
 
 
 class ExternalSearch:
@@ -1105,6 +1147,35 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
             self.window.focus_group(0)
 
 
+class ZkAutoBibCommand(sublime_plugin.TextCommand):
+    """
+    Command that just inserts text, usually a link to a note.
+    """
+    def run(self, edit):
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        bibfile = settings.get('bibfile', None)
+        if bibfile:
+            text = self.view.substr(sublime.Region(0, self.view.size()))
+            ck2bib = Autobib.create_bibliography(text, bibfile, pandoc='pandoc')
+            marker = '<!-- references (auto)'
+            bib_lines = [marker + '\n']
+            for citekey in sorted(ck2bib):
+                bib = ck2bib[citekey]
+                line = '[@{}]: {}\n'.format(citekey, bib)
+                bib_lines.append(line)
+            bib_lines.append('-->')
+            new_lines = []
+            for line in text.split('\n'):
+                if line.strip().startswith(marker):
+                    break
+                new_lines.append(line)
+            result_text = '\n'.join(new_lines)
+            result_text += '\n' + '\n'.join(bib_lines)
+            complete_region = sublime.Region(0, self.view.size())
+            self.view.replace(edit, complete_region, result_text)
+
+
+
 class NoteLinkHighlighter(sublime_plugin.EventListener):
     """
     Receives all updates to all views.
@@ -1158,13 +1229,10 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         # now come the citekeys
         bibfile = settings.get('bibfile', None)
         if bibfile:
-            if os.path.exists(bibfile):
-                citekeys = Autobib.extract_all_citekeys(bibfile)
-                for citekey in citekeys:
-                    citekey = '@' + citekey
-                    completions.append([citekey, '[' + citekey + ']'])
-            else:
-                print('bibfile not found:', bibfile)
+            citekeys = Autobib.extract_all_citekeys(bibfile)
+            for citekey in citekeys:
+                citekey = '@' + citekey
+                completions.append([citekey, '[' + citekey + ']'])
         return (completions, sublime.INHIBIT_WORD_COMPLETIONS)
 
     def on_activated(self, view):
