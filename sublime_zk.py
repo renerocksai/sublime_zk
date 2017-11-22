@@ -51,7 +51,7 @@ class Autobib:
         citekeys = set()
         if not os.path.exists(bibfile):
             print('bibfile not found:', bibfile)
-            return
+            return []
         with open(bibfile, mode='r', encoding='utf-8') as f:
             for line in f:
                 match = Autobib.citekey_matcher.findall(line)
