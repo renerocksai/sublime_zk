@@ -38,6 +38,71 @@ class ZkConstants:
     # when expanding overview notes
 
 
+class TagSearch:
+    """
+    Advanced tag search.
+
+    Grammar:
+    ```
+        search-spec: search-term [, search-term]*
+        search-term: tag-spec [ tag-spec]*
+        tag-spec: [!]#tag-name[*]
+        tag-name: {any valid tag string}
+    ```
+    """
+
+    @staticmethod
+    def advanced_tag_search(search_spec, folder, extension):
+        """
+        Return ids of all notes matching the search_spec.
+        notes containing #tags will be considered unless they contain !#tags
+        """
+        note_tag_map = find_all_notes_all_tags_in(folder, extension)
+        for sterm in [s.strip() for s in search_spec.split(',')]:
+            # iterate through all notes and apply the search-term
+            sterm_results = {}
+            for note_id, tags in note_tag_map.items():
+                if not note_id:
+                    continue
+                # apply each tag-spec match to all tags
+                for tspec in sterm.split():
+                    if tspec[0] == '!':
+                        if tspec[-1] == '*':
+                            match = TagSearch.match_not_startswith(tspec, tags)
+                        else:
+                            match = TagSearch.match_not(tspec, tags)
+                    else:
+                        if tspec[-1] == '*':
+                            match = TagSearch.match_startswith(tspec, tags)
+                        else:
+                            match = TagSearch.match_tag(tspec, tags)
+                    if match:
+                        sterm_results[note_id] = tags   # remember this note
+            # use the results for the next search-term
+            note_tag_map = sterm_results
+        result = list(sterm_results.keys())
+        result.sort()
+        return result
+
+    @staticmethod
+    def match_not(tspec, tags):
+        return tspec[1:] not in tags
+
+    @staticmethod
+    def match_tag(tspec, tags):
+        return tspec in tags
+
+    @staticmethod
+    def match_not_startswith(tspec, tags):
+        tspec = tspec[1:-1]
+        return len([t for t in tags if t.startswith(tspec)]) == 0
+
+    @staticmethod
+    def match_startswith(tspec, tags):
+        tspec = tspec[:-1]
+        return [t for t in tags if t.startswith(tspec)]
+
+
 class ImageHandler:
     """
     Static class to bundle image handling.
@@ -498,33 +563,6 @@ def find_all_notes_all_tags_in(folder, extension):
         if tags:
             ret[note_id] = tags
     return ret
-
-
-def advanced_tag_search(search_spec, folder, extension):
-    """
-    Return ids of all notes matching the search spec.
-    Search spec is a string consisting of #tags and !#tags.
-    notes containing #tags will be considered unless they contain !#tags
-    """
-    good_tags = set()
-    bad_tags = set()
-    for tagspec in search_spec.split():
-        if tagspec.startswith('!'):
-            bad_tags.add(tagspec[1:])
-        else:
-            good_tags.add(tagspec)
-    note_tag_map = find_all_notes_all_tags_in(folder, extension)
-    matching_note_ids = []
-    verbose = False
-    if verbose:
-        import pprint
-        pprint.pprint(note_tag_map)
-    for note_id, tags in note_tag_map.items():
-        tags = set(tags)
-        if tags & good_tags:
-            if not tags & bad_tags:
-                matching_note_ids.append(note_id)
-    return matching_note_ids
 
 
 def tag_at(text, pos=None):
@@ -1226,7 +1264,8 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
             None, None)
 
     def on_done(self, input_text):
-        note_ids = advanced_tag_search(input_text, self.folder, self.extension)
+        note_ids = TagSearch.advanced_tag_search(input_text, self.folder,
+            self.extension)
         settings = sublime.load_settings('sublime_zk.sublime-settings')
         new_pane = settings.get('show_all_tags_in_new_pane')
         link_prefix = '[['
@@ -1235,7 +1274,7 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
             link_prefix = '['
             link_postfix = ']'
 
-        lines = ['Notes matching tagspec ' + input_text + '\n']
+        lines = ['Notes matching search-spec ' + input_text + '\n']
         for note_id in [n for n in note_ids if n]:  # Strip the None
             filn = note_file_by_id(note_id, self.folder, self.extension)
             if filn:
