@@ -43,3 +43,7 @@ contexts:
           captures:
             '1': punctuation.definition.footnote.begin.markdown
             '2': markup.zettel.link
+        # todo
+        - match: '(?i)(todo:)'
+          captures:
+            '1': string.unquoted.plain.out.yaml
