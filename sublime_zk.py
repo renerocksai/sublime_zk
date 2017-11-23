@@ -67,7 +67,6 @@ class ImageHandler:
                 h *= m
                 w = max_width
 
-            print(str(region))
             view.erase_phantoms(str(region))
             view.add_phantom(str(region), region, ImageHandler.FMT.format(img, w, h),
                 sublime.LAYOUT_BLOCK)
