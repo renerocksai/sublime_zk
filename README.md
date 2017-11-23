@@ -36,6 +36,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * **NEW**: Inline [expansion](#inline-expansion-of-note-links) of note links via `[ctrl]+[.]`
 * **EVEN NEWER**: [Searching for advanced tag combinations](#advanced-tag-search)
 * **TOTALLY NEW**: [Automatic Bibliographies](#automatic-bibliographies) and [auto-completion for citekeys](#auto-completion-for-citekeys)
+* **SHOCKINGLY NEW**: [Inline Local Image Display](#inline-local-image-display)
 
 ## Contents
 * [Installation](#installation)
@@ -56,6 +57,7 @@ See the [Usage](#usage) section below to see how this package might support your
     * [Configuring SublimeText's line spacing](#configuring-sublimetexts-line-spacing)
     * [Syntax Coloring for #tags, footnotes, and pandoc references](#syntax-coloring-for-tags-footnotes-and-pandoc-references)
     * [Location of your .bib file](#location-of-your-bib-file)
+    * [Inline image preview size](#inline-image-preview-size)
 * [Usage](#usage)
     * [Creating a new note](#creating-a-new-note)
     * [Creating a link](#creating-a-link)
@@ -74,6 +76,7 @@ See the [Usage](#usage) section below to see how this package might support your
     * [Working with Bibliographies](#working-with-bibliographies)
         * [Auto-Completion for citekeys](#auto-completion-for-citekeys)
         * [Automatic Bibliographies](#automatic-bibliographies)
+    * [Inline Local Image Display](#inline-local-image-display)
 * [Credits](#credits)
 
 
@@ -263,6 +266,15 @@ However, if you maintain your `.bib` file outside of your note archive then you 
 ```
 
 In cases where both a bibfile setting is present *and* an actual `.bib` file is found in your note archive, the one in the note archive will be used.
+
+### Inline image preview size
+This plugin can [show local images](#inline-local-image-display) directly inside your note. To make sure that huge images won't steal too much of your screen, you can limit their size by width. Larger images will always be scaled to not exceed the maximum width.
+
+The default setting limits images to be 320 pixels wide:
+
+```
+    "img_maxwidth": 320,
+```
 
 ## Usage
 
@@ -656,6 +668,27 @@ The animation below shows how handy this is :smile:
 **Note:** You don't have to cite in the `[@pandoc]` notation. If a cite-key is in your text, it will get picked up. However, the generated references section will use the `[@pandoc]` notation.
 
 **WARNING**: Do not write below the generated bibliography. Everything after `<!-- references (auto)` will be replaced when you re-run the command!
+
+### Inline Local Image Display
+Markdown notes are great! Especially because they are text-based. Sometimes, though, they contain images. Well, **links** to images: you only see them when you convert your note into a format that supports images.
+
+Thanks to this plugin, you can now even view your **local** images directly in SublimeText:
+
+* just bring up the command palette with `[ctrl]+[shift]+[p]` (or `[cmd]+[shift]+[p]` on macOS)
+* type `show`
+* select `ZK: Show Images`
+
+**Note**: This *only* works with images stored in your note archive folder (or a subfolder thereof).
+
+You can configure a [size limit](#inline-image-preview-size) for images to make sure big ones don't cover all your screen.
+
+To hide them:
+
+* bring up the command palette with `[ctrl]+[shift]+[p]` (or `[cmd]+[shift]+[p]` on macOS)
+* type `show`
+* select `ZK: Hide Images`
+
+![inline_imgs](https://user-images.githubusercontent.com/30892199/33154565-7df466ac-cfe9-11e7-8920-b204fa4dcb02.gif)
 
 
 ## Credits
