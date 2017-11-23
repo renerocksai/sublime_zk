@@ -58,7 +58,7 @@ class ImageHandler:
         for region in img_regs:
             rel_p = view.substr(region)
             img = os.path.join(folder, rel_p)
-            size  = get_image_size(img)
+            size  = ImageHandler.get_image_size(img)
             if not size:
                 continue
             w, h = size
@@ -88,6 +88,7 @@ class ImageHandler:
         """
         with open(img, 'rb') as f:
             head = f.read(24)
+            # print('head:\n', repr(head))
             if len(head) != 24:
                 return
             if imghdr.what(img) == 'png':
