@@ -30,6 +30,10 @@ class ZkConstants:
     # search for tags in files
     RE_TAGS = r"(?<=\s|^)(?<!`)(#+([^#\s.,\/!$%\^&\*;{}\[\]'\"=`~()<>”\\]" \
                                                              r"|:[a-zA-Z0-9])+)"
+    # Same RE just for ST python's re module
+    ## un-require line-start, sublimetext python's RE doesn't like it
+    RE_TAGS_PY = r"(?<=\s)(?<!`)(#+([^#\s.,\/!$%\^&\*;{}\[\]'\"=`~()<>”\\]" \
+                                                             r"|:[a-zA-Z0-9])+)"
 
     # match note links in text
     Link_Matcher = re.compile('(\[+|§)([0-9]{12})(\]+|.?)')
@@ -55,7 +59,6 @@ class TagSearch:
     def advanced_tag_search(search_spec, folder, extension):
         """
         Return ids of all notes matching the search_spec.
-        notes containing #tags will be considered unless they contain !#tags
         """
         note_tag_map = find_all_notes_all_tags_in(folder, extension)
         for sterm in [s.strip() for s in search_spec.split(',')]:
@@ -443,6 +446,129 @@ class ExternalSearch:
         return os.path.join(folder, ExternalSearch.EXTERNALIZE)
 
 
+class TextProduction:
+    """
+    Static class grouping functions for text production from overview notes.
+    """
+    @staticmethod
+    def read_full_note(note_id, folder, extension):
+        """
+        Return contents of note with ID note_id.
+        """
+        note_file = note_file_by_id(note_id, folder, extension)
+        if not note_file:
+            return None, None
+        with open(note_file, mode='r', encoding='utf-8') as f:
+            return note_file, f.read()
+
+    @staticmethod
+    def expand_links(text, folder, extension, replace_lines=False):
+        """
+        Expand all note-links in text, replacing their lines by note contents.
+        """
+        result_lines = []
+        for line in text.split('\n'):
+            link_results = ZkConstants.Link_Matcher.findall(line)
+            if link_results:
+                if not replace_lines:
+                    result_lines.append(line)
+                for pre, note_id, post in link_results:
+                    note_file, content = TextProduction.read_full_note(note_id,
+                        folder, extension)
+                    if not content:
+                        header = '\n<!-- Note not found: ' + note_id + ' -->'
+                    else:
+                        filename = os.path.basename(note_file).replace(
+                            extension, '')
+                        filename = filename.split(' ', 1)[1]
+                        header = pre + note_id + post + ' ' + filename
+                        header = '\n<!-- !    ' + header + '    -->'
+                        footer = '<!-- (End of note ' + note_id + ') -->'
+                        result_lines.append(header)
+                        result_lines.extend(content.split('\n'))
+                    result_lines.append(footer)
+            else:
+                result_lines.append(line)
+        return '\n'.join(result_lines)
+
+    @staticmethod
+    def refresh_result(text, folder, extension):
+        """
+        Refresh the result of expand_links with current contents of referenced
+        notes.
+        """
+        result_lines = []
+        state = 'default'
+        note_id = pre = post = None
+
+        for line in text.split('\n'):
+            if state == 'skip_lines':
+                if not line.startswith('<!-- (End of note'):
+                    continue
+                # insert note
+                note_file, content = TextProduction.read_full_note(note_id,
+                    folder, extension)
+                if not content:
+                    header = '\n<!-- Note not found: ' + note_id + ' -->'
+                else:
+                    filename = os.path.basename(note_file).replace(
+                        extension, '')
+                    filename = filename.split(' ', 1)[1]
+                    header = pre + note_id + post + ' ' + filename
+                    header = '<!-- !    ' + header + '    -->'
+                    footer = '<!-- (End of note ' + note_id + ') -->'
+                    result_lines.append(header)
+                    result_lines.extend(content.split('\n'))
+                result_lines.append(footer)
+                state = 'default'
+                continue
+
+            if line.startswith('<!-- !'):
+                # get note id
+                note_links = ZkConstants.Link_Matcher.findall(line)
+                if note_links:
+                    pre, note_id, post = note_links[0]
+                    state = 'skip_lines'
+            else:
+                result_lines.append(line)
+        return '\n'.join(result_lines)
+
+    @staticmethod
+    def expand_link_in(view, edit, folder, extension):
+        """
+        Expand note-link under cursor inside the current view
+        """
+        linestart_till_cursor_str, link_region = select_link_in(view)
+        if not link_region:
+            return
+        note_id = view.substr(link_region)
+        cursor_pos = view.sel()[0].begin()
+        line_region = view.line(cursor_pos)
+
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        pre = '[['
+        post = ']]'
+        if not settings.get('double_brackets', True):
+            pre = '['
+            post = ']'
+
+        result_lines = []
+
+        note_file, content = TextProduction.read_full_note(note_id, folder,
+            extension)
+        if not content:
+            header = '\n<!-- Note not found: ' + note_id + ' -->'
+        else:
+            filename = os.path.basename(note_file).replace(extension, '')
+            filename = filename.split(' ', 1)[1]
+            header = pre + note_id + post + ' ' + filename
+            header = '\n<!-- !    ' + header + '    -->'
+            footer = '<!-- (End of note ' + note_id + ') -->'
+            result_lines.append(header)
+            result_lines.extend(content.split('\n'))
+        result_lines.append(footer)
+        view.insert(edit, line_region.b, '\n' + '\n'.join(result_lines))
+
 # global magic
 F_EXT_SEARCH = os.system('{} --help'.format(ExternalSearch.SEARCH_COMMAND)) == 0
 if F_EXT_SEARCH:
@@ -513,15 +639,13 @@ def extract_tags(file):
     """
     Extract #tags from file.
     Returns all words starting with `#`.
+    To be precise, it returns everything that matches RE_TAGS_PY.
     """
     tags = set()
-    # un-require line-start, sublimetext python's RE doesn't like this
-    RE_TAGS = r"(?<=\s)(?<!`)(#+([^#\s.,\/!$%\^&\*;{}\[\]'\"=`~()<>”\\]" \
-                                                             r"|:[a-zA-Z0-9])+)"
     with open(file, mode='r', encoding='utf-8') as f:
         for line in f:
             line = line.strip()
-            for tag in re.findall(RE_TAGS, line):
+            for tag in re.findall(ZkConstants.RE_TAGS_PY, line):
                 tags.add(tag[0])
     return tags
 
@@ -686,130 +810,6 @@ def get_note_id_and_title_of(view):
             # split off title and replace extension
             origin_title = filn.rsplit(origin_id)[1].strip().rsplit('.')[0]
     return origin_id, origin_title
-
-
-class TextProduction:
-    """
-    Static class grouping functions for text production from overview notes.
-    """
-    @staticmethod
-    def read_full_note(note_id, folder, extension):
-        """
-        Return contents of note with ID note_id.
-        """
-        note_file = note_file_by_id(note_id, folder, extension)
-        if not note_file:
-            return None, None
-        with open(note_file, mode='r', encoding='utf-8') as f:
-            return note_file, f.read()
-
-    @staticmethod
-    def expand_links(text, folder, extension, replace_lines=False):
-        """
-        Expand all note-links in text, replacing their lines by note contents.
-        """
-        result_lines = []
-        for line in text.split('\n'):
-            link_results = ZkConstants.Link_Matcher.findall(line)
-            if link_results:
-                if not replace_lines:
-                    result_lines.append(line)
-                for pre, note_id, post in link_results:
-                    note_file, content = TextProduction.read_full_note(note_id,
-                        folder, extension)
-                    if not content:
-                        header = '\n<!-- Note not found: ' + note_id + ' -->'
-                    else:
-                        filename = os.path.basename(note_file).replace(
-                            extension, '')
-                        filename = filename.split(' ', 1)[1]
-                        header = pre + note_id + post + ' ' + filename
-                        header = '\n<!-- !    ' + header + '    -->'
-                        footer = '<!-- (End of note ' + note_id + ') -->'
-                        result_lines.append(header)
-                        result_lines.extend(content.split('\n'))
-                    result_lines.append(footer)
-            else:
-                result_lines.append(line)
-        return '\n'.join(result_lines)
-
-    @staticmethod
-    def refresh_result(text, folder, extension):
-        """
-        Refresh the result of expand_links with current contents of referenced
-        notes.
-        """
-        result_lines = []
-        state = 'default'
-        note_id = pre = post = None
-
-        for line in text.split('\n'):
-            if state == 'skip_lines':
-                if not line.startswith('<!-- (End of note'):
-                    continue
-                # insert note
-                note_file, content = TextProduction.read_full_note(note_id,
-                    folder, extension)
-                if not content:
-                    header = '\n<!-- Note not found: ' + note_id + ' -->'
-                else:
-                    filename = os.path.basename(note_file).replace(
-                        extension, '')
-                    filename = filename.split(' ', 1)[1]
-                    header = pre + note_id + post + ' ' + filename
-                    header = '<!-- !    ' + header + '    -->'
-                    footer = '<!-- (End of note ' + note_id + ') -->'
-                    result_lines.append(header)
-                    result_lines.extend(content.split('\n'))
-                result_lines.append(footer)
-                state = 'default'
-                continue
-
-            if line.startswith('<!-- !'):
-                # get note id
-                note_links = ZkConstants.Link_Matcher.findall(line)
-                if note_links:
-                    pre, note_id, post = note_links[0]
-                    state = 'skip_lines'
-            else:
-                result_lines.append(line)
-        return '\n'.join(result_lines)
-
-    @staticmethod
-    def expand_link_in(view, edit, folder, extension):
-        """
-        Expand note-link under cursor inside the current view
-        """
-        linestart_till_cursor_str, link_region = select_link_in(view)
-        if not link_region:
-            return
-        note_id = view.substr(link_region)
-        cursor_pos = view.sel()[0].begin()
-        line_region = view.line(cursor_pos)
-
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
-        pre = '[['
-        post = ']]'
-        if not settings.get('double_brackets', True):
-            pre = '['
-            post = ']'
-
-        result_lines = []
-
-        note_file, content = TextProduction.read_full_note(note_id, folder,
-            extension)
-        if not content:
-            header = '\n<!-- Note not found: ' + note_id + ' -->'
-        else:
-            filename = os.path.basename(note_file).replace(extension, '')
-            filename = filename.split(' ', 1)[1]
-            header = pre + note_id + post + ' ' + filename
-            header = '\n<!-- !    ' + header + '    -->'
-            footer = '<!-- (End of note ' + note_id + ') -->'
-            result_lines.append(header)
-            result_lines.extend(content.split('\n'))
-        result_lines.append(footer)
-        view.insert(edit, line_region.b, '\n' + '\n'.join(result_lines))
 
 
 class ZkExpandLinkCommand(sublime_plugin.TextCommand):
@@ -1241,8 +1241,8 @@ class ZkShowAllTagsCommand(sublime_plugin.WindowCommand):
 
 class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
     """
-    Command that creates a new view containing a sorted list of all tags
-    in all notes
+    Command for the advanced tag search.
+    Prompts for search-spec, executes search, and shows results.
     """
     def run(self):
         # sanity check: do we have a project
