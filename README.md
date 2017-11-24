@@ -561,9 +561,11 @@ tag-name: {any valid tag string}
 Examples:
 
 `#transport !#car` : all notes with transport **+** all notes not containing car (such as `#plane`)
+
 There is no comma. Hence, two search terms will be evaluated and the results of all of them will be combined (_OR_).
 
 `#transport, !#car`: all notes with transport **-** all notes containing car
+
 Here, there is a comma. So first all notes tagged with `#transport` will be searched and of those only the ones that are not tagged with `#car` will be kept (_AND_).
 
 Pretty powerful.
