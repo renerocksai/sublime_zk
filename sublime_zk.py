@@ -3,8 +3,8 @@
         ________ _\_ |__ |  | |__| _____   ____      _______|  | __
        /  ___/  |  \ __ \|  | |  |/     \_/ __ \     \___   /  |/ /
        \___ \|  |  / \_\ \  |_|  |  Y Y  \  ___/      /    /|    <
-      /____  >____/|___  /____/__|__|_|  /\___  >____/_____ \__|_ \
-           \/          \/              \/     \/_____/     \/    \/
+      /____  >____/|___  /____/__|__|_|  /\___  >    /_____ \__|_ \
+           \/          \/              \/     \/           \/    \/
 """
 import sublime, sublime_plugin, os, re, subprocess, glob, datetime
 from collections import defaultdict
@@ -21,6 +21,8 @@ class ZkConstants:
     """
     Some constants used over and over
     """
+    Settings_File = 'sublime_zk.sublime-settings'
+    Syntax_File = 'Packages/sublime_zk/sublime_zk.sublime-syntax'
     Link_Prefix = '['
     Link_Prefix_Len = len(Link_Prefix)
     Link_Postfix = ']'
@@ -45,6 +47,33 @@ class ZkConstants:
     # TOC markers
     TOC_HDR = '<!-- table of contents (auto) -->'
     TOC_END = '<!-- (end of auto-toc) -->'
+
+
+# global magic
+F_EXT_SEARCH = False
+
+def get_settings():
+    return sublime.load_settings(ZkConstants.Settings_File)
+
+def plugin_loaded():
+    global F_EXT_SEARCH
+    F_EXT_SEARCH = os.system(ExternalSearch.SEARCH_COMMAND + ' --help') == 0
+
+    if F_EXT_SEARCH:
+        print('Sublime_ZK: Using ag!')
+    else:
+        settings = get_settings()
+        ag = settings.get('path_to_ag', '/usr/local/bin/ag')
+        if ag:
+            if os.system(ag + ' --help') == 0:
+                ExternalSearch.SEARCH_COMMAND = ag
+                F_EXT_SEARCH = True
+                print('Sublime_ZK: Using ', ag)
+            else:
+                print('Sublime_ZK: Not using ag!')
+        else:
+            print('Sublime_ZK: Not using ag!')
+
 
 class TagSearch:
     """
@@ -140,8 +169,9 @@ class ImageHandler:
                 w = max_width
 
             view.erase_phantoms(str(region))
-            view.add_phantom(str(region), region, ImageHandler.FMT.format(img, w, h),
-                sublime.LAYOUT_BLOCK)
+            view.add_phantom(str(region), region,
+                             ImageHandler.FMT.format(img, w, h),
+                             sublime.LAYOUT_BLOCK)
             ImageHandler.Phantoms[view.id()].add(str(region))
 
     @staticmethod
@@ -293,7 +323,7 @@ class Autobib:
         # make me windows-safe
         stdout = stdout.decode('utf-8').replace('\r', '')
         stderr = stderr.decode('utf-8').replace('\r', '')
-        print('pandoc says:', stderr)
+        # print('pandoc says:', stderr)
         return stdout
 
 
@@ -361,12 +391,7 @@ class ExternalSearch:
         """
         regexp = '(\[' + note_id + '\])|(§' + note_id + ')'
         output = ExternalSearch.search_in(folder, regexp, extension)
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
-        link_prefix = '[['
-        link_postfix = ']]'
-        if not settings.get('double_brackets', True):
-            link_prefix = '['
-            link_postfix = ']'
+        link_prefix, link_postfix = get_link_pre_postfix()
         prefix = 'Notes referencing {}{}{}:'.format(link_prefix, note_id,
             link_postfix)
         ExternalSearch.externalize_note_links(output, folder, prefix)
@@ -385,9 +410,7 @@ class ExternalSearch:
             args.extend(['--nofilename', '--nonumbers', '--only-matching'])
         else:
             args.extend(['-l'])
-        # args.extend(['--silent', '--' + extension[1:], regexp,
-        args.extend(['--silent', '--markdown', regexp,
-            folder])
+        args.extend(['--silent', '--markdown', regexp, folder])
         return ExternalSearch.run(args, folder)
 
     @staticmethod
@@ -421,14 +444,7 @@ class ExternalSearch:
         in `[[note_id]] note title` style.
         """
         if ExternalSearch.EXTERNALIZE:
-            settings = sublime.load_settings('sublime_zk.sublime-settings')
-            extension = settings.get('wiki_extension')
-            link_prefix = '[['
-            link_postfix = ']]'
-            if not settings.get('double_brackets', True):
-                link_prefix = '['
-                link_postfix = ']'
-
+            link_prefix, link_postfix = get_link_pre_postfix()
             with open(ExternalSearch.external_file(folder),
                 mode='w', encoding='utf-8') as f:
                 if prefix:
@@ -449,6 +465,33 @@ class ExternalSearch:
         """ Return the name of the external search results file. """
         return os.path.join(folder, ExternalSearch.EXTERNALIZE)
 
+    @staticmethod
+    def show_search_results(window, folder, title, lines, new_pane_setting):
+        """
+        Helper method to display the results either in the external file
+        or, if not available, in a new window
+        """
+        if ExternalSearch.EXTERNALIZE:
+            window.open_file(ExternalSearch.external_file(folder))
+        else:
+            settings = get_settings()
+            new_pane = settings.get(new_pane_setting)
+            if new_pane:
+                window.run_command('set_layout', {
+                    'cols': [0.0, 0.5, 1.0],
+                    'rows': [0.0, 1.0],
+                    'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
+                })
+                # goto right-hand pane
+                window.focus_group(1)
+            tagview = window.new_file()
+            tagview.set_name(title)
+            tagview.set_scratch(True)
+            tagview.run_command("insert",{"characters": ' ' + '\n'.join(lines)})
+            tagview.set_syntax_file(ZkConstants.Syntax_File)
+            # return back to note
+            window.focus_group(0)
+
 
 class TextProduction:
     """
@@ -466,6 +509,27 @@ class TextProduction:
             return note_file, f.read()
 
     @staticmethod
+    def embed_note(note_id, folder, extension, link_prefix, link_postfix):
+        """
+        Put the contents of a note into a comment block.
+        """
+        result_lines = []
+        note_file, content = TextProduction.read_full_note(note_id, folder,
+                                                                    extension)
+        if not content:
+            header = '<!-- Note not found: ' + note_id + ' -->'
+        else:
+            filename = os.path.basename(note_file).replace(extension, '')
+            filename = filename.split(' ', 1)[1]
+            header = link_prefix + note_id + link_postfix + ' ' + filename
+            header = '<!-- !    ' + header + '    -->'
+            footer = '<!-- (End of note ' + note_id + ') -->'
+            result_lines.append(header)
+            result_lines.extend(content.split('\n'))
+        result_lines.append(footer)
+        return result_lines
+
+    @staticmethod
     def expand_links(text, folder, extension, replace_lines=False):
         """
         Expand all note-links in text, replacing their lines by note contents.
@@ -477,20 +541,8 @@ class TextProduction:
                 if not replace_lines:
                     result_lines.append(line)
                 for pre, note_id, post in link_results:
-                    note_file, content = TextProduction.read_full_note(note_id,
-                        folder, extension)
-                    if not content:
-                        header = '\n<!-- Note not found: ' + note_id + ' -->'
-                    else:
-                        filename = os.path.basename(note_file).replace(
-                            extension, '')
-                        filename = filename.split(' ', 1)[1]
-                        header = pre + note_id + post + ' ' + filename
-                        header = '\n<!-- !    ' + header + '    -->'
-                        footer = '<!-- (End of note ' + note_id + ') -->'
-                        result_lines.append(header)
-                        result_lines.extend(content.split('\n'))
-                    result_lines.append(footer)
+                    result_lines.extend(TextProduction.embed_note(note_id,
+                        folder, extension, pre, post))
             else:
                 result_lines.append(line)
         return '\n'.join(result_lines)
@@ -510,20 +562,8 @@ class TextProduction:
                 if not line.startswith('<!-- (End of note'):
                     continue
                 # insert note
-                note_file, content = TextProduction.read_full_note(note_id,
-                    folder, extension)
-                if not content:
-                    header = '\n<!-- Note not found: ' + note_id + ' -->'
-                else:
-                    filename = os.path.basename(note_file).replace(
-                        extension, '')
-                    filename = filename.split(' ', 1)[1]
-                    header = pre + note_id + post + ' ' + filename
-                    header = '<!-- !    ' + header + '    -->'
-                    footer = '<!-- (End of note ' + note_id + ') -->'
-                    result_lines.append(header)
-                    result_lines.extend(content.split('\n'))
-                result_lines.append(footer)
+                result_lines.extend(TextProduction.embed_note(note_id, folder,
+                    extension, pre, post))
                 state = 'default'
                 continue
 
@@ -549,50 +589,25 @@ class TextProduction:
         cursor_pos = view.sel()[0].begin()
         line_region = view.line(cursor_pos)
 
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
-        pre = '[['
-        post = ']]'
-        if not settings.get('double_brackets', True):
-            pre = '['
-            post = ']'
-
-        result_lines = []
-
-        note_file, content = TextProduction.read_full_note(note_id, folder,
-            extension)
-        if not content:
-            header = '\n<!-- Note not found: ' + note_id + ' -->'
-        else:
-            filename = os.path.basename(note_file).replace(extension, '')
-            filename = filename.split(' ', 1)[1]
-            header = pre + note_id + post + ' ' + filename
-            header = '\n<!-- !    ' + header + '    -->'
-            footer = '<!-- (End of note ' + note_id + ') -->'
-            result_lines.append(header)
-            result_lines.extend(content.split('\n'))
-        result_lines.append(footer)
+        pre, post = get_link_pre_postfix()
+        result_lines = TextProduction.embed_note(note_id, folder, extension,
+                                                                    pre, post)
+        result_lines.append('')   # append a newline for empty line after exp.
         view.insert(edit, line_region.b, '\n' + '\n'.join(result_lines))
-
-# global magic
-F_EXT_SEARCH = os.system('{} --help'.format(ExternalSearch.SEARCH_COMMAND)) == 0
-if F_EXT_SEARCH:
-    print('Sublime_ZK: Using ag!')
-else:
-    settings = sublime.load_settings('sublime_zk.sublime-settings')
-    ag = settings.get('path_to_ag', '/usr/local/bin/ag')
-    if ag:
-        if os.system(ag + ' --help') == 0:
-            ExternalSearch.SEARCH_COMMAND = ag
-            F_EXT_SEARCH = True
-            print('Sublime_ZK: Using ', ag)
-        else:
-            print('Sublime_ZK: Not using ag!')
-    else:
-        print('Sublime_ZK: Not using ag!')
 
 
 def timestamp():
     return '{:%Y%m%d%H%M}'.format(datetime.datetime.now())
+
+def get_link_pre_postfix():
+    settings = get_settings()
+    extension = settings.get('wiki_extension')
+    link_prefix = '[['
+    link_postfix = ']]'
+    if not settings.get('double_brackets', True):
+        link_prefix = '['
+        link_postfix = ']'
+    return link_prefix, link_postfix
 
 def create_note(filn, title, origin_id=None, origin_title=None):
     params = {
@@ -605,7 +620,7 @@ def create_note(filn, title, origin_id=None, origin_title=None):
                 # don't break legacy
                 'origin': origin_id,
               }
-    settings = sublime.load_settings('sublime_zk.sublime-settings')
+    settings = get_settings()
     format_str = settings.get('new_note_template')
     if not format_str:
         format_str = u'# {title}\ntags = \n\n'
@@ -673,7 +688,6 @@ def find_all_tags_in(folder, extension):
         tags |= extract_tags(file)
     return list(tags)
 
-
 def find_all_notes_all_tags_in(folder, extension):
     """
     Manual and ag implementation to get a dict mapping note_ids to tags
@@ -691,7 +705,6 @@ def find_all_notes_all_tags_in(folder, extension):
         if tags:
             ret[note_id] = tags
     return ret
-
 
 def tag_at(text, pos=None):
     """
@@ -734,7 +747,6 @@ def tag_at(text, pos=None):
         if tag.replace('#', ''):
             return text[inner:end], (inner, end)
     return '', (None, None)
-
 
 def select_link_in(view):
     """
@@ -784,12 +796,11 @@ def select_link_in(view):
             return  linestart_till_cursor_str, link_region
     return linestart_till_cursor_str, None
 
-
 def get_note_id_of_file(filn):
     """
     Return the note id of the file named filn or None.
     """
-    settings = sublime.load_settings('sublime_zk.sublime-settings')
+    settings = get_settings()
     extension = settings.get('wiki_extension')
     if filn.endswith(extension):
         # we have a markdown file
@@ -798,7 +809,6 @@ def get_note_id_of_file(filn):
             note_id = note_id[0]
             if os.path.basename(filn).startswith(note_id):
                 return note_id
-
 
 def get_note_id_and_title_of(view):
     """
@@ -825,7 +835,7 @@ class ZkExpandLinkCommand(sublime_plugin.TextCommand):
         if not folder:
             return
 
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        settings = get_settings()
         extension = settings.get('wiki_extension')
         TextProduction.expand_link_in(self.view, edit, folder, extension)
 
@@ -839,7 +849,7 @@ class ZkExpandOverviewNoteCommand(sublime_plugin.TextCommand):
         if not folder:
             return
 
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        settings = get_settings()
         extension = settings.get('wiki_extension')
 
         complete_text = self.view.substr(sublime.Region(0, self.view.size()))
@@ -851,8 +861,7 @@ class ZkExpandOverviewNoteCommand(sublime_plugin.TextCommand):
         # new_view.run_command("insert", {"characters": result_text})
         new_view.insert(edit, 0, result_text)   # no auto-indent
         # set syntax late, seems to speed insertion up
-        new_view.set_syntax_file(
-            'Packages/sublime_zk/sublime_zk.sublime-syntax')
+        new_view.set_syntax_file(ZkConstants.Syntax_File)
 
 
 class ZkRefreshExpandedNoteCommand(sublime_plugin.TextCommand):
@@ -864,7 +873,7 @@ class ZkRefreshExpandedNoteCommand(sublime_plugin.TextCommand):
         if not folder:
             return
 
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        settings = get_settings()
         extension = settings.get('wiki_extension')
         complete_region = sublime.Region(0, self.view.size())
         complete_text = self.view.substr(complete_region)
@@ -914,7 +923,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
             if not tag:
                 return
 
-            settings = sublime.load_settings('sublime_zk.sublime-settings')
+            settings = get_settings()
 
             if F_EXT_SEARCH:
                 extension = settings.get('wiki_extension')
@@ -961,7 +970,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         if not folder:
             return
 
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        settings = get_settings()
         extension = settings.get('wiki_extension')
         id_in_title = settings.get('id_in_title')
 
@@ -1039,7 +1048,7 @@ class ZkShowReferencingNotesCommand(sublime_plugin.TextCommand):
         if not link_region:
             return
 
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        settings = get_settings()
         if F_EXT_SEARCH:
             extension = settings.get('wiki_extension')
             folder = get_path_for(self.view)
@@ -1110,7 +1119,7 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
                 'Note cannot be created without a project or an open folder!')
                 return
 
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        settings = get_settings()
         extension = settings.get('wiki_extension')
         id_in_title = settings.get('id_in_title')
 
@@ -1135,13 +1144,8 @@ class ZkGetWikiLinkCommand(sublime_plugin.TextCommand):
                 'zk_insert_wiki_link', {'args': {'text': '[['}})
             return
 
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
-        prefix = '[['
-        postfix = ']]'
-        if not settings.get('double_brackets', True):
-            prefix = '['
-            postfix = ']'
-
+        settings = get_settings()
+        prefix, postfix = get_link_pre_postfix()
         note_id, title = self.modified_files[selection].split(' ', 1)
         link_txt = prefix + note_id + postfix
         do_insert_title = settings.get('insert_links_with_titles', False)
@@ -1156,7 +1160,7 @@ class ZkGetWikiLinkCommand(sublime_plugin.TextCommand):
         if not folder:
             return
 
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        settings = get_settings()
         extension = settings.get('wiki_extension')
 
         self.files = [f for f in os.listdir(folder) if f.endswith(extension)]
@@ -1190,7 +1194,7 @@ class ZkTagSelectorCommand(sublime_plugin.TextCommand):
         folder = get_path_for(self.view)
         if not folder:
             return
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        settings = get_settings()
         extension = settings.get('wiki_extension')
         temp = ExternalSearch.EXTERNALIZE
         ExternalSearch.EXTERNALIZE = False
@@ -1216,31 +1220,13 @@ class ZkShowAllTagsCommand(sublime_plugin.WindowCommand):
         else:
             # don't know where to grep
             return
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        settings = get_settings()
         extension = settings.get('wiki_extension')
-        new_pane = settings.get('show_all_tags_in_new_pane')
-
         tags = find_all_tags_in(folder, extension)
-        if ExternalSearch.EXTERNALIZE:
-            self.window.open_file(ExternalSearch.external_file(folder))
-        else:
-            tags.sort()
-            if new_pane:
-                self.window.run_command('set_layout', {
-                    'cols': [0.0, 0.5, 1.0],
-                    'rows': [0.0, 1.0],
-                    'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
-                })
-                # goto right-hand pane
-                self.window.focus_group(1)
-            tagview = self.window.new_file()
-            tagview.set_name('Tags')
-            tagview.set_scratch(True)
-            tagview.run_command("insert",{"characters": ' ' + '\n'.join(tags)})
-            tagview.set_syntax_file(
-                'Packages/sublime_zk/sublime_zk.sublime-syntax')
-            # return back to note
-            self.window.focus_group(0)
+        tags.sort()
+        lines = '\n'.join(tags)
+        ExternalSearch.show_search_results(self.window, folder, 'Tags', lines,
+                                                'show_all_tags_in_new_pane')
 
 
 class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
@@ -1260,7 +1246,7 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
         else:
             # don't know where to grep
             return
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        settings = get_settings()
         extension = settings.get('wiki_extension')
         self.folder = folder
         self.extension = extension
@@ -1270,14 +1256,7 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
     def on_done(self, input_text):
         note_ids = TagSearch.advanced_tag_search(input_text, self.folder,
             self.extension)
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
-        new_pane = settings.get('show_all_tags_in_new_pane')
-        link_prefix = '[['
-        link_postfix = ']]'
-        if not settings.get('double_brackets', True):
-            link_prefix = '['
-            link_postfix = ']'
-
+        link_prefix, link_postfix = get_link_pre_postfix()
         lines = ['Notes matching search-spec ' + input_text + '\n']
         for note_id in [n for n in note_ids if n]:  # Strip the None
             filn = note_file_by_id(note_id, self.folder, self.extension)
@@ -1291,24 +1270,8 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
             with open(ExternalSearch.external_file(self.folder), mode='w',
                 encoding='utf-8') as f:
                 f.write('\n'.join(lines))
-            self.window.open_file(ExternalSearch.external_file(self.folder))
-        else:
-            if new_pane:
-                self.window.run_command('set_layout', {
-                    'cols': [0.0, 0.5, 1.0],
-                    'rows': [0.0, 1.0],
-                    'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
-                })
-                # goto right-hand pane
-                self.window.focus_group(1)
-            tagview = self.window.new_file()
-            tagview.set_name('Tag-search')
-            tagview.set_scratch(True)
-            tagview.run_command("insert",{"characters": '\n'.join(lines)})
-            tagview.set_syntax_file(
-                'Packages/sublime_zk/sublime_zk.sublime-syntax')
-            # return back to note
-            self.window.focus_group(0)
+        ExternalSearch.show_search_results(self.window, self.folder,
+            'Tag-Search', lines, 'show_all_tags_in_new_pane')
 
 
 class ZkAutoBibCommand(sublime_plugin.TextCommand):
@@ -1316,7 +1279,7 @@ class ZkAutoBibCommand(sublime_plugin.TextCommand):
     Command that just inserts text, usually a link to a note.
     """
     def run(self, edit):
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        settings = get_settings()
         bibfile = Autobib.look_for_bibfile(self.view, settings)
         if bibfile:
             text = self.view.substr(sublime.Region(0, self.view.size()))
@@ -1344,7 +1307,7 @@ class ZkShowImagesCommand(sublime_plugin.TextCommand):
     Show local images inline.
     """
     def run(self, edit):
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        settings = get_settings()
         max_width = settings.get('img_maxwidth', None)
         if not max_width:
             max_width = 1024
@@ -1359,7 +1322,6 @@ class ZkHideImagesCommand(sublime_plugin.TextCommand):
     """
     def run(self, edit):
         ImageHandler.hide_images(self.view)
-
 
 
 class ZkTocCommand(sublime_plugin.TextCommand):
@@ -1390,7 +1352,7 @@ class ZkTocCommand(sublime_plugin.TextCommand):
         return re.sub('[-\s]+', '-', ref)
 
     def run(self, edit):
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        settings = get_settings()
         suffix_sep = settings.get('toc_suffix_separator', None)
         if not suffix_sep:
             suffix_sep = '_'
@@ -1505,13 +1467,8 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
             return []
 
         # we have a path and are in markdown!
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
-        prefix = '[['
-        postfix = ']]'
-        if not settings.get('double_brackets', True):
-            prefix = '['
-            postfix = ']'
-
+        settings = get_settings()
+        prefix, postfix = get_link_pre_postfix()
         extension = settings.get('wiki_extension')
         completions = []
         ids_and_names = [f.split(' ', 1) for f in os.listdir(folder)
@@ -1553,7 +1510,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         """
         The entry point. Find all LINKs in view, store and highlight them
         """
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        settings = get_settings()
         should_highlight = settings.get('highlight_note_links')
 
         max_note_link_limit = NoteLinkHighlighter.DEFAULT_MAX_LINKS
@@ -1588,7 +1545,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         Creates a set of regions from the intersection of note_links and scopes,
         underlines all of them.
         """
-        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        settings = get_settings()
         show_bookmarks = settings.get('show_bookmarks_in_gutter')
 
         # We need separate regions for each lexical scope for ST to use a
