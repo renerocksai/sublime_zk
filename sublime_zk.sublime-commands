@@ -9,4 +9,5 @@
     { "caption": "ZK: Auto-Bib", "command": "zk_auto_bib" },
     { "caption": "ZK: Show Images", "command": "zk_show_images" },
     { "caption": "ZK: Hide Images", "command": "zk_hide_images" },
+    { "caption": "ZK: Auto-TOC", "command": "zk_toc" },
 ]

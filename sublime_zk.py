@@ -13,7 +13,8 @@ import io
 from subprocess import Popen, PIPE
 import struct
 import imghdr
-
+import unicodedata
+from collections import Counter
 
 
 class ZkConstants:
@@ -41,6 +42,9 @@ class ZkConstants:
     # This works in our favour so we support [[201711122259 This is a note]]
     # when expanding overview notes
 
+    # TOC markers
+    TOC_HDR = '<!-- table of contents (auto) -->'
+    TOC_END = '<!-- (end of auto-toc) -->'
 
 class TagSearch:
     """
@@ -1357,11 +1361,67 @@ class ZkHideImagesCommand(sublime_plugin.TextCommand):
         ImageHandler.hide_images(self.view)
 
 
+
+class ZkTocCommand(sublime_plugin.TextCommand):
+    """
+    Auto-insert or refresh a toc in(to) current view.
+    """
+
+    def find_toc_region(self):
+        """
+        Find the entire toc region including start and end markers.
+        """
+        toc_hdr = ZkConstants.TOC_HDR.replace('(', '\(').replace(')', '\)')
+        toc_end = ZkConstants.TOC_END.replace('(', '\(').replace(')', '\)')
+        hdr_region = self.view.find(toc_hdr, 0)
+        if hdr_region and hdr_region.a > 0:
+            end_region = self.view.find(toc_end, hdr_region.b)
+            if end_region and end_region.a > hdr_region.b:
+                return sublime.Region(hdr_region.a, end_region.b)
+        return None
+
+    @staticmethod
+    def heading2ref(heading):
+        """
+        Turn heading into a reference as in `[heading](#reference)`.
+        """
+        ref = unicodedata.normalize('NFKD', heading).encode('ascii', 'ignore')
+        ref = re.sub('[^\w\s-]', '', ref.decode('ascii')).strip().lower()
+        return re.sub('[-\s]+', '-', ref)
+
+    def run(self, edit):
+        settings = sublime.load_settings('sublime_zk.sublime-settings')
+        suffix_sep = settings.get('toc_suffix_separator', None)
+        if not suffix_sep:
+            suffix_sep = '_'
+        ref_counter = Counter({'': 1})   # '' for unprintable char only headings
+        toc_region = self.find_toc_region()
+        if not toc_region:
+            toc_region = self.view.sel()[0]
+        lines = [ZkConstants.TOC_HDR]
+        for h_region in self.view.find_by_selector('markup.heading.markdown'):
+            heading = self.view.substr(h_region)
+            ref = self.heading2ref(heading)
+            ref_counter[ref] += 1
+            if ref_counter[ref] > 1:
+                ref = ref + '{}{}'.format(suffix_sep, ref_counter[ref] - 1)
+
+            match = re.match('\s*(#+)(.*)', heading)
+            hashes, title = match.groups()
+            title = title.strip()
+            level = len(hashes) - 1
+            line = '    ' * level+ '* [{}](#{})'.format(title, ref)
+            lines.append(line)
+        lines.append(ZkConstants.TOC_END)
+        self.view.replace(edit, toc_region, '')
+        self.view.insert(edit, toc_region.a, '\n'.join(lines))
+
+
 class NoteLinkHighlighter(sublime_plugin.EventListener):
     """
     Receives all updates to all views.
     * Highlights [[201710310102]] style links.
-    * Enables word completion (ctrl + space) to insert links to notes
+    * Enables word completion (ctrl + space) to insert links to notes.
     """
     DEFAULT_MAX_LINKS = 1000
 

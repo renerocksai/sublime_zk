@@ -38,4 +38,8 @@
     // make sure images don't get too large
     // scale them to max_width, proportionally
     "img_maxwidth": 320,
+
+    // separator to use when appending numbered suffix to duplicate headings
+    // in table of contents. If you use pandoc, change this to a "-".
+    "toc_suffix_separator": "_",
 }
