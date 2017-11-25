@@ -10,4 +10,6 @@
     { "caption": "ZK: Show Images", "command": "zk_show_images" },
     { "caption": "ZK: Hide Images", "command": "zk_hide_images" },
     { "caption": "ZK: Auto-TOC", "command": "zk_toc" },
+    { "caption": "ZK: Number Headings", "command": "zk_renumber_headings" },
+    { "caption": "ZK: Remove Heading Numbers", "command": "zk_denumber_headings" },
 ]

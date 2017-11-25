@@ -1399,6 +1399,7 @@ class ZkTocCommand(sublime_plugin.TextCommand):
         if not toc_region:
             toc_region = self.view.sel()[0]
         lines = [ZkConstants.TOC_HDR]
+
         for h_region in self.view.find_by_selector('markup.heading.markdown'):
             heading = self.view.substr(h_region)
             ref = self.heading2ref(heading)
@@ -1415,6 +1416,62 @@ class ZkTocCommand(sublime_plugin.TextCommand):
         lines.append(ZkConstants.TOC_END)
         self.view.replace(edit, toc_region, '')
         self.view.insert(edit, toc_region.a, '\n'.join(lines))
+
+
+class ZkRenumberHeadingsCommand(sublime_plugin.TextCommand):
+    """
+    Re-number headings of the current note.
+    """
+
+    def run(self, edit):
+        current_level = 0
+        levels = [0] * 6
+        regions_to_skip = 0
+        while True:
+            h_regions = self.view.find_by_selector('markup.heading.markdown')
+            h_regions = h_regions[regions_to_skip:]
+            if not h_regions:
+                break
+            regions_to_skip += 1
+            h_region = h_regions[0]
+            heading = self.view.substr(h_region)
+            match = re.match('(\s*)(#+)(\s*[1-9.]*\s)(.*)', heading)
+            spaces, hashes, old_numbering, title = match.groups()
+            level = len(hashes) - 1
+            levels[level] += 1
+            if level < current_level:
+                levels[:current_level] + [0] * (6 - level)
+                # print('resetting levels to', levels)
+            numbering = ' ' + '.'.join([str(l) for l in levels[:level+1]]) + ' '
+            h_region.a += len(spaces) + len(hashes)   # we're behind the hash
+            if old_numbering.strip():   # there is an old numbering to replace
+                h_region.b = h_region.a + len(old_numbering)
+            else:
+                h_region.b = h_region.a
+            self.view.replace(edit, h_region, numbering)
+
+
+class ZkDenumberHeadingsCommand(sublime_plugin.TextCommand):
+    """
+    Remove numbers of numbered headings of the current note.
+    """
+
+    def run(self, edit):
+        regions_to_skip = 0
+        while True:
+            h_regions = self.view.find_by_selector('markup.heading.markdown')
+            h_regions = h_regions[regions_to_skip:]
+            if not h_regions:
+                break
+            regions_to_skip += 1
+            h_region = h_regions[0]
+            heading = self.view.substr(h_region)
+            match = re.match('(\s*)(#+)(\s*[1-9.]*\s)(.*)', heading)
+            spaces, hashes, old_numbering, title = match.groups()
+            h_region.a += len(spaces) + len(hashes)   # we're behind the hash
+            if old_numbering.strip():   # there is an old numbering to replace
+                h_region.b = h_region.a + len(old_numbering)
+                self.view.replace(edit, h_region, '')
 
 
 class NoteLinkHighlighter(sublime_plugin.EventListener):

@@ -38,6 +38,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * [Automatic Bibliographies](#automatic-bibliographies) and [auto-completion for citekeys](#auto-completion-for-citekeys)
 * [Inline Local Image Display](#inline-local-image-display)
 * **NEW**: [Automatic Table Of Contents](#automatic-table-of-contents)
+* **EVEN NEWER**: [Automatic Section Numbering](#automatic-section-numbering)
 
 ## Contents
 * [Installation](#installation)
@@ -80,7 +81,9 @@ See the [Usage](#usage) section below to see how this package might support your
         * [Auto-Completion for citekeys](#auto-completion-for-citekeys)
         * [Automatic Bibliographies](#automatic-bibliographies)
     * [Inline Local Image Display](#inline-local-image-display)
-    * [Automatic Table Of Contents](#automatic-table-of-contents)
+    * [Section Numbering and Table Of Contents](#section-numbering-and-table-of-contents)
+        * [Automatic Table Of Contents](#automatic-table-of-contents)
+        * [Automatic Section Numbering](#automatic-section-numbering)
 * [Credits](#credits)
 
 
@@ -750,7 +753,12 @@ To hide them:
 
 ![inline_imgs](https://user-images.githubusercontent.com/30892199/33154565-7df466ac-cfe9-11e7-8920-b204fa4dcb02.gif)
 
-### Automatic Table Of Contents
+
+### Section Numbering and Table Of Contents
+
+This plugin lets you pep up your texts with automatically numbered sections and tables of content.
+
+#### Automatic Table Of Contents
 Some notes can get quite long, especially when turning overview notes into growing documents. At some stage it might make sense to introduce a table of contents into the text. This can be useful when using the [markdown preview](https://github.com/revolunet/sublimetext-markdown-preview) plugin to quickly check your text in a browser.
 
 To insert a table of contents at your current cursor position:
@@ -820,6 +828,44 @@ Funny characters can be a challenge in the `(#references)`.
 The following animation shows TOC insertion and refreshing in action:
 
 ![auto-toc](https://user-images.githubusercontent.com/30892199/33225714-6b7aeb32-d17d-11e7-9d72-d2d890b0394c.gif)
+
+
+#### Automatic Section Numbering
+
+Especially when your text is large enough for needing a table of contents, it is a good idea to number your sections. This can be done automatically by the plugin as follows:
+
+* bring up the command palette with `[ctrl]+[shift]+[p]` (or `[cmd]+[shift]+[p]` on macOS)
+* type `zk`
+* select `ZK: Number Headings`
+
+Automatically inserted section numbers will look like in the following note:
+
+```markdown
+# 1  201711250024 Working with tocs
+tags = #sublime_zk #toc
+
+
+## 1.1  This is a very long note!
+At least we pretend so.
+
+## 1.2  It contains many headings
+That's why we are going to need a table of contents.
+
+### 1.2.1  [**with funny chäråcters!]
+Funny characters can be a challenge in the `(#references)`.
+
+## 1.3  as can duplicate headers
+
+# 2  as can duplicate headers
+```
+
+**Note:** You can refresh the section numbers at any time by repeating the above command.
+
+**Note:** To switch off numbered sections, use the command `ZK: Remove Heading Numbers`.
+
+The animation below shows both section (re-)numbering and auto-TOC:
+
+![section-numbers](https://user-images.githubusercontent.com/30892199/33226705-12169142-d194-11e7-940a-8a8e26c054ae.gif)
 
 
 ## Credits
