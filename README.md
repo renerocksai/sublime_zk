@@ -374,6 +374,7 @@ As a consequence, they might turn evil and try to kill us all ........... [[2017
 If you now click into `[[201710282118]]` and press `[ctrl]+[enter]`, the target note will be opened where you can read up on how AI is potentially going to kill us all.
 
 Here you can see what the list of notes to choose from looks like:
+
 ![screenshot2](https://user-images.githubusercontent.com/30892199/32403198-25f55650-c134-11e7-8f62-58fdbfb13c2b.png)
 
 ### Using auto-completion to insert note-links
@@ -388,6 +389,7 @@ You can, just as before, narrow the list auf auto-completion suggestions down by
 Which ever method for link insertion you use is up to you.
 
 Here is a screenshot so you can compare:
+
 ![screenshot2](https://user-images.githubusercontent.com/30892199/32403199-260fb374-c134-11e7-99ad-59e22852a095.png)
 
 **Note:** With [this setting](#insert-links-with-or-without-titles) you can have the note's title inserted right after the link as well, like in : `[[201710282118]] AI is going to kill us all`

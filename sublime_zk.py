@@ -381,7 +381,7 @@ class ExternalSearch:
         """
         output = ExternalSearch.search_in(folder, tag, extension)
         prefix = 'Notes tagged with {}:'.format(tag)
-        ExternalSearch.externalize_note_links(output, folder, prefix)
+        ExternalSearch.externalize_note_links(output, folder, extension, prefix)
         return output.split('\n')
 
     @staticmethod
@@ -394,7 +394,8 @@ class ExternalSearch:
         link_prefix, link_postfix = get_link_pre_postfix()
         prefix = 'Notes referencing {}{}{}:'.format(link_prefix, note_id,
             link_postfix)
-        ExternalSearch.externalize_note_links(output, folder, prefix)
+        ExternalSearch.externalize_note_links(output, folder, extension,
+            prefix)
         return output.split('\n')
 
     @staticmethod
@@ -438,7 +439,7 @@ class ExternalSearch:
         return output.decode('utf-8')
 
     @staticmethod
-    def externalize_note_links(ag_out, folder, prefix=None):
+    def externalize_note_links(ag_out, folder, extension, prefix=None):
         """
         If enabled, write ag file name output into external search results file
         in `[[note_id]] note title` style.
