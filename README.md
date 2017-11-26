@@ -784,7 +784,7 @@ At least we pretend so.
 ## It contains many headings
 That's why we are going to need a table of contents.
 
-### **with funny chäråcters!
+### **with funny chäråcters!**
 Funny characters can be a challenge in the `(#references)`.
 
 ## as can duplicate headings
@@ -802,7 +802,7 @@ tags = #sublime_zk #toc
 * [201711250024 Working with tocs](#201711250024-working-with-tocs)
     * [This is a very long note!](#this-is-a-very-long-note)
     * [It contains many headings](#it-contains-many-headings)
-        * [**with funny chäråcters!](#with-funny-characters)
+        * [**with funny chäråcters!**](#with-funny-characters)
     * [as can duplicate headings](#as-can-duplicate-headings)
 * [as can duplicate headings](#as-can-duplicate-headings_1)
 <!-- (end of auto-toc) -->
@@ -813,7 +813,7 @@ At least we pretend so.
 ## It contains many headings
 That's why we are going to need a table of contents.
 
-### **with funny chäråcters!
+### **with funny chäråcters!**
 Funny characters can be a challenge in the `(#references)`.
 
 ## as can duplicate headings
@@ -851,7 +851,7 @@ At least we pretend so.
 ## 1.2  It contains many headings
 That's why we are going to need a table of contents.
 
-### 1.2.1  **with funny chäråcters!
+### 1.2.1  **with funny chäråcters!**
 Funny characters can be a challenge in the `(#references)`.
 
 ## 1.3  as can duplicate headers
