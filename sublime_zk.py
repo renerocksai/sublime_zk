@@ -473,7 +473,8 @@ class ExternalSearch:
         or, if not available, in a new window
         """
         if ExternalSearch.EXTERNALIZE:
-            window.open_file(ExternalSearch.external_file(folder))
+            new_view = window.open_file(ExternalSearch.external_file(folder))
+            window.set_view_index(new_view, 1, 0)
         else:
             settings = get_settings()
             new_pane = settings.get(new_pane_setting)
@@ -897,6 +898,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
             return
         the_file = os.path.join(self.folder, self.tagged_note_files[selection])
         new_view = self.view.window().open_file(the_file)
+        self.view.window().set_view_index(new_view, 0, 0)
 
     def select_link(self):
         """
@@ -935,8 +937,10 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
                 self.tagged_note_files = ExternalSearch.search_tagged_notes(
                     folder, extension, tag)
                 if ExternalSearch.EXTERNALIZE:
-                    self.view.window().open_file(ExternalSearch.external_file(
+                    n=self.view.window().open_file(ExternalSearch.external_file(
                         folder))
+                    self.view.window().set_view_index(n, 1, 0)
+
                 else:
                     self.tagged_note_files = [os.path.basename(f) for f in
                         self.tagged_note_files]
@@ -990,6 +994,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
 
         if the_file:
             new_view = window.open_file(the_file)
+            window.set_view_index(new_view, 0, 0)
         else:
             # suppose you have entered "[[my new note]]", then we are going to
             # create "201710201631 my new note.md". We will also add a link
@@ -1062,8 +1067,10 @@ class ZkShowReferencingNotesCommand(sublime_plugin.TextCommand):
             self.friend_note_files = [os.path.basename(f) for f in
                 self.friend_note_files]
             if ExternalSearch.EXTERNALIZE:
-                self.view.window().open_file(ExternalSearch.external_file(
+                nv = self.view.window().open_file(ExternalSearch.external_file(
                     folder))
+                self.view.window().set_view_index(nv, 1, 0)
+
             else:
                 self.view.window().show_quick_panel(self.friend_note_files,
                     self.on_done)
@@ -1132,6 +1139,7 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
 
         create_note(the_file, input_text, self.origin, self.o_title)
         new_view = self.window.open_file(the_file)
+        self.window.set_view_index(new_view, 0, 0)
 
 
 class ZkGetWikiLinkCommand(sublime_plugin.TextCommand):
@@ -1332,6 +1340,7 @@ class ZkHideImagesCommand(sublime_plugin.TextCommand):
     """
     def run(self, edit):
         ImageHandler.hide_images(self.view)
+        print(self.view.window().get_view_index(self.view))
 
 
 class ZkTocCommand(sublime_plugin.TextCommand):
