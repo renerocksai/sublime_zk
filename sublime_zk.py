@@ -389,7 +389,7 @@ class ExternalSearch:
         """
         Return a list of notes referencing note_id.
         """
-        regexp = '(\[' + note_id + '\])|(§' + note_id + ')'
+        regexp = '(\[' + note_id + ')|(§' + note_id + ')'   # don't insist on ]
         output = ExternalSearch.search_in(folder, regexp, extension)
         link_prefix, link_postfix = get_link_pre_postfix()
         prefix = 'Notes referencing {}{}{}:'.format(link_prefix, note_id,
@@ -517,6 +517,7 @@ class TextProduction:
         result_lines = []
         note_file, content = TextProduction.read_full_note(note_id, folder,
                                                                     extension)
+        footer = '<!-- (End of note ' + note_id + ') -->'
         if not content:
             header = '<!-- Note not found: ' + note_id + ' -->'
         else:
@@ -524,7 +525,6 @@ class TextProduction:
             filename = filename.split(' ', 1)[1]
             header = link_prefix + note_id + link_postfix + ' ' + filename
             header = '<!-- !    ' + header + '    -->'
-            footer = '<!-- (End of note ' + note_id + ') -->'
             result_lines.append(header)
             result_lines.extend(content.split('\n'))
         result_lines.append(footer)
@@ -586,7 +586,7 @@ class TextProduction:
         linestart_till_cursor_str, link_region = select_link_in(view)
         if not link_region:
             return
-        note_id = view.substr(link_region)
+        note_id = view.substr(link_region)[:12]
         cursor_pos = view.sel()[0].begin()
         line_region = view.line(cursor_pos)
 
@@ -986,7 +986,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
 
         # search for file starting with text between the brackets (usually
         # the ID)
-        the_file = note_file_by_id(selected_text, folder, extension)
+        the_file = note_file_by_id(selected_text[:12], folder, extension)
 
         if the_file:
             new_view = window.open_file(the_file)
@@ -1056,7 +1056,7 @@ class ZkShowReferencingNotesCommand(sublime_plugin.TextCommand):
             if not folder:
                 return
             self.folder = folder
-            note_id = self.view.substr(link_region)
+            note_id = self.view.substr(link_region)[:12]
             self.friend_note_files = ExternalSearch.search_friend_notes(
                 folder, extension, note_id)
             self.friend_note_files = [os.path.basename(f) for f in
@@ -1073,7 +1073,7 @@ class ZkShowReferencingNotesCommand(sublime_plugin.TextCommand):
             # hack for the find in files panel: select tag in view, copy it
             selection = self.view.sel()
             selection.clear()
-            selection.add(link_region)
+            selection.add(sublime.Region(link_region.a, link_region.a+12))
             self.view.window().run_command("copy")
             self.view.window().run_command("show_panel",
                 {"panel": "find_in_files",
