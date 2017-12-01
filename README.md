@@ -59,6 +59,7 @@ See the [Usage](#usage) section below to see how this package might support your
     * [Configuring SublimeText's line spacing](#configuring-sublimetexts-line-spacing)
     * [Syntax Coloring for #tags, footnotes, and pandoc references](#syntax-coloring-for-tags-footnotes-and-pandoc-references)
     * [Location of your .bib file](#location-of-your-bib-file)
+    * [Citation Reference Style](#citation-reference-style)
     * [Inline image preview size](#inline-image-preview-size)
 * [Usage](#usage)
     * [Creating a new note](#creating-a-new-note)
@@ -260,7 +261,7 @@ When looking at the screenshot at the beginning of this document, you might have
 **Note:** The above file is part of your "User" settings and will be created by SublimeText automatically. It is not the one you downloaded with this plugin. So please don't confuse the two :-)
 
 ### Location of your .bib file
-If you [work with bibliographies](#working-with-bibliographies), this plugin can make use of your `.bib` files to enable [auto-completion](#auto-completion-for-citekeys) for `@citekeys` and [automatic creation of bibliographies](#automatic-bibliographies) inside of your notes.
+If you [work with bibliographies](#working-with-bibliographies), this plugin can make use of your `.bib` files to enable [auto-completion](#auto-completion-for-citekeys) for `@citekeys` (or `#citekeys` if you use MultiMarkdown) and [automatic creation of bibliographies](#automatic-bibliographies) inside of your notes.
 
 **Note:** If a `.bib` file resides in your note archive folder then the plugin will find it automatically. No configuration needed!
 
@@ -273,6 +274,38 @@ However, if you maintain your `.bib` file outside of your note archive then you 
 ```
 
 In cases where both a bibfile setting is present *and* an actual `.bib` file is found in your note archive, the one in the note archive will be used.
+
+### Citation Reference Style
+
+Two major ways to handle citations in Markdown documents exist: Pandoc and MultiMarkdown. Which one you use, depends on your preferred tool-chain.
+
+**Note:** Pandoc style is the default, see below how to change this.
+
+Example for pandoc:
+
+```markdown
+Reference to some awesome article [@awesome2017].
+
+<!-- bibliography
+[@awesome2017]: Mr. Awesome. 2017. _On Awesomeness_
+-->
+```
+
+Example for MultiMarkdown:
+
+```markdown
+Reference to some awesome article [][#awesome2017].
+
+<!-- bibliography -->
+[#awesome2017]: Mr. Awesome. 2017. _On Awesomeness_
+
+```
+
+The following line in the plugin's settings turns MultiMarkdown mode on:
+
+```
+"citations-mmd-style": true,
+```
 
 ### Inline image preview size
 This plugin can [show local images](#inline-local-image-display) directly inside your note. To make sure that huge images won't steal too much of your screen, you can limit their size by width. Larger images will always be scaled to not exceed the maximum width.
@@ -696,7 +729,7 @@ tags =
 ### Working with Bibliographies
 
 #### Auto-Completion for @citekeys
-If your note archive contains one or you [configured](#location-of-your-bib-file) a `.bib` file, then the auto-completion suggestions you get via `[ctrl]+[space]` (or `[alt]+[/]` on Linux) will also contain your cite-keys, marked by a starting `@` symbol. Pressing `[enter]` will insert a pandoc citation like this: `[@citekey]`.
+If your note archive contains one or you [configured](#location-of-your-bib-file) a `.bib` file, then the auto-completion suggestions you get via `[ctrl]+[space]` (or `[alt]+[/]` on Linux) will also contain your cite-keys, marked by a starting `@` symbol. (If you [use MultiMarkdown style](#citation-reference-style), they will start with a `#` sign instead). Pressing `[enter]` will insert a pandoc citation like this: `[@citekey]` (or `[][#citekey]` if you use MultiMarkdown style).
 
 **Note:** Never actually press the `@` key when searching for cite-keys. At least on my system SublimeText will always insert the current suggestion when pressing `@` :(.
 
@@ -730,7 +763,7 @@ The animation below shows how handy this is :smile:
 
 ![autobib](https://user-images.githubusercontent.com/30892199/33105451-6851a402-cf2d-11e7-8b5a-3d869a269aa0.gif)
 
-**Note:** You don't have to cite in the `[@pandoc]` notation. If a cite-key is in your text, it will get picked up. However, the generated references section will use the `[@pandoc]` notation.
+**Note:** You don't have to cite in the `[@pandoc]` notation. If a cite-key is in your text, it will get picked up. However, the generated references section will use the `[@pandoc]` notation, except if you set [change the setting](#citation-reference-style) `citations-mmd-style` to `true`, then the `[#citekey]: ...` MultiMarkdown notation will be used.
 
 **WARNING**: Do not write below the generated bibliography. Everything after `<!-- references (auto)` will be replaced when you re-run the command!
 
