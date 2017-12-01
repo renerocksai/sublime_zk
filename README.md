@@ -66,6 +66,7 @@ See the [Usage](#usage) section below to see how this package might support your
     * [Creating a link](#creating-a-link)
         * [Using auto-completion to insert note-links](#using-auto-completion-to-insert-note-links)
         * [Implicitly creating a new note via a link](#implicitly-creating-a-new-note-via-a-link)
+        * [Supported link styles](#supported-link-styles)
     * [Searching for friends](#searching-for-friends)
     * [Working with tags](#working-with-tags)
         * [Getting an overview of all your tags](#getting-an-overview-of-all-your-tags)
@@ -410,7 +411,7 @@ Here you can see what the list of notes to choose from looks like:
 
 ![screenshot2](https://user-images.githubusercontent.com/30892199/32403198-25f55650-c134-11e7-8f62-58fdbfb13c2b.png)
 
-### Using auto-completion to insert note-links
+#### Using auto-completion to insert note-links
 A different way to insert a link to another note is via auto-completion. This differs from the previous one in the following ways:
 
 * auto-completion is triggered via [ctrl]+[space] (or `[alt]+[/]` on Linux)
@@ -427,7 +428,7 @@ Here is a screenshot so you can compare:
 
 **Note:** With [this setting](#insert-links-with-or-without-titles) you can have the note's title inserted right after the link as well, like in : `[[201710282118]] AI is going to kill us all`
 
-### Implicitly creating a new note via a link
+#### Implicitly creating a new note via a link
 There is another way to create a new note: Just create a link containing its title and follow the link.
 
 To showcase this, let's modify our example from above: Say, the "AI is going to kill us all" does **not** exist and you're in your "The rise of the machines" note.
@@ -488,6 +489,31 @@ The new note will be pre-filled with the following text:
 tags =
 
 ```
+
+#### Supported link styles
+When inserting links manually, you are can choose between the following supported link styles:
+
+```markdown
+## Wiki Style
+[[201711111707]] Ordinary double-bracket wiki-style links
+
+## Wiki Style with title
+[[201711111708 here goes the note's title]] same with title
+
+## Old-School
+§201711111709 support for old-school links :)
+
+## Single-Pair
+[201711111709] one pair of brackets is enough
+
+## Single-Pair with title
+[201711111709 one pair of brackets is enough]
+```
+
+This is how they are rendered in SublimeText:
+
+![link_styles](https://user-images.githubusercontent.com/30892199/33497107-fdaf0c50-d6cc-11e7-81d3-27af3ba9e740.png)
+
 
 ### Searching for friends
 If you see a link in a note and wonder what **other** notes also reference this note, then that is easy enough to do: Just click inside the link and press `[alt]+[enter]`.
