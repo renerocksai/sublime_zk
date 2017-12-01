@@ -33,11 +33,12 @@ contexts:
             '1': markup.zettel.space
             '2': markup.zettel.tag, markup.italic
         # a [201701010202] note link
-        - match: '([\[]?\[)([0-9]{12})(.*\][\]]?)'
+        - match: '([\[]?\[)([0-9]{12})([^]]*)(\][\]]?)'
           captures:
             '1': punctuation.definition.footnote.begin.markdown
             '2': markup.zettel.link
-            '3': punctuation.definition.footnote.begin.markdown
+            '3': markup.zettel.linktitle #constant.other.reference.link.markdown
+            '4': punctuation.definition.footnote.begin.markdown
         # olds school §201701010202 note link
         - match: '(§)([0-9]{12})'
           captures:

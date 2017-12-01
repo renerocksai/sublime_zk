@@ -1477,6 +1477,19 @@
     </dict>
     <dict>
       <key>name</key>
+      <string>Markup: Zettelkasten note link title</string>
+      <key>scope</key>
+      <string>markup.zettel.linktitle</string>
+      <key>settings</key>
+      <dict>
+        <key>fontStyle</key>
+        <string>underline</string>
+        <key>foreground</key>
+        <string>#7a9aff</string>
+      </dict>
+    </dict>
+    <dict>
+      <key>name</key>
       <string>Markup: strike</string>
       <key>scope</key>
       <string>markup.strike</string>
