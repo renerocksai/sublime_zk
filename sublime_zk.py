@@ -1281,17 +1281,26 @@ class ZkAutoBibCommand(sublime_plugin.TextCommand):
     """
     def run(self, edit):
         settings = get_settings()
+        mmd_style = settings.get('citations-mmd-style', None)
+
         bibfile = Autobib.look_for_bibfile(self.view, settings)
         if bibfile:
             text = self.view.substr(sublime.Region(0, self.view.size()))
             ck2bib = Autobib.create_bibliography(text, bibfile, pandoc='pandoc')
             marker = '<!-- references (auto)'
-            bib_lines = [marker + '\n']
+            marker_line = marker
+            if mmd_style:
+                marker_line += ' -->'
+            bib_lines = [marker_line + '\n']
             for citekey in sorted(ck2bib):
                 bib = ck2bib[citekey]
-                line = '[@{}]: {}\n'.format(citekey, bib)
+                if mmd_style:
+                    line = '[#{}]: {}\n'.format(citekey, bib)
+                else:
+                    line = '[@{}]: {}\n'.format(citekey, bib)
                 bib_lines.append(line)
-            bib_lines.append('-->')
+            if not mmd_style:
+                bib_lines.append('-->')
             new_lines = []
             for line in text.split('\n'):
                 if line.strip().startswith(marker):
@@ -1485,10 +1494,18 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         # now come the citekeys
         bibfile = Autobib.look_for_bibfile(view, settings)
         if bibfile:
+            mmd_style = settings.get('citations-mmd-style', None)
             citekeys = Autobib.extract_all_citekeys(bibfile)
+            if mmd_style:
+                fmt_key = '#{}'
+                fmt_completion = '[][#{}]'
+            else:
+                fmt_key = '@{}'
+                fmt_completion = '[@{}]'
+
             for citekey in citekeys:
-                citekey = '@' + citekey
-                completions.append([citekey, '[' + citekey + ']'])
+                citekey = fmt_key.format(citekey)
+                completions.append([citekey, fmt_completion.format(citekey)])
         return (completions, sublime.INHIBIT_WORD_COMPLETIONS)
 
     def on_activated(self, view):

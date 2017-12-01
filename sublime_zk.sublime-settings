@@ -42,4 +42,15 @@
     // separator to use when appending numbered suffix to duplicate headings
     // in table of contents. If you use pandoc, change this to a "-".
     "toc_suffix_separator": "_",
+
+    // use multimarkdown style for citations
+    // set to false to use pandoc style:
+    //    use [@citekey] to reference something in your .bib file
+    //    autobib style will be: [@citekey]: full-blown reference
+    // set to true to use multimarkdown style:
+    //    use [][#citekey] to reference something in your .bib file
+    //    autobib style will be: [#citekey]: full-blown reference
+    // note: for autobib to work you still need pandoc installed in either case
+    "citations-mmd-style": false,
+
 }
