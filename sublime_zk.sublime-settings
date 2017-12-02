@@ -39,6 +39,9 @@
     // scale them to max_width, proportionally
     "img_maxwidth": 320,
 
+    // set to true if you want images to be displayed automatically when you open a note
+    "auto_show_images": false,
+
     // separator to use when appending numbered suffix to duplicate headings
     // in table of contents. If you use pandoc, change this to a "-".
     "toc_suffix_separator": "_",

@@ -55,6 +55,8 @@ PANE_FOR_OPENING_NOTES = 0
 PANE_FOR_OPENING_RESULTS = 1
 DISTRACTION_FREE_MODE_ACTIVE = defaultdict(bool)
 VIEWS_WITH_IMAGES = set()
+AUTO_SHOW_IMAGES = False
+
 
 def get_settings():
     return sublime.load_settings(ZkConstants.Settings_File)
@@ -62,6 +64,7 @@ def get_settings():
 def settings_changed():
     global PANE_FOR_OPENING_RESULTS
     global PANE_FOR_OPENING_NOTES
+    global AUTO_SHOW_IMAGES
     settings = get_settings()
     value = settings.get("pane_for_opening_notes", None)
     if value is not None:
@@ -69,6 +72,7 @@ def settings_changed():
     value = settings.get("pane_for_opening_results", None)
     if value is not None:
         PANE_FOR_OPENING_RESULTS = value
+    AUTO_SHOW_IMAGES = settings.get('auto_show_images', False)
 
 def plugin_loaded():
     global F_EXT_SEARCH
@@ -1633,7 +1637,10 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
 
     # Async listeners for ST3
     def on_load_async(self, view):
+        global AUTO_SHOW_IMAGES
         self.update_note_link_highlights_async(view)
+        if AUTO_SHOW_IMAGES:
+            view.run_command('zk_show_images')
 
     def on_modified_async(self, view):
         self.update_note_link_highlights_async(view)
