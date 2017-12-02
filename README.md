@@ -62,6 +62,7 @@ See the [Usage](#usage) section below to see how this package might support your
     * [Location of your .bib file](#location-of-your-bib-file)
     * [Citation Reference Style](#citation-reference-style)
     * [Inline image preview size](#inline-image-preview-size)
+    * [Auto inline image preview](#auto-inline-image-preview)
     * [Default panes](#default-panes)
 * [Usage](#usage)
     * [Creating a new note](#creating-a-new-note)
@@ -319,6 +320,14 @@ The default setting limits images to be 320 pixels wide:
 ```
     "img_maxwidth": 320,
 ```
+
+### Auto inline image preview
+If you want images displayed automatically right when you open a note, put this into the plugin settings:
+
+```
+    "auto_show_images": true,
+```
+
 
 ### Default Panes
 
@@ -821,6 +830,7 @@ To hide them:
 
 ![inline_imgs](https://user-images.githubusercontent.com/30892199/33154565-7df466ac-cfe9-11e7-8920-b204fa4dcb02.gif)
 
+**Note:** If you want images automatically displayed right when you open a note, you can [configure](#auto-inline-image-preview) that.
 
 ### Section Numbering and Table Of Contents
 
