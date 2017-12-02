@@ -190,6 +190,9 @@ class ImageHandler:
                 break
             region = img_regs[0]
             rel_p = view.substr(region)
+            if rel_p.startswith('http'):
+                continue
+
             img = os.path.join(folder, rel_p)
             size  = ImageHandler.get_image_size(img)
             if not size:
@@ -1523,8 +1526,7 @@ class ZkDenumberHeadingsCommand(sublime_plugin.TextCommand):
 
 class ZkSelectPanesCommand(sublime_plugin.WindowCommand):
     """
-    Command that prompts for pane number for opening notes and results
-    title.
+    Command that prompts for pane numbers for opening notes and results panes.
     """
     def run(self):
         global PANE_FOR_OPENING_NOTES
