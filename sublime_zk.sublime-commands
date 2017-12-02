@@ -12,4 +12,5 @@
     { "caption": "ZK: Auto-TOC", "command": "zk_toc" },
     { "caption": "ZK: Number Headings", "command": "zk_renumber_headings" },
     { "caption": "ZK: Remove Heading Numbers", "command": "zk_denumber_headings" },
+    { "caption": "ZK: Select Panes for opening notes/results", "command": "zk_select_panes" },
 ]

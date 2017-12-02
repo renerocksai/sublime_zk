@@ -53,4 +53,13 @@
     // note: for autobib to work you still need pandoc installed in either case
     "citations-mmd-style": false,
 
+    // Pane where notes are opened when a link is clicked or a new note is created
+    // Pane 0 is the 1st pane ever
+    "pane_for_opening_notes": 0,
+    //Pane where search results and tag lists, etc are opened (if ag is installed)
+    // Pane 1 is the second pane, created when you split the window
+    //    in a 2-column layout, this is the right column
+    //    in a 2-row layout, this is the bottom row
+    "pane_for_opening_results": 1,
+
 }

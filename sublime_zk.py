@@ -51,9 +51,22 @@ class ZkConstants:
 
 # global magic
 F_EXT_SEARCH = False
+PANE_FOR_OPENING_NOTES = 0
+PANE_FOR_OPENING_RESULTS = 1
 
 def get_settings():
     return sublime.load_settings(ZkConstants.Settings_File)
+
+def settings_changed():
+    global PANE_FOR_OPENING_RESULTS
+    global PANE_FOR_OPENING_NOTES
+    settings = get_settings()
+    value = settings.get("pane_for_opening_notes", None)
+    if value is not None:
+        PANE_FOR_OPENING_NOTES = value
+    value = settings.get("pane_for_opening_results", None)
+    if value is not None:
+        PANE_FOR_OPENING_RESULTS = value
 
 def plugin_loaded():
     global F_EXT_SEARCH
@@ -73,6 +86,10 @@ def plugin_loaded():
                 print('Sublime_ZK: Not using ag!')
         else:
             print('Sublime_ZK: Not using ag!')
+    settings = get_settings()
+    settings.clear_on_change("sublime_zk_notify")
+    settings.add_on_change("sublime_zk_notify", settings_changed)
+    settings_changed()
 
 
 class TagSearch:
@@ -472,9 +489,10 @@ class ExternalSearch:
         Helper method to display the results either in the external file
         or, if not available, in a new window
         """
+        global PANE_FOR_OPENING_RESULTS
         if ExternalSearch.EXTERNALIZE:
             new_view = window.open_file(ExternalSearch.external_file(folder))
-            window.set_view_index(new_view, 1, 0)
+            window.set_view_index(new_view, PANE_FOR_OPENING_RESULTS, 0)
         else:
             settings = get_settings()
             new_pane = settings.get(new_pane_setting)
@@ -894,11 +912,12 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         Called when the link was a tag, a tag picker overlay was displayed, and
         a tag was selected by the user.
         """
+        global PANE_FOR_OPENING_NOTES
         if selection == -1:
             return
         the_file = os.path.join(self.folder, self.tagged_note_files[selection])
         new_view = self.view.window().open_file(the_file)
-        self.view.window().set_view_index(new_view, 0, 0)
+        self.view.window().set_view_index(new_view, PANE_FOR_OPENING_NOTES, 0)
 
     def select_link(self):
         """
@@ -910,6 +929,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         * else present overlay to pick a note
         """
         global F_EXT_SEARCH
+        global PANE_FOR_OPENING_RESULTS
         linestart_till_cursor_str, link_region = select_link_in(self.view)
         if link_region:
             return link_region
@@ -939,7 +959,8 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
                 if ExternalSearch.EXTERNALIZE:
                     n=self.view.window().open_file(ExternalSearch.external_file(
                         folder))
-                    self.view.window().set_view_index(n, 1, 0)
+                    self.view.window().set_view_index(n,
+                        PANE_FOR_OPENING_RESULTS, 0)
 
                 else:
                     self.tagged_note_files = [os.path.basename(f) for f in
@@ -971,6 +992,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         * searching for #tagged notes
         depending on what's under the cursor
         """
+        global PANE_FOR_OPENING_NOTES
         folder = get_path_for(self.view)
         if not folder:
             return
@@ -994,7 +1016,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
 
         if the_file:
             new_view = window.open_file(the_file)
-            window.set_view_index(new_view, 0, 0)
+            window.set_view_index(new_view, PANE_FOR_OPENING_NOTES, 0)
         else:
             # suppose you have entered "[[my new note]]", then we are going to
             # create "201710201631 my new note.md". We will also add a link
@@ -1050,6 +1072,7 @@ class ZkShowReferencingNotesCommand(sublime_plugin.TextCommand):
         Try to select note link if present. Search for notes as described above.
         """
         global F_EXT_SEARCH
+        global PANE_FOR_OPENING_RESULTS
         linestart_till_cursor_str, link_region = select_link_in(self.view)
         if not link_region:
             return
@@ -1069,7 +1092,8 @@ class ZkShowReferencingNotesCommand(sublime_plugin.TextCommand):
             if ExternalSearch.EXTERNALIZE:
                 nv = self.view.window().open_file(ExternalSearch.external_file(
                     folder))
-                self.view.window().set_view_index(nv, 1, 0)
+                self.view.window().set_view_index(nv,
+                    PANE_FOR_OPENING_RESULTS, 0)
 
             else:
                 self.view.window().show_quick_panel(self.friend_note_files,
@@ -1107,6 +1131,7 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
         self.window.show_input_panel('New Note:', '', self.on_done, None, None)
 
     def on_done(self, input_text):
+        global PANE_FOR_OPENING_NOTES
         # sanity check: do we have a project
         if self.window.project_file_name():
             # yes we have a project!
@@ -1139,7 +1164,7 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
 
         create_note(the_file, input_text, self.origin, self.o_title)
         new_view = self.window.open_file(the_file)
-        self.window.set_view_index(new_view, 0, 0)
+        self.window.set_view_index(new_view, PANE_FOR_OPENING_NOTES, 0)
 
 
 class ZkGetWikiLinkCommand(sublime_plugin.TextCommand):
@@ -1453,6 +1478,55 @@ class ZkDenumberHeadingsCommand(sublime_plugin.TextCommand):
             if old_numbering.strip():   # there is an old numbering to replace
                 h_region.b = h_region.a + len(old_numbering)
                 self.view.replace(edit, h_region, '')
+
+
+class ZkSelectPanesCommand(sublime_plugin.WindowCommand):
+    """
+    Command that prompts for pane number for opening notes and results
+    title.
+    """
+    def run(self):
+        global PANE_FOR_OPENING_NOTES
+        for group in range(self.window.num_groups()):
+            group_view = self.window.active_view_in_group(group)
+            show_str = '<h1 style="color:#FFFFFF;">Pane {}</h1>'.format(group)
+            group_view.add_phantom('popup', sublime.Region(0,0), show_str,
+                sublime.LAYOUT_BLOCK)
+        self.window.show_input_panel('Pane number for opening NOTES:',
+            str(PANE_FOR_OPENING_NOTES), self.on_done_first, None,
+            self.on_cancel)
+
+    def on_done_first(self, text):
+        global F_EXT_SEARCH
+        global PANE_FOR_OPENING_NOTES
+        global PANE_FOR_OPENING_RESULTS
+        try:
+            PANE_FOR_OPENING_NOTES = int(text)
+        except ValueError:
+            self.hide_popups()
+            return
+        if F_EXT_SEARCH:
+            self.window.show_input_panel('Pane number for opening RESULTS:',
+                str(PANE_FOR_OPENING_RESULTS), self.on_done_second, None,
+               self.on_cancel)
+        else:
+            self.hide_popups()
+
+    def on_done_second(self, text):
+        global PANE_FOR_OPENING_RESULTS
+        try:
+            PANE_FOR_OPENING_RESULTS = int(text)
+        except ValueError:
+            pass
+        self.hide_popups()
+
+    def on_cancel(self):
+        self.hide_popups()
+
+    def hide_popups(self):
+        for group in range(self.window.num_groups()):
+            group_view = self.window.active_view_in_group(group)
+            group_view.erase_phantoms('popup')
 
 
 class NoteLinkHighlighter(sublime_plugin.EventListener):

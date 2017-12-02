@@ -61,6 +61,7 @@ See the [Usage](#usage) section below to see how this package might support your
     * [Location of your .bib file](#location-of-your-bib-file)
     * [Citation Reference Style](#citation-reference-style)
     * [Inline image preview size](#inline-image-preview-size)
+    * [Default panes](#default-panes)
 * [Usage](#usage)
     * [Creating a new note](#creating-a-new-note)
     * [Creating a link](#creating-a-link)
@@ -86,6 +87,7 @@ See the [Usage](#usage) section below to see how this package might support your
     * [Section Numbering and Table Of Contents](#section-numbering-and-table-of-contents)
         * [Automatic Table Of Contents](#automatic-table-of-contents)
         * [Automatic Section Numbering](#automatic-section-numbering)
+    * [Working with Panes](#working-with-panes)
 * [Credits](#credits)
 
 
@@ -316,6 +318,10 @@ The default setting limits images to be 320 pixels wide:
 ```
     "img_maxwidth": 320,
 ```
+
+### Default Panes
+
+Please see [Working with Panes](#working-with-panes) how to configure the default panes notes and results should open.
 
 ## Usage
 
@@ -927,6 +933,37 @@ Funny characters can be a challenge in the `(#references)`.
 The animation below shows both section (re-)numbering and auto-TOC:
 
 ![section-numbers](https://user-images.githubusercontent.com/30892199/33226705-12169142-d194-11e7-940a-8a8e26c054ae.gif)
+
+### Working with Panes
+
+This only applies if you have split your window into multiple panes. By default, notes are opened in the first pane and if you have `ag` installed, search results are opened in the second pane. So in a 2-column layout notes are left and results are right. In a 2-row layout notes are at the top, results at the bottom. Notes are opened when clicking on a note-link or creating a new note, results are displayed by the various search operations, tag list, etc.
+
+If you have a more complex layout or you want to change the default target panes, there is a command for you:
+
+* bring up the command palette by pressing `[cmd]+[shift]+[p]` on macOS (`[ctrl]+[shift]+[p]` on Windows and Linux).
+* type `zk` to list the *Zettelkasten* commands.
+* select `ZK: Select Panes for opening notes/results`
+
+This will first prompt you for the pane number notes should be opened in and, if you have `ag` installed, it will then prompt you for the pane number results should be opened in.
+
+To help you with finding out the pane numbers, it shows a pane identifier inside each pane, reading "Pane _n_", where _n_ is the pane's number.
+
+The following screenshot illustrates that:
+
+![panes](https://user-images.githubusercontent.com/30892199/33515865-e400ca54-d768-11e7-8fba-c641871c0cc0.png)
+
+The plugin will remember your choices as long as SublimeText is running. To make these changes permanent, add the following to the plugin's settings:
+
+```json
+    // Pane where notes are opened when a link is clicked or a new note is created
+    // Pane 0 is the 1st pane ever
+    "pane_for_opening_notes": 0,
+    //Pane where search results and tag lists, etc are opened (if ag is installed)
+    // Pane 1 is the second pane, created when you split the window
+    //    in a 2-column layout, this is the right column
+    //    in a 2-row layout, this is the bottom row
+    "pane_for_opening_results": 1,
+```
 
 
 ## Credits
