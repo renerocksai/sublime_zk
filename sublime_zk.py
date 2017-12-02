@@ -208,7 +208,7 @@ class ImageHandler:
                 line_str = view.substr(line_region)
                 line_len = len(line_str)
                 spaces -= line_len + 1
-                view.insert(edit, line_region.b, ' ' * spaces)
+                view.insert(edit, region.b, ' ' * spaces)
                 view.add_phantom(str(region),
                     sublime.Region(line_region.b + spaces, line_region.b + spaces),
                                  ImageHandler.FMT.format(img, w, h),
