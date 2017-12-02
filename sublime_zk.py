@@ -53,6 +53,8 @@ class ZkConstants:
 F_EXT_SEARCH = False
 PANE_FOR_OPENING_NOTES = 0
 PANE_FOR_OPENING_RESULTS = 1
+DISTRACTION_FREE_MODE_ACTIVE = defaultdict(bool)
+VIEWS_WITH_IMAGES = set()
 
 def get_settings():
     return sublime.load_settings(ZkConstants.Settings_File)
@@ -161,19 +163,28 @@ class ImageHandler:
     Static class to bundle image handling.
     """
 
-    FMT = '<img src="file://{}" width="{}" height="{}">'
+    FMT = '''
+        <img src="file://{}" class="centerImage" width="{}" height="{}">
+    '''
     Phantoms = defaultdict(set)
 
     @staticmethod
-    def show_images(view, max_width=1024):
+    def show_images(view, edit, max_width=1024):
         """
         markup.underline.link.image.markdown
         """
-        img_regs = view.find_by_selector('markup.underline.link.image.markdown')
+        global DISTRACTION_FREE_MODE_ACTIVE
+        global VIEWS_WITH_IMAGES
         folder = get_path_for(view)
         if not folder:
             return
-        for region in img_regs:
+        skip = 0
+        while True:
+            img_regs = view.find_by_selector('markup.underline.link.image.markdown')[skip:]
+            skip += 1
+            if not img_regs:
+                break
+            region = img_regs[0]
             rel_p = view.substr(region)
             img = os.path.join(folder, rel_p)
             size  = ImageHandler.get_image_size(img)
@@ -184,21 +195,48 @@ class ImageHandler:
                 m = max_width / w
                 h *= m
                 w = max_width
-
+            line_region = view.line(region)
+            settings = sublime.load_settings('Distraction Free.sublime-settings')
+            spaces = settings.get('wrap_width', 80)
+            centered = settings.get('draw_centered', True)
             view.erase_phantoms(str(region))
-            view.add_phantom(str(region), region,
-                             ImageHandler.FMT.format(img, w, h),
-                             sublime.LAYOUT_BLOCK)
+            if centered and DISTRACTION_FREE_MODE_ACTIVE[view.window().id()]:
+                line_str = view.substr(line_region)
+                line_len = len(line_str)
+                spaces -= line_len + 1
+                view.insert(edit, line_region.b, ' ' * spaces)
+                view.add_phantom(str(region),
+                    sublime.Region(line_region.b + spaces, line_region.b + spaces),
+                                 ImageHandler.FMT.format(img, w, h),
+                                 sublime.LAYOUT_BELOW)
+            else:
+                view.add_phantom(str(region), region,
+                                 ImageHandler.FMT.format(img, w, h),
+                                 sublime.LAYOUT_BLOCK)
             ImageHandler.Phantoms[view.id()].add(str(region))
+        VIEWS_WITH_IMAGES.add(view.id())
+
 
     @staticmethod
-    def hide_images(view):
+    def hide_images(view, edit):
         """
         Hide all imgs; use buffered identifiers
         """
         for rel_p in ImageHandler.Phantoms[view.id()]:
             view.erase_phantoms(rel_p)
         del ImageHandler.Phantoms[view.id()]
+        skip = 0
+        while True:
+            img_regs = view.find_by_selector('markup.underline.link.image.markdown')[skip:]
+            skip += 1
+            if not img_regs:
+                break
+            region = img_regs[0]
+            rel_p = view.substr(region)
+            line_region = view.line(region)
+            line_str = view.substr(line_region)
+            view.replace(edit, line_region, line_str.strip())
+        VIEWS_WITH_IMAGES.discard(view.id())
 
     @staticmethod
     def get_image_size(img):
@@ -1356,7 +1394,7 @@ class ZkShowImagesCommand(sublime_plugin.TextCommand):
             max_width = 1024
         if max_width < 0:
             max_width = 1024
-        ImageHandler.show_images(self.view, max_width)
+        ImageHandler.show_images(self.view, edit, max_width)
 
 
 class ZkHideImagesCommand(sublime_plugin.TextCommand):
@@ -1364,8 +1402,7 @@ class ZkHideImagesCommand(sublime_plugin.TextCommand):
     Hide all shown images.
     """
     def run(self, edit):
-        ImageHandler.hide_images(self.view)
-        print(self.view.window().get_view_index(self.view))
+        ImageHandler.hide_images(self.view, edit)
 
 
 class ZkTocCommand(sublime_plugin.TextCommand):
@@ -1691,3 +1728,14 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
             for unused_scope_name in unused_scopes:
                 view.erase_regions(u'clickable-note_links ' + unused_scope_name)
         NoteLinkHighlighter.scopes_for_view[view.id()] = new_scopes
+
+    def on_window_command(self, window, command_name, args):
+        global DISTRACTION_FREE_MODE_ACTIVE
+        if command_name == 'toggle_distraction_free':
+            DISTRACTION_FREE_MODE_ACTIVE[window.id()] = \
+                                not DISTRACTION_FREE_MODE_ACTIVE[window.id()]
+            for view in [v for v in window.views()
+                                                if v.id() in VIEWS_WITH_IMAGES]:
+                view.run_command('zk_hide_images')
+                view.run_command('zk_show_images')
+
