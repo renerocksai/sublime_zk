@@ -653,6 +653,7 @@ Here, there is a comma. So first all notes tagged with `#transport` will be sear
 Pretty powerful.
 
 `#transport #car, !#plane` : `#transport` or `#car` but never `#plane`
+
 `#transport #car !#plane` : `#transport` or `#car` or anything else that's not `#plane`
 
 I omitted examples using the `*` placeholder, it should be pretty obvious.
