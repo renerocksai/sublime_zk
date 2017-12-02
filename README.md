@@ -37,8 +37,9 @@ See the [Usage](#usage) section below to see how this package might support your
 * [Searching for advanced tag combinations](#advanced-tag-search)
 * [Automatic Bibliographies](#automatic-bibliographies) and [auto-completion for citekeys](#auto-completion-for-citekeys)
 * [Inline Local Image Display](#inline-local-image-display)
-* **NEW**: [Automatic Table Of Contents](#automatic-table-of-contents)
-* **EVEN NEWER**: [Automatic Section Numbering](#automatic-section-numbering)
+* [Automatic Table Of Contents](#automatic-table-of-contents)
+* [Automatic Section Numbering](#automatic-section-numbering)
+* **NEW**: [Support for Panes](#working-with-panes)
 
 ## Contents
 * [Installation](#installation)
