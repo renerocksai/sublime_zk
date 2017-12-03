@@ -292,7 +292,7 @@ Example for pandoc:
 Reference to some awesome article [@awesome2017].
 
 <!-- bibliography
-[@awesome2017]: Mr. Awesome. 2017. _On Awesomeness_
+[@awesome2017]: Mr. Awesome. 2017. _On Being Awesome_
 -->
 ```
 
@@ -302,7 +302,7 @@ Example for MultiMarkdown:
 Reference to some awesome article [][#awesome2017].
 
 <!-- bibliography -->
-[#awesome2017]: Mr. Awesome. 2017. _On Awesomeness_
+[#awesome2017]: Mr. Awesome. 2017. _On Being Awesome_
 
 ```
 

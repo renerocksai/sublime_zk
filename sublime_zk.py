@@ -184,7 +184,8 @@ class ImageHandler:
             return
         skip = 0
         while True:
-            img_regs = view.find_by_selector('markup.underline.link.image.markdown')[skip:]
+            img_regs = view.find_by_selector(
+                'markup.underline.link.image.markdown')[skip:]
             skip += 1
             if not img_regs:
                 break
@@ -203,7 +204,8 @@ class ImageHandler:
                 h *= m
                 w = max_width
             line_region = view.line(region)
-            settings = sublime.load_settings('Distraction Free.sublime-settings')
+            settings = sublime.load_settings(
+                'Distraction Free.sublime-settings')
             spaces = settings.get('wrap_width', 80)
             centered = settings.get('draw_centered', True)
             view.erase_phantoms(str(region))
@@ -212,10 +214,12 @@ class ImageHandler:
                 line_len = len(line_str)
                 spaces -= line_len + 1
                 view.insert(edit, region.b, ' ' * spaces)
-                view.add_phantom(str(region),
-                    sublime.Region(line_region.b + spaces, line_region.b + spaces),
-                                 ImageHandler.FMT.format(img, w, h),
-                                 sublime.LAYOUT_BELOW)
+                view.add_phantom(
+                    str(region),
+                    sublime.Region(line_region.b + spaces,
+                                   line_region.b + spaces),
+                    ImageHandler.FMT.format(img, w, h),
+                    sublime.LAYOUT_BELOW)
             else:
                 view.add_phantom(str(region), region,
                                  ImageHandler.FMT.format(img, w, h),
@@ -234,7 +238,8 @@ class ImageHandler:
         del ImageHandler.Phantoms[view.id()]
         skip = 0
         while True:
-            img_regs = view.find_by_selector('markup.underline.link.image.markdown')[skip:]
+            img_regs = view.find_by_selector(
+                'markup.underline.link.image.markdown')[skip:]
             skip += 1
             if not img_regs:
                 break
