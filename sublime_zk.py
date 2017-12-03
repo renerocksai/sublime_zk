@@ -1745,6 +1745,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
 
     def on_window_command(self, window, command_name, args):
         global DISTRACTION_FREE_MODE_ACTIVE
+        global VIEWS_WITH_IMAGES
         if command_name == 'toggle_distraction_free':
             DISTRACTION_FREE_MODE_ACTIVE[window.id()] = \
                                 not DISTRACTION_FREE_MODE_ACTIVE[window.id()]
@@ -1752,4 +1753,13 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
                                                 if v.id() in VIEWS_WITH_IMAGES]:
                 view.run_command('zk_hide_images')
                 view.run_command('zk_show_images')
+        elif command_name == 'toggle_full_screen':
+            # exit full screen when in distraction free mode exits distraction-
+            # free mode!
+            if DISTRACTION_FREE_MODE_ACTIVE[window.id()]:
+                DISTRACTION_FREE_MODE_ACTIVE[window.id()] = False
+                for view in [v for v in window.views()
+                                                if v.id() in VIEWS_WITH_IMAGES]:
+                    view.run_command('zk_hide_images')
+                    view.run_command('zk_show_images')
 
