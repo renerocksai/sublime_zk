@@ -65,4 +65,9 @@
     //    in a 2-row layout, this is the bottom row
     "pane_for_opening_results": 1,
 
+    // seconds in note IDs?
+    // if true : YYYYMMDDHHMMSS 20171224183045
+    // if false: YYYYMMDDHHMM   201712241830
+    "seconds_in_id": false,
+
 }

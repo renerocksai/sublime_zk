@@ -39,7 +39,7 @@ class ZkConstants:
                                                              r"|:[a-zA-Z0-9])+)"
 
     # match note links in text
-    Link_Matcher = re.compile('(\[+|§)([0-9]{12})(\]+|.?)')
+    Link_Matcher = re.compile('(\[+|§)([0-9]{12,14})(\]+|.?)')
     # Above RE doesn't really care about closing ] andymore
     # This works in our favour so we support [[201711122259 This is a note]]
     # when expanding overview notes
@@ -56,6 +56,7 @@ PANE_FOR_OPENING_RESULTS = 1
 DISTRACTION_FREE_MODE_ACTIVE = defaultdict(bool)
 VIEWS_WITH_IMAGES = set()
 AUTO_SHOW_IMAGES = False
+SECONDS_IN_ID = False
 
 
 def get_settings():
@@ -65,6 +66,7 @@ def settings_changed():
     global PANE_FOR_OPENING_RESULTS
     global PANE_FOR_OPENING_NOTES
     global AUTO_SHOW_IMAGES
+    global SECONDS_IN_ID
     settings = get_settings()
     value = settings.get("pane_for_opening_notes", None)
     if value is not None:
@@ -73,6 +75,9 @@ def settings_changed():
     if value is not None:
         PANE_FOR_OPENING_RESULTS = value
     AUTO_SHOW_IMAGES = settings.get('auto_show_images', False)
+    value = settings.get("seconds_in_id", None)
+    if value is not None:
+        SECONDS_IN_ID = value
 
 def plugin_loaded():
     global F_EXT_SEARCH
@@ -655,7 +660,7 @@ class TextProduction:
         linestart_till_cursor_str, link_region = select_link_in(view)
         if not link_region:
             return
-        note_id = view.substr(link_region)[:12]
+        note_id = cut_after_note_id(view.substr(link_region))
         cursor_pos = view.sel()[0].begin()
         line_region = view.line(cursor_pos)
 
@@ -667,7 +672,18 @@ class TextProduction:
 
 
 def timestamp():
-    return '{:%Y%m%d%H%M}'.format(datetime.datetime.now())
+    if SECONDS_IN_ID:
+        return '{:%Y%m%d%H%M%S}'.format(datetime.datetime.now())
+    else:
+        return '{:%Y%m%d%H%M}'.format(datetime.datetime.now())
+
+def cut_after_note_id(text):
+    """
+    Tries to find the 12/14 digit note ID (at beginning) in text.
+    """
+    note_ids = re.findall('[0-9]{12,14}', text)
+    if note_ids:
+        return note_ids[0]
 
 def get_link_pre_postfix():
     settings = get_settings()
@@ -719,6 +735,8 @@ def note_file_by_id(note_id, folder, extension):
     """
     Find the file for note_id.
     """
+    if not note_id:
+        return
     the_file = os.path.join(folder, note_id + '*')
     candidates = [f for f in glob.glob(the_file) if f.endswith(extension)]
     if len(candidates) > 0:
@@ -838,9 +856,9 @@ def select_link_in(view):
     p_symbol_pos = linestart_till_cursor_str.rfind('§')
     if p_symbol_pos >= 0:
         p_link_start = line_start + p_symbol_pos + 1
-        p_link_end = p_link_start + 12
-        # check if it's a numeric link
-        if re.match('§[0-9]{12}', full_line[p_symbol_pos:]):
+        note_id = cut_after_note_id(full_line[p_symbol_pos:])
+        if note_id:
+            p_link_end = p_link_start + len(note_id)
             return linestart_till_cursor_str, sublime.Region(p_link_start,
                 p_link_end)
 
@@ -874,9 +892,8 @@ def get_note_id_of_file(filn):
     extension = settings.get('wiki_extension')
     if filn.endswith(extension):
         # we have a markdown file
-        note_id = re.findall('[0-9]{12}', os.path.basename(filn))
+        note_id = cut_after_note_id(os.path.basename(filn))
         if note_id:
-            note_id = note_id[0]
             if os.path.basename(filn).startswith(note_id):
                 return note_id
 
@@ -1062,7 +1079,8 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
 
         # search for file starting with text between the brackets (usually
         # the ID)
-        the_file = note_file_by_id(selected_text[:12], folder, extension)
+        note_id = cut_after_note_id(selected_text[:14])
+        the_file = note_file_by_id(note_id, folder, extension)
 
         if the_file:
             new_view = window.open_file(the_file)
@@ -1134,7 +1152,7 @@ class ZkShowReferencingNotesCommand(sublime_plugin.TextCommand):
             if not folder:
                 return
             self.folder = folder
-            note_id = self.view.substr(link_region)[:12]
+            note_id = cut_after_note_id(self.view.substr(link_region)[:14])
             self.friend_note_files = ExternalSearch.search_friend_notes(
                 folder, extension, note_id)
             self.friend_note_files = [os.path.basename(f) for f in
@@ -1154,7 +1172,9 @@ class ZkShowReferencingNotesCommand(sublime_plugin.TextCommand):
             # hack for the find in files panel: select tag in view, copy it
             selection = self.view.sel()
             selection.clear()
-            selection.add(sublime.Region(link_region.a, link_region.a+12))
+            note_id = cut_after_note_id(self.view.substr(link_region))
+            selection.add(sublime.Region(link_region.a,
+                link_region.a+len(note_id)))
             self.view.window().run_command("copy")
             self.view.window().run_command("show_panel",
                 {"panel": "find_in_files",
