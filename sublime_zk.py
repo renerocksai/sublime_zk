@@ -672,6 +672,7 @@ class TextProduction:
 
 
 def timestamp():
+    global SECONDS_IN_ID
     if SECONDS_IN_ID:
         return '{:%Y%m%d%H%M%S}'.format(datetime.datetime.now())
     else:
