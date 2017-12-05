@@ -21,7 +21,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * Typing `[ctrl]+[space]` (or `[alt]+[/]` on Linux) will trigger note-link auto-completion for even quicker insertion of links to other notes.
 * Typing `[shift]+[enter]` lets you enter a name for a new note. The new note is then created with a new note ID.
 * Implicit note creation via links to non-existing notes' titles, see [below](#implicitly-creating-a-new-note-via-a-link).
-* The ID format is YYYYMMDDHHMM - eg: 201710282111
+* The ID format is timestamp-based YYYYMMDDHHMM - eg: 201710282111, but can be switched second-precision YYYYMMDDHHMMSS - eg: 20171224183045
 * Highlighting of note links
 * Highlighting of #tags
 * Highlighting of footnote references `[^like this one]` and `[ref. @pandoc]` references.
@@ -53,6 +53,7 @@ See the [Usage](#usage) section below to see how this package might support your
             * [Manual approach](#manual-approach)
     * [Markdown filename extension](#markdown-filename-extension)
     * [Single or double brackets](#single-or-double-brackets)
+    * [Note ID precision](#note-id-precision)
     * [Insert links with or without titles](#insert-links-with-or-without-titles)
     * [IDs in titles of new notes](#ids-in-titles-of-new-notes)
     * [New Note templates](#new-note-templates)
@@ -163,6 +164,19 @@ By default, the extension `.md` is used for your notes. If that does not match y
 
 ### Single or double brackets
 Whether you want to use `[[this link style]]` or `[that link style]` is totally up to you. Both work. But you need to configure which style you prefer, so automatically inserted links will match your style. `[[double bracket]]` links are the default, and if you want to change that to single bracket links, set the `double_brackets` parameter to `false` in the `sublime_zk.sublime-settings`.
+
+### Note ID precision
+
+The default note ID format is a timestamp in `YYYYMMDDHHMM` format, with minute precision. If you tend to create more than one note per minute, this can be a problem. In that case, you can change the note ID format to `YYYYMMDDHHMMSS`, with second-precision.
+
+The following setting influences the note ID format:
+
+```json
+    // seconds in note IDs?
+    // if true : YYYYMMDDHHMMSS 20171224183045
+    // if false: YYYYMMDDHHMM   201712241830
+    "seconds_in_id": true,
+```
 
 ### Insert links with or without titles
 There are numerous times where the plugin inserts a `[[link]]` to a note into your text on your behalf. You may not only choose the single or double-bracketness of the links, you may also choose whether the **note title** should follow the inserted link.
