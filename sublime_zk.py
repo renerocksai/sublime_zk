@@ -44,6 +44,9 @@ class ZkConstants:
     # This works in our favour so we support [[201711122259 This is a note]]
     # when expanding overview notes
 
+    # image links with attributes
+    RE_IMG_LINKS = '(!\[)(.*)(\])(\()(.*)(\))(\{)(.*)(\})'
+
     # TOC markers
     TOC_HDR = '<!-- table of contents (auto) -->'
     TOC_END = '<!-- (end of auto-toc) -->'
@@ -173,7 +176,7 @@ class ImageHandler:
     """
 
     FMT = '''
-        <img src="file://{}" class="centerImage" width="{}" height="{}">
+        <img src="file://{}" class="centerImage" {}>
     '''
     Phantoms = defaultdict(set)
 
@@ -204,16 +207,21 @@ class ImageHandler:
             if not size:
                 continue
             w, h = size
-            if w > max_width:
-                m = max_width / w
-                h *= m
-                w = max_width
             line_region = view.line(region)
+            imgattr = ImageHandler.check_imgattr(view, line_region, region)
+            if not imgattr:
+                if w > max_width:
+                    m = max_width / w
+                    h *= m
+                    w = max_width
+                imgattr = 'width="{}" height="{}"'.format(w, h)
+
             settings = sublime.load_settings(
                 'Distraction Free.sublime-settings')
             spaces = settings.get('wrap_width', 80)
             centered = settings.get('draw_centered', True)
             view.erase_phantoms(str(region))
+            html_img = ImageHandler.FMT.format(img, imgattr)
             if centered and DISTRACTION_FREE_MODE_ACTIVE[view.window().id()]:
                 line_str = view.substr(line_region)
                 line_len = len(line_str)
@@ -223,14 +231,24 @@ class ImageHandler:
                     str(region),
                     sublime.Region(line_region.b + spaces,
                                    line_region.b + spaces),
-                    ImageHandler.FMT.format(img, w, h),
+                    html_img,
                     sublime.LAYOUT_BELOW)
             else:
                 view.add_phantom(str(region), region,
-                                 ImageHandler.FMT.format(img, w, h),
+                                 html_img,
                                  sublime.LAYOUT_BLOCK)
             ImageHandler.Phantoms[view.id()].add(str(region))
         VIEWS_WITH_IMAGES.add(view.id())
+
+    @staticmethod
+    def check_imgattr(view, line_region, link_region=None):
+        # find attrs for this link
+        full_line = view.substr(line_region)
+        link_till_eol = full_line[link_region.a - line_region.a:]
+        # find attr if present
+        m = re.match(r'.*\)\{(.*)\}', link_till_eol)
+        if m:
+            return m.groups()[0]
 
 
     @staticmethod

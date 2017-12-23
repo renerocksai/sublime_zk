@@ -48,3 +48,16 @@ contexts:
         - match: '(?i)(todo:)'
           captures:
             '1': string.unquoted.plain.out.yaml
+        # image links ![desc](url){attrs}
+        - match: '(!\[)(.*)(\])(\()(.*)(\))(\{)(.*)(\})'
+          captures:
+            '1': meta.image.inline.markdown punctuation.definition.image.begin.markdown
+            '2': meta.image.inline.description.markdown
+            '3': meta.image.inline.markdown punctuation.definition.image.end.markdown
+            '4': meta.image.inline.markdown punctuation.definition.metadata.begin.markdown
+            '5': meta.image.inline.markdown markup.underline.link.image.markdown
+            '6': meta.image.inline.markdown punctuation.definition.metadata.end.markdown
+            '7': meta.image.inline.markdown punctuation.definition.imageattr.begin.markdown
+            '8': meta.image.inline.markdown.imageattr
+            '9': meta.image.inline.markdown punctuation.definition.imageattr.end.markdown
+

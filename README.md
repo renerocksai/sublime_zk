@@ -335,6 +335,8 @@ The default setting limits images to be 320 pixels wide:
     "img_maxwidth": 320,
 ```
 
+Note: If you like, you can define a preview size on a per image basis. See [inline local image display](#inline-local-image-display) for more information.
+
 ### Auto inline image preview
 If you want images displayed automatically right when you open a note, put this into the plugin settings:
 
@@ -846,6 +848,21 @@ To hide them:
 ![inline_imgs](https://user-images.githubusercontent.com/30892199/33154565-7df466ac-cfe9-11e7-8920-b204fa4dcb02.gif)
 
 **Note:** If you want images automatically displayed right when you open a note, you can [configure](#auto-inline-image-preview) that.
+
+#### Per image preview size
+You can define a specific preview size per image by adding image attributes inside a pair of curly braces as shown below:
+
+```markdown
+![xxx](img/zettelkasten-book-de.jpg){width=100% height=100%}
+![xxx](img/zettelkasten-book-de.jpg){width=200px height=200px}
+
+```
+
+**Note:**
+
+* SublimeText requires you to specify both width and height when you specify your own attributes.
+* SublimeText seems to have its own interpretation of how big a pixel is
+* If you don't want to manually convert width and height to scaled values, then just use percentages. Start with 100% for each and take it from there.
 
 ### Section Numbering and Table Of Contents
 
