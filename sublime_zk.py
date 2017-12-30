@@ -500,7 +500,7 @@ class ExternalSearch:
         if tags:
             args.extend(['--nofilename', '--nonumbers', '--only-matching'])
         else:
-            args.extend(['-l'])
+            args.extend(['-l', '--ackmate'])
         args.extend(['--silent', '--markdown', regexp, folder])
         return ExternalSearch.run(args, folder)
 
@@ -526,7 +526,7 @@ class ExternalSearch:
             print('sublime_zk: search timed out:', ' '.join(args))
         if verbose:
             print(output.decode('utf-8'))
-        return output.decode('utf-8')
+        return output.decode('utf-8').replace('\r', '')
 
     @staticmethod
     def externalize_note_links(ag_out, folder, extension, prefix=None):
@@ -544,12 +544,13 @@ class ExternalSearch:
                     if not line.strip():
                         continue
                     if line.endswith(extension):
+                        line = os.path.basename(line)
                         line = line.replace(extension, '')
-                    note_id, title = line.split(' ', 1)
-                    note_id = os.path.basename(note_id)
+                        note_id, title = line.split(' ', 1)
+                        note_id = os.path.basename(note_id)
 
-                    f.write(u'{}{}{} {}\n'.format(link_prefix, note_id,
-                        link_postfix, title))
+                        f.write(u'{}{}{} {}\n'.format(link_prefix, note_id,
+                            link_postfix, title))
 
     @staticmethod
     def external_file(folder):
