@@ -39,7 +39,7 @@ class ZkConstants:
                                                              r"|:[a-zA-Z0-9])+)"
 
     # match note links in text
-    Link_Matcher = re.compile('(\[+|§)([0-9]{12,14})(\]+|.?)')
+    Link_Matcher = re.compile('(\[+|§)([0-9.]{12,18})(\]+|.?)')
     # Above RE doesn't really care about closing ] andymore
     # This works in our favour so we support [[201711122259 This is a note]]
     # when expanding overview notes
@@ -783,7 +783,7 @@ def cut_after_note_id(text):
     """
     Tries to find the 12/14 digit note ID (at beginning) in text.
     """
-    note_ids = re.findall('[0-9]{12,14}', text)
+    note_ids = re.findall('[0-9.]{12,18}', text)
     if note_ids:
         return note_ids[0]
 
@@ -1184,7 +1184,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
 
         # search for file starting with text between the brackets (usually
         # the ID)
-        note_id = cut_after_note_id(selected_text[:14])
+        note_id = cut_after_note_id(selected_text)
         the_file = note_file_by_id(note_id, folder, extension)
 
         if the_file:
@@ -1257,7 +1257,7 @@ class ZkShowReferencingNotesCommand(sublime_plugin.TextCommand):
             if not folder:
                 return
             self.folder = folder
-            note_id = cut_after_note_id(self.view.substr(link_region)[:14])
+            note_id = cut_after_note_id(self.view.substr(link_region))
             self.friend_note_files = ExternalSearch.search_friend_notes(
                 folder, extension, note_id)
             self.friend_note_files = [os.path.basename(f) for f in
