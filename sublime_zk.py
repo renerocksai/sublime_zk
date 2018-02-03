@@ -839,8 +839,9 @@ def note_file_by_id(note_id, folder, extension):
     """
     if not note_id:
         return
-    the_file = os.path.join(folder, note_id + '*')
-    candidates = [f for f in glob.glob(the_file) if f.endswith(extension)]
+    candidates = []
+    for root, dirs, files in os.walk(folder):
+        candidates.extend([os.path.join(root, f) for f in files if f.startswith(note_id)])
     if len(candidates) > 0:
         return candidates[0]
 
@@ -862,8 +863,10 @@ def get_all_notes_for(folder, extension):
     """
     Return all files with extension in folder.
     """
-    return [os.path.join(folder, f) for f in os.listdir(folder)
-                                                    if f.endswith(extension)]
+    candidates = []
+    for root, dirs, files in os.walk(folder):
+        candidates.extend([f for f in files if f.endswith(extension)])
+    return candidates
 
 def find_all_tags_in(folder, extension):
     """
@@ -1386,9 +1389,8 @@ class ZkGetWikiLinkCommand(sublime_plugin.TextCommand):
 
         settings = get_settings()
         extension = settings.get('wiki_extension')
-
-        self.files = [f for f in os.listdir(folder) if f.endswith(extension)]
-        self.modified_files = [f.replace(extension, '') for f in self.files]
+        self.files = get_all_notes_for(folder, extension)
+        self.modified_files = [os.path.basename(f).replace(extension, '') for f in self.files]
         self.view.window().show_quick_panel(self.modified_files, self.on_done)
 
 
@@ -1783,7 +1785,8 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         prefix, postfix = get_link_pre_postfix()
         extension = settings.get('wiki_extension')
         completions = []
-        ids_and_names = [f.split(' ', 1) for f in os.listdir(folder)
+        aux = [os.path.basename(f) for f in get_all_notes_for(folder, extension)]
+        ids_and_names = [f.split(' ', 1) for f in aux
                                             if f.endswith(extension)
                                             and ' ' in f]
         do_insert_title = settings.get('insert_links_with_titles', False)
