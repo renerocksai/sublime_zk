@@ -1205,6 +1205,13 @@ class ZkShowReferencingNotesCommand(sublime_plugin.TextCommand):
         return
 
 
+class ZkReplaceSelectedTextCommand(sublime_plugin.TextCommand):
+    def run(self, edit, args):
+        text = args['text']
+        region = self.view.sel()[0]
+        self.view.replace(edit, region, text)
+
+
 class ZkNewZettelCommand(sublime_plugin.WindowCommand):
     """
     Command that prompts for a note title and then creates a note with that
@@ -1214,11 +1221,17 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
         # try to find out if we come from a zettel
         self.origin = None
         self.o_title = None
+        self.insert_link = False
         view = self.window.active_view()
+        suggested_title = ''
         if view:
             filn = view.file_name()
             self.origin, self.o_title = get_note_id_and_title_of(view)
-        self.window.show_input_panel('New Note:', '', self.on_done, None, None)
+            sel = view.sel()
+            if len(sel) >=1 and not sel[0].empty():
+                suggested_title = view.substr(sel[0])
+                self.insert_link = True
+        self.window.show_input_panel('New Note:', suggested_title, self.on_done, None, None)
 
     def on_done(self, input_text):
         global PANE_FOR_OPENING_NOTES
@@ -1252,6 +1265,11 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
         if id_in_title:
             input_text = new_id + ' ' + input_text
 
+        if self.insert_link:
+            prefix, postfix = get_link_pre_postfix()
+            link_text = prefix + input_text + postfix
+            view = self.window.active_view()
+            view.run_command('zk_replace_selected_text', {'args': {'text': link_text}})
         create_note(the_file, input_text, self.origin, self.o_title)
         new_view = self.window.open_file(the_file)
         self.window.set_view_index(new_view, PANE_FOR_OPENING_NOTES, 0)
