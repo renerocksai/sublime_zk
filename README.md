@@ -67,6 +67,7 @@ See the [Usage](#usage) section below to see how this package might support your
     * [Default panes](#default-panes)
 * [Usage](#usage)
     * [Creating a new note](#creating-a-new-note)
+    * [Creating a new note and link from selected text](#creating-a-new-note-and-link-from-selected-text)
     * [Creating a link](#creating-a-link)
         * [Using auto-completion to insert note-links](#using-auto-completion-to-insert-note-links)
         * [Implicitly creating a new note via a link](#implicitly-creating-a-new-note-via-a-link)
@@ -84,6 +85,7 @@ See the [Usage](#usage) section below to see how this package might support your
         * [Refreshing an expanded overview note](#refreshing-an-expanded-overview-note)
         * [Inline expansion of note-links](#inline-expansion-of-note-links)
     * [Working with Bibliographies](#working-with-bibliographies)
+        * [Inserting a citation](#inserting-a-citation)
         * [Auto-Completion for citekeys](#auto-completion-for-citekeys)
         * [Automatic Bibliographies](#automatic-bibliographies)
     * [Inline Local Image Display](#inline-local-image-display)
@@ -367,6 +369,18 @@ The new note will look like this:
 tags =
 
 ```
+
+### Creating a new note and link from selected text
+
+There is a very convenient shortcut to create notes from selected text and automatically inserting a link to the new note, replacing the selected text: Just select the text you want to use as note title before pressing `[shift]+[enter]`.
+
+This will bring up the same input field at the bottom of the window, this time pre-filled with the selected text. When you press `[enter]`, a new note will be created, using the selected text as its title. In addition, the selected text in the original note will be replaced by a link to the new note.
+
+The following animation illustrates this:
+
+![new-note-from-sel](https://user-images.githubusercontent.com/30892199/35771204-d784333c-0928-11e8-85e6-6378d787395d.gif)
+
+
 
 ### Syntax Coloring for #tags, footnotes, and pandoc references
 To enable highlighting of #tags, footnotes, and pandoc references in your newly created note, and for all your Zettelkasten notes, switch Sublime Text's syntax to `Markdown Zettelkasten`. You can use the menu: 'View' -> 'Syntax' -> 'Open all with current extension as...', and select 'Markdown Zettelkasten'.
@@ -786,6 +800,18 @@ tags =
 **Note:** Use this at your own risk when **ever** planning on refreshing an overview note. You are going to have nested expansions and precisely those will get overwritten when the parent note is refreshed.
 
 ### Working with Bibliographies
+
+#### Inserting a citation
+If your note archive contains one or you [configured](#location-of-your-bib-file) a `.bib` file, then you can use the shortcut `[@` or `[#` to insert a citation. Which one you use depends on your preferences, whether your prefer pandoc or multimarkdown.
+
+A fuzzy-searchable list of all entries in your bibfile will pop up, containing authors, year, title, and citekey. To select the entry you like, just press `[enter]`. To exit without selecting anything, press `[esc]`.
+
+When you made your choice, a citation link will be inserted into the text: `[@citekey]` (or `[][#citekey]` if you [use MultiMarkdown style](#citation-reference-style)).
+
+The following animation shows this in action:
+
+![insert-citation](https://user-images.githubusercontent.com/30892199/35771311-e8da9b06-092a-11e8-847b-aa1649da499d.gif)
+
 
 #### Auto-Completion for @citekeys
 If your note archive contains one or you [configured](#location-of-your-bib-file) a `.bib` file, then the auto-completion suggestions you get via `[ctrl]+[space]` (or `[alt]+[/]` on Linux) will also contain your cite-keys, marked by a starting `@` symbol. (If you [use MultiMarkdown style](#citation-reference-style), they will start with a `#` sign instead). Pressing `[enter]` will insert a pandoc citation like this: `[@citekey]` (or `[][#citekey]` if you use MultiMarkdown style).

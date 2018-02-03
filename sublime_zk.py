@@ -1391,6 +1391,7 @@ class ZkGetWikiLinkCommand(sublime_plugin.TextCommand):
         self.modified_files = [f.replace(extension, '') for f in self.files]
         self.view.window().show_quick_panel(self.modified_files, self.on_done)
 
+
 class ZkInsertCitationCommand(sublime_plugin.TextCommand):
     def on_done(self, selection):
         if selection < 0:
@@ -1420,6 +1421,7 @@ class ZkInsertCitationCommand(sublime_plugin.TextCommand):
                 d['title'], citekey), d['title']]
             self.itemlist.append(item)
         self.view.window().show_quick_panel(self.itemlist, self.on_done)
+
 
 class ZkInsertWikiLinkCommand(sublime_plugin.TextCommand):
     """
