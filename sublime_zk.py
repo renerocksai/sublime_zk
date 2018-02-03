@@ -408,7 +408,7 @@ class Autobib:
             first = ''
             last = author.strip()
             if ',' in author:
-                last, first = [x.strip() for x in author.split(',')]
+                last, first = [x.strip() for x in author.split(',')][:2]
             author_tuples.append((last, first))
         if len(author_tuples) > 2:
             authors = '{} et al.'.format(author_tuples[0][0])  # last et al
