@@ -1669,10 +1669,10 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
             citekeys = Autobib.extract_all_citekeys(bibfile)
             if mmd_style:
                 fmt_key = '#{}'
-                fmt_completion = '[][#{}]'
+                fmt_completion = '[][{}]'
             else:
                 fmt_key = '@{}'
-                fmt_completion = '[@{}]'
+                fmt_completion = '[{}]'
 
             for citekey in citekeys:
                 citekey = fmt_key.format(citekey)
