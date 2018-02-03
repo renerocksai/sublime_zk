@@ -316,6 +316,9 @@ class Autobib:
     Static class to group all auto-bibliography functions.
     """
     citekey_matcher = re.compile('^@.*{([^,]*)[,]?')
+    author_matcher = re.compile(r'^\s*author\s*=\s*(.*)')
+    title_matcher = re.compile(r'^\s*title\s*=\s*(.*)')
+    year_matcher = re.compile(r'^\s*year\s*=\s*(.*)')
 
     @staticmethod
     def look_for_bibfile(view, settings):
@@ -340,13 +343,11 @@ class Autobib:
                 print('bibfile not found:', bibfile)
                 return None
 
-
     @staticmethod
     def extract_all_citekeys(bibfile):
         """
         Parse the bibfile and return all citekeys.
         """
-        bibs = ''
         citekeys = set()
         if not os.path.exists(bibfile):
             print('bibfile not found:', bibfile)
@@ -358,6 +359,87 @@ class Autobib:
                     continue
                 citekeys.add(match[0])
         return citekeys
+
+    @staticmethod
+    def extract_all_entries(bibfile):
+        """
+        Return dict: {citekey: {title, authors, year}}
+        """
+        entries = defaultdict(lambda: defaultdict(str))
+        if not os.path.exists(bibfile):
+            print('bibfile not found:', bibfile)
+            return {}
+        current_citekey = None
+        with open(bibfile, mode='r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line.endswith(','):
+                    line = line[:-1]
+                match = Autobib.citekey_matcher.findall(line)
+                if match:
+                    current_citekey = match[0]
+                    continue
+                match = Autobib.author_matcher.findall(line)
+                if match:
+                    authors = match[0]
+                    authors = Autobib.parse_authors(authors)
+                    entries[current_citekey]['authors'] = authors
+                    continue
+                match = Autobib.title_matcher.findall(line)
+                if match:
+                    title = match[0]
+                    title = Autobib.remove_latex_commands(title)
+                    entries[current_citekey]['title'] = title
+                    continue
+                match = Autobib.year_matcher.findall(line)
+                if match:
+                    year = match[0]
+                    year = Autobib.remove_latex_commands(year)
+                    entries[current_citekey]['year'] = year
+                    continue
+        return entries
+
+    @staticmethod
+    def parse_authors(line):
+        line = Autobib.remove_latex_commands(line)
+        authors = line.split('and')
+        author_tuples = []
+        for author in authors:
+            first = ''
+            last = author.strip()
+            if ',' in author:
+                last, first = [x.strip() for x in author.split(',')]
+            author_tuples.append((last, first))
+        if len(author_tuples) > 2:
+            authors = '{} et al.'.format(author_tuples[0][0])  # last et al
+        else:
+            authors = ' & '.join(x[0] for x in author_tuples)
+        return authors
+
+    @staticmethod
+    def remove_latex_commands(s):
+        """
+        Simple function to remove any LaTeX commands or brackets from the string,
+        replacing it with its contents.
+        """
+        chars = []
+        FOUND_SLASH = False
+
+        for c in s:
+            if c == '{':
+                # i.e., we are entering the contents of the command
+                if FOUND_SLASH:
+                    FOUND_SLASH = False
+            elif c == '}':
+                pass
+            elif c == '\\':
+                FOUND_SLASH = True
+            elif not FOUND_SLASH:
+                chars.append(c)
+            elif c.isspace():
+                FOUND_SLASH = False
+
+        return ''.join(chars)
 
     @staticmethod
     def find_citations(text, citekeys):
@@ -1309,6 +1391,35 @@ class ZkGetWikiLinkCommand(sublime_plugin.TextCommand):
         self.modified_files = [f.replace(extension, '') for f in self.files]
         self.view.window().show_quick_panel(self.modified_files, self.on_done)
 
+class ZkInsertCitationCommand(sublime_plugin.TextCommand):
+    def on_done(self, selection):
+        if selection < 0:
+            return
+        settings = get_settings()
+        mmd_style = settings.get('citations-mmd-style', None)
+        if mmd_style:
+            fmt_completion = '[][#{}]'
+        else:
+            fmt_completion = '[@{}]'
+
+        citekey = self.citekey_list[selection]
+        text = fmt_completion.format(citekey)
+        self.view.run_command('zk_insert_wiki_link', {'args': {'text': text}})
+
+    def run(self, edit):
+        self.citekey_list = []
+        self.itemlist = []
+        settings = get_settings()
+        bibfile = Autobib.look_for_bibfile(self.view, settings)
+        if not bibfile:
+            return
+        entries = Autobib.extract_all_entries(bibfile)
+        for citekey, d in entries.items():
+            self.citekey_list.append(citekey)
+            item = ['{} {} - {} ({})'.format(d['authors'], d['year'],
+                d['title'], citekey), d['title']]
+            self.itemlist.append(item)
+        self.view.window().show_quick_panel(self.itemlist, self.on_done)
 
 class ZkInsertWikiLinkCommand(sublime_plugin.TextCommand):
     """

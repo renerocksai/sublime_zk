@@ -1,5 +1,6 @@
 [
     { "caption": "ZK: New Zettel Note", "command": "zk_new_zettel" },
+    { "caption": "ZK: Insert Citation", "command": "zk_insert_citation" },
     { "caption": "ZK: Pick tag from list", "command": "zk_tag_selector" },
     { "caption": "ZK: Find all tags in archive", "command": "zk_show_all_tags" },
     { "caption": "ZK: Expand Overview Note", "command": "zk_expand_overview_note" },
