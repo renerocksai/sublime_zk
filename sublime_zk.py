@@ -1348,14 +1348,17 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
         the_file = os.path.join(folder,  new_id + ' ' + input_text + extension)
 
         if id_in_title:
-            input_text = new_id + ' ' + input_text
+            new_title = new_id + ' ' + input_text
 
         if self.insert_link:
             prefix, postfix = get_link_pre_postfix()
-            link_text = prefix + input_text + postfix
+            link_txt = prefix + new_id + postfix
+            do_insert_title = settings.get('insert_links_with_titles', False)
+            if do_insert_title:
+                link_txt += ' ' + input_text
             view = self.window.active_view()
-            view.run_command('zk_replace_selected_text', {'args': {'text': link_text}})
-        create_note(the_file, input_text, self.origin, self.o_title)
+            view.run_command('zk_replace_selected_text', {'args': {'text': link_txt}})
+        create_note(the_file, new_title, self.origin, self.o_title)
         new_view = self.window.open_file(the_file)
         self.window.set_view_index(new_view, PANE_FOR_OPENING_NOTES, 0)
 
