@@ -35,7 +35,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * [Optional](#insert-links-with-or-without-titles) insertion of `[[links]] WITH note titles` instead of just `[[links]]`
 * Inline [expansion](#inline-expansion-of-note-links) of note links via `[ctrl]+[.]`
 * [Searching for advanced tag combinations](#advanced-tag-search)
-* [Automatic Bibliographies](#automatic-bibliographies) and [auto-completion for citekeys](#auto-completion-for-citekeys)
+* [Automatic Bibliographies](#automatic-bibliographies), [auto-completion for citekeys](#auto-completion-for-citekeys), and fuzzy-search [insertion of citations](#inserting-a-citation)
 * [Inline Local Image Display](#inline-local-image-display)
 * [Automatic Table Of Contents](#automatic-table-of-contents)
 * [Automatic Section Numbering](#automatic-section-numbering)
@@ -378,7 +378,7 @@ This will bring up the same input field at the bottom of the window, this time p
 
 The following animation illustrates this:
 
-![new-note-from-sel](https://user-images.githubusercontent.com/30892199/35771204-d784333c-0928-11e8-85e6-6378d787395d.gif)
+![new-note-from-sel](https://user-images.githubusercontent.com/30892199/35781566-18734f7c-09ec-11e8-8bd6-c2ee3ed240c1.gif)
 
 
 
