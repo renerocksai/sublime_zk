@@ -1346,7 +1346,7 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
 
         new_id = timestamp()
         the_file = os.path.join(folder,  new_id + ' ' + input_text + extension)
-
+        new_title = input_text
         if id_in_title:
             new_title = new_id + ' ' + input_text
 
