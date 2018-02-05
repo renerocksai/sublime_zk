@@ -316,9 +316,9 @@ class Autobib:
     Static class to group all auto-bibliography functions.
     """
     citekey_matcher = re.compile('^@.*{([^,]*)[,]?')
-    author_matcher = re.compile(r'^\s*author\s*=\s*(.*)')
-    title_matcher = re.compile(r'^\s*title\s*=\s*(.*)')
-    year_matcher = re.compile(r'^\s*year\s*=\s*(.*)')
+    author_matcher = re.compile(r'^\s*author\s*=\s*(.*)', re.IGNORECASE)
+    title_matcher = re.compile(r'^\s*title\s*=\s*(.*)', re.IGNORECASE)
+    year_matcher = re.compile(r'^\s*year\s*=\s*(.*)', re.IGNORECASE)
 
     @staticmethod
     def look_for_bibfile(view, settings):
