@@ -530,7 +530,7 @@ class ExternalSearch:
         Return a dict {note_id: tags}.
         """
         args = [ExternalSearch.SEARCH_COMMAND, '--nocolor']
-        args.extend(['--nonumbers', '-o', '--silent', '--markdown',
+        args.extend(['--nonumbers', '-o', '--silent', '-G', '.*\\' + extension,
             ZkConstants.RE_TAGS, folder])
         ag_out = ExternalSearch.run(args, folder)
         if not ag_out:
@@ -583,7 +583,7 @@ class ExternalSearch:
             args.extend(['--nofilename', '--nonumbers', '--only-matching'])
         else:
             args.extend(['-l', '--ackmate'])
-        args.extend(['--silent', '--markdown', regexp, folder])
+        args.extend(['--silent', '-G', '.*\\' + extension, regexp, folder])
         return ExternalSearch.run(args, folder)
 
     @staticmethod
