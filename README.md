@@ -153,7 +153,7 @@ That's easier than it might look. This is how I do it:
 Just start working and [create a new note](#creating-a-new-note)! Hit `shift+enter` in an empty SublimeText window with no project or file open. After entering the note's title, SublimeText will ask you where to save your new note and its corresponding project file. From then on, you'll be working in the very project directory that you just selected or created.
 
 ##### Manual approach
-If you want to create an empty project first and then start creating notes, here is what I would do:
+If you want to create an empty project first and then start creating notes or if you want to create a project for a folder that already contains notes, here is what I would do:
 
 * Start with a fresh SublimeText window (containing no open files or projects).
 * Use the menu: "Projects" -> "Save Project As ..." and save this empty project into your desired Zettelkasten folder, giving the project file a name other than untitled if you like.
