@@ -20,6 +20,16 @@ contexts:
             '2': support.function.footnote.markdown
             '3': support.function.footnote.markdown
             '4': punctuation.definition.footnote.begin.markdown
+        # [#key]: values , ... for autobib insertion mmd style
+        - match: '(\[)(#)([^]]*)(\])(:)([ ]*)(.*)'
+          captures:
+            '1': punctuation.definition.constant.markdown
+            '2': constant.other.reference.link.markdown
+            '3': constant.other.reference.link.markdown
+            '4': punctuation.definition.constant.markdown
+            '5': punctuation.separator.key-value.markdown
+            '6': meta.link.reference.def.markdown
+            '7': markup.underline.link.markdown
         # [@pandoc] and [see @pandoc]
         - match: '(\[[a-zA-Z:\. ]*)(@)([^]]*)(\])'
           captures:
