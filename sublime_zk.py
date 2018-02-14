@@ -5,6 +5,7 @@
        \___ \|  |  / \_\ \  |_|  |  Y Y  \  ___/      /    /|    <
       /____  >____/|___  /____/__|__|_|  /\___  >    /_____ \__|_ \
            \/          \/              \/     \/           \/    \/
+                                       The SublimeText Zettelkasten
 """
 import sublime, sublime_plugin, os, re, subprocess, glob, datetime
 from collections import defaultdict
@@ -547,13 +548,14 @@ class ExternalSearch:
         return note_tags
 
     @staticmethod
-    def search_tagged_notes(folder, extension, tag):
+    def search_tagged_notes(folder, extension, tag, externalize=True):
         """
         Return a list of note files containing #tag.
         """
         output = ExternalSearch.search_in(folder, tag, extension)
         prefix = 'Notes tagged with {}:'.format(tag)
-        ExternalSearch.externalize_note_links(output, folder, extension, prefix)
+        if externalize:
+            ExternalSearch.externalize_note_links(output, folder, extension, prefix)
         return output.split('\n')
 
     @staticmethod
@@ -759,17 +761,40 @@ class TextProduction:
         Expand note-link under cursor inside the current view
         """
         linestart_till_cursor_str, link_region = select_link_in(view)
-        if not link_region:
-            return
-        note_id = cut_after_note_id(view.substr(link_region))
         cursor_pos = view.sel()[0].begin()
         line_region = view.line(cursor_pos)
-
         pre, post = get_link_pre_postfix()
-        result_lines = TextProduction.embed_note(note_id, folder, extension,
-                                                                    pre, post)
-        result_lines.append('')   # append a newline for empty line after exp.
-        view.insert(edit, line_region.b, '\n' + '\n'.join(result_lines))
+        if link_region:
+            # we're in a link, so expand it
+            note_id = cut_after_note_id(view.substr(link_region))
+            result_lines = TextProduction.embed_note(note_id, folder, extension,
+                                                                      pre, post)
+            result_lines.append('')   # append a newline for empty line after exp.
+            view.insert(edit, line_region.b, '\n' + '\n'.join(result_lines))
+        else:
+            # check if we're in a tag
+            full_line = view.substr(line_region)
+            line_start = line_region.begin()
+            cursor_pos_in_line = cursor_pos - line_start
+            tag, (begin, end) = tag_at(full_line, cursor_pos_in_line)
+            if not tag:
+                return
+            # we have a #tag so let's search for tagged notes
+            note_list = ExternalSearch.search_tagged_notes(folder, extension,
+                tag, externalize=False)
+            bullet_list = []
+            for line in note_list:
+                if not line:
+                    continue
+                if line.endswith(extension):
+                    line = os.path.basename(line)
+                    line = line.replace(extension, '')
+                    note_id, title = line.split(' ', 1)
+                    note_id = os.path.basename(note_id)
+                    bullet_line = '* {}{}{} {}'.format(pre, note_id, post, title)
+                    bullet_list.append(bullet_line)
+            view.insert(edit, line_region.b, '\n' + '\n'.join(bullet_list))
+
 
 
 def timestamp():
