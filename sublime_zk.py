@@ -553,7 +553,7 @@ class ExternalSearch:
         Return a list of note files containing #tag.
         """
         output = ExternalSearch.search_in(folder, tag, extension)
-        prefix = 'Notes tagged with {}:'.format(tag)
+        prefix = 'Notes referencing {}:'.format(tag)
         if externalize:
             ExternalSearch.externalize_note_links(output, folder, extension, prefix)
         return output.split('\n')

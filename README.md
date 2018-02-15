@@ -27,8 +27,8 @@ See the [Usage](#usage) section below to see how this package might support your
 * Highlighting of footnote references `[^like this one]` and `[ref. @pandoc]` references.
 * Typing `[#][!]` will create a scratch file containing all your **#tags**, sorted
 * `[#][?]` opens up a list of all your **#tags** and lets you fuzzy search and select them (like note-links).
-* Clicking a **#tag** and pressing `[ctrl]+[enter]` will search for all notes containing this tag.
-* Alternatively `[alt]` + double clicking the tag will do the same thing.
+* Clicking a **#tag** or citekey and pressing `[ctrl]+[enter]` will search for all notes containing this tag / citekey.
+* Alternatively `[alt]` + double clicking the tag/citekey will do the same thing.
 * Support for `ag`, [The Silver Searcher](#installing-the-silver-searcher)
 * [Expansion of overview notes with selective refresh](#expansion-of-overview-notes-with-selective-refresh)!!!
 * [Templates for new notes](#new-note-templates)
@@ -88,6 +88,7 @@ See the [Usage](#usage) section below to see how this package might support your
         * [Inserting a citation](#inserting-a-citation)
         * [Auto-Completion for citekeys](#auto-completion-for-citekeys)
         * [Automatic Bibliographies](#automatic-bibliographies)
+        * [Searching for notes referencing a specific citekey](#searching-for-notes-referencing-a-specific-citekey)
     * [Inline Local Image Display](#inline-local-image-display)
     * [Section Numbering and Table Of Contents](#section-numbering-and-table-of-contents)
         * [Automatic Table Of Contents](#automatic-table-of-contents)
@@ -869,6 +870,19 @@ The animation below shows how handy this is :smile:
 **Note:** You don't have to cite in the `[@pandoc]` notation. If a cite-key is in your text, it will get picked up. However, the generated references section will use the `[@pandoc]` notation, except if you set [change the setting](#citation-reference-style) `citations-mmd-style` to `true`, then the `[#citekey]: ...` MultiMarkdown notation will be used.
 
 **WARNING**: Do not write below the generated bibliography. Everything after `<!-- references (auto)` will be replaced when you re-run the command!
+
+#### Searching for notes referencing a specific citekey
+
+In order to be able to search for all notes citing the same source, just like note-links and #tags, **citation keys** can also be "followed" by pressing `[ctrl]+[enter]`.
+
+
+
+**Note:** This works with `@pandoc` and `#multimarkdown` style citation keys and is independent of whether the citekey is part of an actual citation (`[@citekey]` or `[][#citekey]`) or just occurs in your text as `@citekey` or `#citekey`.
+
+As usual, if you have `ag` installed, as is recommended, this will make the most sense, because search results will show up in the external search results, as is illustrated by the following animation:
+
+![follow-citekey](https://user-images.githubusercontent.com/30892199/36261085-86e70708-1263-11e8-8b0f-fa2c95498b88.gif)
+
 
 ### Inline Local Image Display
 Markdown notes are great! Especially because they are text-based. Sometimes, though, they contain images. Well, **links** to images: you only see them when you convert your note into a format that supports images.
