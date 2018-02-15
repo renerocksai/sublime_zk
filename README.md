@@ -33,7 +33,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * [Expansion of overview notes with selective refresh](#expansion-of-overview-notes-with-selective-refresh)!!!
 * [Templates for new notes](#new-note-templates)
 * [Optional](#insert-links-with-or-without-titles) insertion of `[[links]] WITH note titles` instead of just `[[links]]`
-* Inline [expansion](#inline-expansion-of-note-links) of note links via `[ctrl]+[.]`
+* Inline expansion of [note links](#inline-expansion-of-note-links) and [tags](#inline-expansion-of-tags) via `[ctrl]+[.]`
 * [Searching for advanced tag combinations](#advanced-tag-search)
 * [Automatic Bibliographies](#automatic-bibliographies), [auto-completion for citekeys](#auto-completion-for-citekeys), and fuzzy-search [insertion of citations](#inserting-a-citation)
 * [Inline Local Image Display](#inline-local-image-display)
@@ -798,6 +798,15 @@ tags =
 **Hint:** If, after expansion, you don't like what you see, just undo! :smile:
 
 **Note:** Use this at your own risk when **ever** planning on refreshing an overview note. You are going to have nested expansions and precisely those will get overwritten when the parent note is refreshed.
+
+### Inline expansion of #tags
+Another workflow for producing overview notes is by #tag. So if you want to produce an overview note referencing all notes tagged by a single tag, cust press `[ctrl]+[.]` while the cursor is inside a #tag. This will produce a **bulleted list** of notes tagged with the #tag.
+
+The following animation shows inline expansion of #tags in action:
+
+![expand-tag](https://user-images.githubusercontent.com/30892199/36258162-f198e972-1259-11e8-8b9c-0d6f4519c1e1.gif)
+
+
 
 ### Working with Bibliographies
 
