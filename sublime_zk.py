@@ -624,7 +624,7 @@ class ExternalSearch:
                 mode='w', encoding='utf-8') as f:
                 if prefix:
                     f.write(u'{}\n\n'.format(prefix))
-                for line in ag_out.split('\n'):
+                for line in sorted(ag_out.split('\n')):
                     if not line.strip():
                         continue
                     if line.endswith(extension):
@@ -783,7 +783,7 @@ class TextProduction:
             note_list = ExternalSearch.search_tagged_notes(folder, extension,
                 tag, externalize=False)
             bullet_list = []
-            for line in note_list:
+            for line in sorted(note_list):
                 if not line:
                     continue
                 if line.endswith(extension):
