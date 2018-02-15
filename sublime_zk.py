@@ -764,7 +764,12 @@ class TextProduction:
         cursor_pos = view.sel()[0].begin()
         line_region = view.line(cursor_pos)
         pre, post = get_link_pre_postfix()
+        link_text = ''
         if link_region:
+            link_text = view.substr(link_region)
+        link_is_citekey = link_text.startswith('@') or link_text.startswith('#')
+
+        if link_region and not link_is_citekey:
             # we're in a link, so expand it
             note_id = cut_after_note_id(view.substr(link_region))
             result_lines = TextProduction.embed_note(note_id, folder, extension,
@@ -772,13 +777,19 @@ class TextProduction:
             result_lines.append('')   # append a newline for empty line after exp.
             view.insert(edit, line_region.b, '\n' + '\n'.join(result_lines))
         else:
-            # check if we're in a tag
-            full_line = view.substr(line_region)
-            line_start = line_region.begin()
-            cursor_pos_in_line = cursor_pos - line_start
-            tag, (begin, end) = tag_at(full_line, cursor_pos_in_line)
-            if not tag:
-                return
+            if link_is_citekey:
+                tag = link_text
+            else:
+                # check if we're in a tag
+                full_line = view.substr(line_region)
+                line_start = line_region.begin()
+                cursor_pos_in_line = cursor_pos - line_start
+                tag, (begin, end) = tag_at(full_line, cursor_pos_in_line)
+                if not tag:
+                    tag, (begin, end) = pandoc_citekey_at(full_line,
+                        cursor_pos_in_line)
+                    if not tag:
+                        return
             # we have a #tag so let's search for tagged notes
             note_list = ExternalSearch.search_tagged_notes(folder, extension,
                 tag, externalize=False)
@@ -966,6 +977,48 @@ def tag_at(text, pos=None):
             return text[inner:end], (inner, end)
     return '', (None, None)
 
+def pandoc_citekey_at(text, pos=None):
+    """
+    Search for a ####tag inside of text.
+    If pos is given, searches for the tag at pos
+    """
+    if pos is None:
+        search_text = text
+    else:
+        search_text = text[:pos + 1]
+    # find first `#`
+    inner = search_text.rfind('@')
+    if inner >=0:
+        # find next consecutive `#`
+        for c in reversed(search_text[:inner]):
+            if c != '@':
+                break
+            inner -=1
+        # search end of tag
+        end = inner
+        mode = ''
+        for c in text[inner:]:
+            if mode == ':':
+                if (c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z') \
+                    or (c >= '0' and c <= '9'):
+                    pass
+                else:
+                    end -= 1
+                    break
+            if c.isspace() or c in ZkConstants.Tag_Stops:
+                break
+            mode = c
+            end += 1
+        tag = text[inner:end]
+        if tag.endswith(':'):
+            tag = tag[:-1]
+            end -= 1
+
+        # test if it's just a `# heading` (resulting in `#`) or a real tag
+        if tag.replace('@', ''):
+            return text[inner:end], (inner, end)
+    return '', (None, None)
+
 def select_link_in(view):
     """
     Used by different commands to select the link under the cursor, if
@@ -1128,11 +1181,16 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         global F_EXT_SEARCH
         global PANE_FOR_OPENING_RESULTS
         linestart_till_cursor_str, link_region = select_link_in(self.view)
+        link_text = ''
+        link_is_citekey = False
         if link_region:
-            return link_region
+            link_text = self.view.substr(link_region)
+            link_is_citekey = link_text.startswith('@') or link_text.startswith('#')
+            if not link_is_citekey:
+                return link_region
 
         # test if we are supposed to follow a tag
-        if '#' in linestart_till_cursor_str:
+        if '#' in linestart_till_cursor_str or '@' in linestart_till_cursor_str:
             view = self.view
             cursor_pos = view.sel()[0].begin()
             line_region = view.line(cursor_pos)
@@ -1141,7 +1199,10 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
             cursor_pos_in_line = cursor_pos - line_start
             tag, (begin, end) = tag_at(full_line, cursor_pos_in_line)
             if not tag:
-                return
+                tag, (begin, end) = pandoc_citekey_at(full_line, cursor_pos_in_line)
+                if not tag:
+                    return
+
 
             settings = get_settings()
 
