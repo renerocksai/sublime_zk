@@ -46,6 +46,7 @@ See the [Usage](#usage) section below to see how this package might support your
     * [Automatic Installation & Updates](#automatic-installation-updates)
     * [Manual Installation](#manual-installation)
     * [Installing The Silver Searcher](#installing-the-silver-searcher)
+    * [Installing Pandoc](#installing-pandoc)
 * [Configuration](#configuration)
     * [Zettelkasten note folder](#zettelkasten-note-folder)
         * [How do I create a project in SublimeText?](#how-do-i-create-a-project-in-sublimetext)
@@ -140,6 +141,9 @@ The permanent search results file is like a navigation-window and is especially 
 
 ![silver-tags](https://user-images.githubusercontent.com/30892199/32641877-b27b28fc-c5d0-11e7-89ac-20f1f83db586.png)
 
+### Installing Pandoc
+
+Whether you use [Pandoc](https://pandoc.org) or not for Markdown processing, the [AutoBib](#automatic-bibliographies) feature requires it. Luckily it is [easy to install](https://pandoc.org/installing.html).
 
 ## Configuration
 
