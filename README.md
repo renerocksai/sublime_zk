@@ -385,6 +385,13 @@ The following animation illustrates this:
 
 ![new-note-from-sel](https://user-images.githubusercontent.com/30892199/35781566-18734f7c-09ec-11e8-8bd6-c2ee3ed240c1.gif)
 
+As a bonus feature, you can even select multiple lines and create a new note complete with title and body:
+
+* the first selected line will become the note's title
+* all the other selected lines will become the note's body (text).
+
+![new-note-from-multiline-sel](https://user-images.githubusercontent.com/30892199/36332808-fd458c9c-1373-11e8-9fe3-fa6755876499.gif)
+
 
 
 ### Syntax Coloring for #tags, footnotes, and pandoc references
