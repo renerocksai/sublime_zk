@@ -834,7 +834,7 @@ def get_link_pre_postfix():
         link_postfix = ']'
     return link_prefix, link_postfix
 
-def create_note(filn, title, origin_id=None, origin_title=None):
+def create_note(filn, title, origin_id=None, origin_title=None, body=None):
     params = {
                 'title': title,
                 'file': os.path.basename(filn),
@@ -851,6 +851,8 @@ def create_note(filn, title, origin_id=None, origin_title=None):
         format_str = u'# {title}\ntags = \n\n'
     with open(filn, mode='w', encoding='utf-8') as f:
         f.write(format_str.format(**params))
+        if body is not None:
+            f.write('\n' + body)
 
 def get_path_for(view):
     """
@@ -1394,6 +1396,7 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
         self.origin = None
         self.o_title = None
         self.insert_link = False
+        self.note_body = None
         view = self.window.active_view()
         suggested_title = ''
         if view:
@@ -1402,6 +1405,11 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
             sel = view.sel()
             if len(sel) >=1 and not sel[0].empty():
                 suggested_title = view.substr(sel[0])
+                if '\n' in suggested_title:
+                    lines = suggested_title.split('\n')
+                    suggested_title = lines[0]
+                    if len(lines) > 1:
+                        self.note_body = '\n'.join(lines[1:])
                 self.insert_link = True
         self.window.show_input_panel('New Note:', suggested_title, self.on_done, None, None)
 
@@ -1445,7 +1453,7 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
                 link_txt += ' ' + input_text
             view = self.window.active_view()
             view.run_command('zk_replace_selected_text', {'args': {'text': link_txt}})
-        create_note(the_file, new_title, self.origin, self.o_title)
+        create_note(the_file, new_title, self.origin, self.o_title, self.note_body)
         new_view = self.window.open_file(the_file)
         self.window.set_view_index(new_view, PANE_FOR_OPENING_NOTES, 0)
 
