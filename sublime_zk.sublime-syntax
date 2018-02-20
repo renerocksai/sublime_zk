@@ -37,6 +37,11 @@ contexts:
             '2': support.function.footnote.markdown
             '3': support.function.footnote.markdown
             '4': punctuation.definition.footnote.begin.markdown
+        - match: '([\s]+|^)(@)([\S]+)'
+          captures:
+            '1': text.html.markdown.multimarkdown.custom
+            '2': support.function.footnote.markdown
+            '3': support.function.footnote.markdown
         # all sorts of #tags
         - match: '(\s)(#+([^#\W]|[-§]|:[a-zA-Z0-9])+)' # better real just tags matching
           captures:
