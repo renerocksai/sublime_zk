@@ -447,8 +447,8 @@ class Autobib:
         """
         Find all mentioned citekeys in text
         """
-        citekeys_re = [re.escape( '@' + citekey) for citekey in citekeys]
-        citekeys_re.extend([re.escape( '#' + citekey) for citekey in citekeys])
+        citekeys_re = [re.escape('@' + citekey) for citekey in citekeys]
+        citekeys_re.extend([re.escape('#' + citekey) for citekey in citekeys])
         founds = re.findall('|'.join(list(citekeys_re)), text)
         founds = set(founds)
         return founds
