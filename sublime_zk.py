@@ -447,8 +447,9 @@ class Autobib:
         """
         Find all mentioned citekeys in text
         """
-        citekeys = [re.escape(citekey) for citekey in citekeys]
-        founds = re.findall('|'.join(list(citekeys)), text)
+        citekeys_re = [re.escape( '@' + citekey) for citekey in citekeys]
+        citekeys_re.extend([re.escape( '#' + citekey) for citekey in citekeys])
+        founds = re.findall('|'.join(list(citekeys_re)), text)
         founds = set(founds)
         return founds
 
@@ -463,7 +464,7 @@ class Autobib:
         citekeys = Autobib.find_citations(text, citekeys)
         citekey2bib = {}
         for citekey in citekeys:
-            pandoc_input = '@' + citekey
+            pandoc_input = citekey.replace('#', '@', 1)
             pandoc_out = Autobib.run(pandoc, bibfile, pandoc_input)
             citation, bib = Autobib.parse_pandoc_out(pandoc_out)
             citekey2bib[citekey] = bib
@@ -1648,10 +1649,7 @@ class ZkAutoBibCommand(sublime_plugin.TextCommand):
             bib_lines = [marker_line + '\n']
             for citekey in sorted(ck2bib):
                 bib = ck2bib[citekey]
-                if mmd_style:
-                    line = '[#{}]: {}\n'.format(citekey, bib)
-                else:
-                    line = '[@{}]: {}\n'.format(citekey, bib)
+                line = '[{}]: {}\n'.format(citekey, bib)
                 bib_lines.append(line)
             if not mmd_style:
                 bib_lines.append('-->')
