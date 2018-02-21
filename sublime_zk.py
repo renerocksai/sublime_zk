@@ -455,7 +455,7 @@ class Autobib:
             if citekey.startswith('[#'):
                 citekey = citekey[1:]
             founds.append(citekey)
-        founds = set([f for f in founds])
+        founds = set(founds)
         return founds
 
     @staticmethod
