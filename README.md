@@ -285,7 +285,7 @@ The format string works like this:
 ##### Examples for note id **201802261632**:
 
 * `{timestamp: %Y-%m-%d %H:%M}`: _2018-02-26 16:32_
-* `{timestamp: '%a, %b %d, %Y'}`: _Mon, Feb 26, 2018_
+* `{timestamp: %a, %b %d, %Y}`: _Mon, Feb 26, 2018_
 
 #### Example YAML note header
 
