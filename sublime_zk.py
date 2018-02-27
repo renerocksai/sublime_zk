@@ -840,12 +840,31 @@ def get_link_pre_postfix():
         link_postfix = ']'
     return link_prefix, link_postfix
 
+def note_template_handle_date_spec(template, note_id):
+    global SECONDS_IN_ID
+    try:
+        if SECONDS_IN_ID:
+            timestamp = datetime.datetime.strptime(note_id, '%Y%m%d%H%M%S')
+        else:
+            timestamp = datetime.datetime.strptime(note_id, '%Y%m%d%H%M')
+    except ValueError:
+        return template
+
+    # now handle the format string(s)
+    new_template = template
+    for pre, fmt, post in re.findall('({timestamp:\s*)([^\}]*)(})', template):
+        spec = pre + fmt + post
+        new_template = new_template.replace(spec, timestamp.strftime(fmt))
+
+    return new_template
+
 def create_note(filn, title, origin_id=None, origin_title=None, body=None):
+    note_id = os.path.basename(filn).split()[0]
     params = {
                 'title': title,
                 'file': os.path.basename(filn),
                 'path': os.path.dirname(filn),
-                'id': os.path.basename(filn).split()[0],
+                'id': note_id,
                 'origin_id': origin_id,
                 'origin_title': origin_title,
                 # don't break legacy
@@ -855,6 +874,8 @@ def create_note(filn, title, origin_id=None, origin_title=None, body=None):
     format_str = settings.get('new_note_template')
     if not format_str:
         format_str = u'# {title}\ntags = \n\n'
+    else:
+        format_str = note_template_handle_date_spec(format_str, note_id)
     with open(filn, mode='w', encoding='utf-8') as f:
         f.write(format_str.format(**params))
         if body is not None:

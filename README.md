@@ -254,8 +254,63 @@ The format string works like this:
 * `{origin_title}` : the title of the note you came from when creating a new note
 * `{file}` : the filename of the note like `201712241830 Why we should celebrate Christmas.md`
 * `{path}` : the path of the note like `/home/reschal/Dropbox/Zettelkasten`
+* `{timestamp: format-string}`: the date timestamp formatted by _format-string_, see [below]
 
 `origin` might need a bit of explanation: When you are in note `201701010101` and create a new note via `[shift]+[enter]` or via `[[implicit note creation via title]]`, the new note will get a new id, maybe `201702020202`. Its `{id}` therefore will be `201702020202` and its `{origin}` will be `201701010101`.
+
+#### Date and time formatting options for timestamp
+
+| Directive | Meaning | Example |
+|-----------|---------|---------|
+|`%a`|Weekday as locale’s abbreviated name.|Sun, Mon, …, Sat (en_US); So, Mo, …, Sa (de_DE)|
+|`%A`|Weekday as locale’s full name.|Sunday, Monday, …, Saturday (en_US); Sonntag, Montag, …, Samstag (de_DE)|
+|`%d`|Day of the month as a zero-padded decimal number.|01, 02, …, 31 |
+|`%b`|Month as locale’s abbreviated name. | Jan, Feb, …, Dec (en_US); Jan, Feb, …, Dez (de_DE) |
+|`%B`|Month as locale’s full name. | January, February, …, December (en_US); Januar, Februar, …, Dezember (de_DE) |
+|`%m`|Month as a zero-padded decimal number.|01, 02, …, 12 |
+|`%y`|Year without century as a zero-padded decimal number.|00, 01, …, 99|
+|`%Y`|Year with century as a decimal number.|2017, 2018, …|
+|`%H`|Hour (24-hour clock) as a zero-padded decimal number.|00, 01, …, 23|
+|`%I`|Hour (12-hour clock) as a zero-padded decimal number.|00, 01, …, 12|
+|`%p`|Locale’s equivalent of either AM or PM.|AM, PM (en_US); am, pm (de_DE)|
+|`%M`|Minute as a zero-padded decimal number.|01, 02, …, 59 |
+|`%S`|Second as a zero-padded decimal number.|01, 02, …, 59 |
+|`%j`|Day of the year as a zero-padded decimal number.|001, 002, …, 366|
+|`%U`|Week number of the year (Sunday as the first day of the week) as a zero padded decimal number. All days in a new year preceding the first Sunday are considered to be in week 0.|00, 01, …, 53|
+|`%W`|Week number of the year (Monday as the first day of the week) as a zero padded decimal number. All days in a new year preceding the first Monday are considered to be in week 0.|00, 01, …, 53|
+|`%c`|Locale’s appropriate date and time representation.|Tue Aug 16 21:30:00 1988 (en_US); Di 16 Aug 21:30:00 1988 (de_DE)|
+|`%c`|Locale’s appropriate date representation.|08/16/88 (None); 08/16/1988 (en_US); 16.08.1988 (de_DE)|
+|`%%`|A literal `%` character.|%|
+
+##### Examples for note id **201802261632**:
+
+* `{timestamp: %Y-%m-%d %H:%M}`: _2018-02-26 16:32_
+* `{timestamp: '%a, %b %d, %Y'}`: _Mon, Feb 26, 2018_
+
+#### Example YAML note header
+
+To produce a YAML note header (for pandoc), like this:
+
+```yaml
+---
+note-id: 201802270019
+title:  Date Test
+author: First Last
+date: 2018-02-27
+tags:
+---
+```
+you can use the following settings:
+
+```json
+// when creating a new note, put id into title?
+ // false to disable
+"id_in_title": false,
+
+// Template for new notes
+"new_note_template":
+    "---\nnote-id: {id}\ntitle: {title}\nauthor: First Last\ndate: {timestamp: %Y-%m-%d}\ntags: \n---\n",
+```
 
 ### Highlight references to other notes
 By default, this plugin highlights links to other notes by underlining them.
