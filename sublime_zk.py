@@ -57,6 +57,13 @@ try:
                 lines.append(headerline)
                 in_pandoc_table = True
 
+            # mmd tables
+            if line.startswith('|') and not in_pandoc_table:
+                lines.append('')
+                lines.append('```')
+                in_pandoc_table = True
+
+
             # fenced code blocks
             if line.startswith('~~~'):
                 line = '```' + line[3:]
