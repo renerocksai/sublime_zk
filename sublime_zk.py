@@ -17,6 +17,31 @@ import imghdr
 import unicodedata
 from collections import Counter
 
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), 'contrib', 'pymmd'))
+
+def show_html_preview(view):
+    pass
+
+try:
+    import pymmd
+    pymmd.load_mmd()
+    def show_html_preview(view):
+        all_region = sublime.Region(0, view.size())
+        all_markdown = view.substr(all_region)
+
+        # minihtml has a problem with comments: expects --/> instead of -->
+        markdown = re.sub('<!--.*-->', '', all_markdown)
+
+        # TODO: handle images like ImageHandler
+
+        html = pymmd.convert(markdown, ext=pymmd.SNIPPET)
+        view.show_popup(html, 0, -1, 640, 800)
+        print(html)
+    print('Sublime_ZK: HTML preview available.')
+except Exception:
+    print('Sublime_ZK: HTML preview unavailable.')
+
 
 class ZkConstants:
     """
@@ -1870,6 +1895,11 @@ class ZkSelectPanesCommand(sublime_plugin.WindowCommand):
         for group in range(self.window.num_groups()):
             group_view = self.window.active_view_in_group(group)
             group_view.erase_phantoms('popup')
+
+
+class ZkHtmlPreviewCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        show_html_preview(self.view)
 
 
 class NoteLinkHighlighter(sublime_plugin.EventListener):

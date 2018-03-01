@@ -1,0 +1,8 @@
+dist: trusty
+language: python
+install:
+    - ./.travis/pygit2.sh
+    - pip install -r requirements.txt
+    - python setup.py download_mmd install
+script:
+    - python test/test.py

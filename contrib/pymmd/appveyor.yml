@@ -1,0 +1,21 @@
+environment:
+  matrix:
+    - PYTHON: "C:\\Python27"
+    - PYTHON: "C:\\Python27-x64"
+    - PYTHON: "C:\\Python35"
+    - PYTHON: "C:\\Python35-x64"
+    - PYTHON: "C:\\Python36"
+    - PYTHON: "C:\\Python36-x64"
+
+install:
+  - cinst pandoc
+  - "%PYTHON%\\python.exe -m pip install wheel pypandoc"
+  - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
+
+build: off
+
+test_script:
+  - "%PYTHON%\\python.exe setup.py download_mmd bdist_wheel"
+
+artifacts:
+  - path: dist/*
