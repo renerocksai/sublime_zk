@@ -50,8 +50,11 @@ try:
 
             chars = set([char for char in line])
             if len(chars) == 2 and '-' in chars and ' ' in chars:
+                headerline = lines[-1]
+                lines = lines[:-1]
                 lines.append('')
                 lines.append('```')
+                lines.append(headerline)
                 in_pandoc_table = True
 
             # fenced code blocks
