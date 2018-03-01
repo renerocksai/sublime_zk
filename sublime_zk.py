@@ -26,140 +26,10 @@ def show_html_preview(view):
 try:
     import pymmd
     pymmd.load_mmd()
-    def show_html_preview(view):
-        # TODO: maybe only for selection
-
-        all_region = sublime.Region(0, view.size())
-        all_markdown = view.substr(all_region)
-
-        # minihtml has a problem with comments: expects --/> instead of -->
-        # flags=re.MULTILINE does not work
-
-        in_comment = False
-        in_code = False
-        in_pandoc_table = False
-        in_list_item = False
-        in_para = False
-        lines = []
-        for line in all_markdown.split('\n'):
-            # pandoc tables: replace by code block
-            if not line and in_pandoc_table:
-                in_pandoc_table = False
-                lines.append('```')
-                lines.append('')
-
-            chars = set([char for char in line])
-            if len(chars) == 2 and '-' in chars and ' ' in chars:
-                headerline = lines[-1]
-                lines = lines[:-1]
-                lines.append('')
-                lines.append('```')
-                lines.append(headerline)
-                in_pandoc_table = True
-
-            # mmd tables
-            if line.startswith('|') and not in_pandoc_table:
-                lines.append('')
-                lines.append('```')
-                in_pandoc_table = True
-
-
-            # fenced code blocks
-            if line.startswith('~~~'):
-                line = '```' + line[3:]
-            if in_comment:
-                if '-->' in line:
-                    line = re.sub('.*-->', '', line)
-                    in_comment = False
-                else:
-                    continue
-
-            if '<!--' in line and not '-->' in line:
-                in_comment = True
-
-            line = re.sub('<!--.*(-->|$)', '', line)
-            lines.append(line)
-        # TODO: handle images like ImageHandler
-        markdown = '\n'.join(lines)
-        html = pymmd.convert(markdown)#, ext=pymmd.SNIPPET)
-
-        # minihtml diesn't like quot
-        html = html.replace('&quot;', '"')
-        lines = []
-        in_header = False
-        code_block = ''
-        for line in html.split('\n')[1:]:
-            # fenced code blocks
-            if line.startswith('<pre><code>'):
-                in_code = True
-                code_block = line.replace('<pre><code>', '') + '<br>'
-                line = '<pre><code><br>'
-                lines.append(line)
-                continue
-            if line.startswith('</code>'):
-                in_code = False
-                code_block = code_block.replace(' ', '&nbsp;')
-                lines.append(code_block)
-            if in_code:
-                code_block += line + '<br>'
-                continue
-
-            # minihtml doesnt like <br> in <li> and <p>
-            if line.startswith('<li>'):
-                line = line.replace('<br/>', '')
-                if '</li>' not in line:
-                    in_list_item = True
-            if in_list_item:
-                line = line.replace('<br/>', '')
-                if '</li>' in line:
-                    in_list_item = False
-
-            if line.startswith('<p>'):
-                line = line.replace('<br/>', '')
-                if '</p>' not in line:
-                    in_para = True
-            if in_para:
-                line = line.replace('<br/>', '')
-                if '</p>' in line:
-                    in_para = False
-
-            if line.startswith('<blockquote'):
-                line = line.replace('<blockquote', '<div class="blockquote"')
-            if line.startswith('</blockquote'):
-                line = line.replace('</blockquote', '</div')
-
-            # start with body
-            if line.startswith('<head>') or line.startswith('<body>'):
-                in_header = not in_header
-            
-            if not in_header:
-                lines.append(line)
-
-            if line.startswith('<body'):
-                lines.extend('''
-                    <style>
-                        p {
-                            font-family: system;
-                        }
-                        code {
-                            background-color: black;
-                            color: lightgray;
-                            font-family: monospace;
-                            padding: 5px;
-                        }
-                        div.blockquote { 
-                            padding: 10px;
-                            color:lightblue;
-                        }
-                    </style>
-                     '''.split('\n'))
-        html = '\n'.join(lines)
-
-        with open('sublime_zk/xxx.html', mode='w', encoding='utf-8') as f:
-            f.write(html)
-
-        view.show_popup(html, 0, -1, 800, 800)
+    pymmd.convert('# test')
     print('Sublime_ZK: HTML preview available.')
+    def show_html_preview(view):
+        HtmlPreview.show_html_preview(view)
 except Exception:
     print('Sublime_ZK: HTML preview unavailable.')
 
@@ -193,6 +63,7 @@ class ZkConstants:
 
     # image links with attributes
     RE_IMG_LINKS = '(!\[)(.*)(\])(\()(.*)(\))(\{)(.*)(\})'
+    Img_Matcher = re.compile(RE_IMG_LINKS)
 
     # TOC markers
     TOC_HDR = '<!-- table of contents (auto) -->'
@@ -457,6 +328,188 @@ class ImageHandler:
             else:
                 return
             return width, height
+
+class HtmlPreview:
+    RE_IMG_LINKS = '(!\[.*\]\()(.*)(\))(\{.*\})?'
+    Img_Matcher = re.compile(RE_IMG_LINKS)
+
+    @staticmethod
+    def show_html_preview(view):
+        # TODO: maybe only for selection
+        folder = get_path_for(view)
+        if not folder:
+            return
+
+        all_region = sublime.Region(0, view.size())
+        all_markdown = view.substr(all_region)
+
+        # minihtml has a problem with comments: expects --/> instead of -->
+        # flags=re.MULTILINE does not work
+
+        in_comment = False
+        in_code = False
+        in_pandoc_table = False
+        in_list_item = False
+        in_para = False
+
+        all_markdown = HtmlPreview.handle_local_imgs(all_markdown, folder)
+
+        lines = []
+        for line in all_markdown.split('\n'):
+            # pandoc tables: replace by code block
+            if not line and in_pandoc_table:
+                in_pandoc_table = False
+                lines.append('```')
+                lines.append('')
+
+            chars = set([char for char in line])
+            if len(chars) == 2 and '-' in chars and ' ' in chars:
+                headerline = lines[-1]
+                lines = lines[:-1]
+                lines.append('')
+                lines.append('```')
+                lines.append(headerline)
+                in_pandoc_table = True
+
+            # mmd tables
+            if line.startswith('|') and not in_pandoc_table:
+                lines.append('')
+                lines.append('```')
+                in_pandoc_table = True
+
+
+            # fenced code blocks
+            if line.startswith('~~~'):
+                line = '```' + line[3:]
+            if in_comment:
+                if '-->' in line:
+                    line = re.sub('.*-->', '', line)
+                    in_comment = False
+                else:
+                    continue
+
+            if '<!--' in line and not '-->' in line:
+                in_comment = True
+
+            line = re.sub('<!--.*(-->|$)', '', line)
+            lines.append(line)
+        # TODO: handle images like ImageHandler
+        markdown = '\n'.join(lines)
+        html = pymmd.convert(markdown)#, ext=pymmd.SNIPPET)
+
+        # minihtml diesn't like quot
+        html = html.replace('&quot;', '"')
+        lines = []
+        in_header = False
+        code_block = ''
+        for line in html.split('\n')[1:]:
+            # fenced code blocks
+            if line.startswith('<pre><code>'):
+                in_code = True
+                code_block = line.replace('<pre><code>', '') + '<br>'
+                line = '<pre><code><br>'
+                lines.append(line)
+                continue
+            if line.startswith('</code>'):
+                in_code = False
+                code_block = code_block.replace(' ', '&nbsp;')
+                lines.append(code_block)
+            if in_code:
+                code_block += line + '<br>'
+                continue
+
+            # minihtml doesnt like <br> in <li> and <p>
+            if line.startswith('<li>'):
+                line = line.replace('<br/>', '')
+                if '</li>' not in line:
+                    in_list_item = True
+            if in_list_item:
+                line = line.replace('<br/>', '')
+                if '</li>' in line:
+                    in_list_item = False
+
+            if line.startswith('<p>'):
+                line = line.replace('<br/>', '')
+                if '</p>' not in line:
+                    in_para = True
+            if in_para:
+                line = line.replace('<br/>', '')
+                if '</p>' in line:
+                    in_para = False
+
+            if line.startswith('<blockquote'):
+                line = line.replace('<blockquote', '<div class="blockquote"')
+            if line.startswith('</blockquote'):
+                line = line.replace('</blockquote', '</div')
+
+            # start with body
+            if line.startswith('<head>') or line.startswith('<body>'):
+                in_header = not in_header
+            
+            if not in_header:
+                lines.append(line)
+
+            if line.startswith('<body'):
+                lines.extend('''
+                    <style>
+                        p {
+                            font-family: system;
+                        }
+                        code {
+                            background-color: black;
+                            color: lightgray;
+                            font-family: monospace;
+                            padding: 5px;
+                        }
+                        div.blockquote { 
+                            padding: 10px;
+                            color:lightblue;
+                        }
+                    </style>
+                     '''.split('\n'))
+        html = '\n'.join(lines)
+
+        with open('C:/Users/rene.schallner/AppData/Roaming/Sublime Text 3/Packages/sublime_zk/xxx.html', mode='w', encoding='utf-8') as f:
+            f.write(html)
+
+        view.show_popup(html, 0, -1, 800, 800)
+
+    @staticmethod
+    def handle_local_imgs(text, folder, max_img_width=320):
+        """Check for local images and try to copy them to imgs/"""
+        new_text = text
+
+        for pre, path, post, opt in HtmlPreview.Img_Matcher.findall(text):
+            if not path.startswith('http'):
+                source_path = os.path.join(folder, path)
+                if os.path.exists(source_path):
+                    # scale img wide
+                    size = ImageHandler.get_image_size(source_path)
+                    if not size:
+                        print('\nError: unknown image format:', source_path)
+                        continue
+
+                    imgattr = ''
+                    w, h = size
+                    max_width = max_img_width
+                    if w > max_width:
+                        m = max_width / w
+                        h *= m
+                        w = max_width
+                        h = int(h)
+                        imgattr = 'width="{}" height="{}"'.format(w, h)
+
+                    # now replace link
+                    orig_markdown = pre + path + post + opt
+                    alt_text = re.findall('(\[.*\])', pre)
+                    if alt_text:
+                        alt_text = alt_text[0]
+                    else:
+                        alt_text = ''
+                    dest_markdown = '<img src="file://{}" {}/>'.format(source_path, imgattr)
+                    new_text = new_text.replace(orig_markdown, dest_markdown)
+        return new_text
+
 
 class Autobib:
     """
