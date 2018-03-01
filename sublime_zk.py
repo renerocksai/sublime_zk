@@ -55,17 +55,47 @@ try:
             lines.append(line)
         # TODO: handle images like ImageHandler
         markdown = '\n'.join(lines)
-        html = pymmd.convert(markdown, ext=pymmd.SNIPPET)
+        html = pymmd.convert(markdown)#, ext=pymmd.SNIPPET)
 
         # minihtml diesn't like quot
         html = html.replace('&quot;', '"')
         lines = []
-        for line in html.split('\n'):
-            if line.startswith('<pre>'):
-                in_code = not in_code
+        in_header = False
+        code_block = ''
+        for line in html.split('\n')[1:]:
+            if line.startswith('<pre><code>'):
+                in_code = True
+                code_block = line.replace('<pre><code>', '') + '<br>'
+                line = '<pre><code><br>'
+                lines.append(line)
+                continue
+            if line.startswith('</code>'):
+                in_code = False
+                code_block = code_block.replace(' ', '&nbsp;')
+                lines.append(code_block)
             if in_code:
-                line = line + ' <br>'
-            lines.append(line)
+                code_block += line + '<br>'
+                continue
+
+            if line.startswith('<head>') or line.startswith('<body>'):
+                in_header = not in_header
+            if not in_header:
+                lines.append(line)
+
+            if line.startswith('<body'):
+                lines.extend('''
+                    <style>
+                        p {
+                            font-family: system;
+                        }
+                        code {
+                            background-color: black;
+                            color: lightgray;
+                            font-family: monospace;
+                            padding: 5px;
+                        }
+                    </style>
+                     '''.split('\n'))
         html = '\n'.join(lines)
 
         print(html)
