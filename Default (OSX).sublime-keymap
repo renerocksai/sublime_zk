@@ -8,5 +8,5 @@
     { "keys": ["ctrl+."], "command": "zk_expand_link"},
     { "keys": ["[", "@"], "command": "zk_insert_citation"},
     { "keys": ["[", "#"], "command": "zk_insert_citation"},
-    { "keys": ["ctrl+h"], "command": "zk_html_preview"},
+    { "keys": ["ctrl+shift+h"], "command": "zk_html_preview"},
 ]

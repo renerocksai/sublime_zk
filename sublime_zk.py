@@ -37,8 +37,24 @@ try:
 
         in_comment = False
         in_code = False
+        in_pandoc_table = False
+        in_list_item = False
+        in_para = False
         lines = []
         for line in all_markdown.split('\n'):
+            # pandoc tables: replace by code block
+            if not line and in_pandoc_table:
+                in_pandoc_table = False
+                lines.append('```')
+                lines.append('')
+
+            chars = set([char for char in line])
+            if len(chars) == 2 and '-' in chars and ' ' in chars:
+                lines.append('')
+                lines.append('```')
+                in_pandoc_table = True
+
+            # fenced code blocks
             if line.startswith('~~~'):
                 line = '```' + line[3:]
             if in_comment:
@@ -63,6 +79,7 @@ try:
         in_header = False
         code_block = ''
         for line in html.split('\n')[1:]:
+            # fenced code blocks
             if line.startswith('<pre><code>'):
                 in_code = True
                 code_block = line.replace('<pre><code>', '') + '<br>'
@@ -77,8 +94,34 @@ try:
                 code_block += line + '<br>'
                 continue
 
+            # minihtml doesnt like <br> in <li> and <p>
+            if line.startswith('<li>'):
+                line = line.replace('<br/>', '')
+                if '</li>' not in line:
+                    in_list_item = True
+            if in_list_item:
+                line = line.replace('<br/>', '')
+                if '</li>' in line:
+                    in_list_item = False
+
+            if line.startswith('<p>'):
+                line = line.replace('<br/>', '')
+                if '</p>' not in line:
+                    in_para = True
+            if in_para:
+                line = line.replace('<br/>', '')
+                if '</p>' in line:
+                    in_para = False
+
+            if line.startswith('<blockquote'):
+                line = line.replace('<blockquote', '<div class="blockquote"')
+            if line.startswith('</blockquote'):
+                line = line.replace('</blockquote', '</div')
+
+            # start with body
             if line.startswith('<head>') or line.startswith('<body>'):
                 in_header = not in_header
+            
             if not in_header:
                 lines.append(line)
 
@@ -94,11 +137,16 @@ try:
                             font-family: monospace;
                             padding: 5px;
                         }
+                        div.blockquote { 
+                            padding: 10px;
+                            color:lightblue;
+                        }
                     </style>
                      '''.split('\n'))
         html = '\n'.join(lines)
 
-        print(html)
+        with open('sublime_zk/xxx.html', mode='w', encoding='utf-8') as f:
+            f.write(html)
 
         view.show_popup(html, 0, -1, 800, 800)
     print('Sublime_ZK: HTML preview available.')
