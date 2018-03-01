@@ -393,7 +393,7 @@ class HtmlPreview:
 
             line = re.sub('<!--.*(-->|$)', '', line)
             lines.append(line)
-        # TODO: handle images like ImageHandler
+
         markdown = '\n'.join(lines)
         html = pymmd.convert(markdown)#, ext=pymmd.SNIPPET)
 
@@ -445,7 +445,7 @@ class HtmlPreview:
             # start with body
             if line.startswith('<head>') or line.startswith('<body>'):
                 in_header = not in_header
-            
+
             if not in_header:
                 lines.append(line)
 
@@ -461,7 +461,7 @@ class HtmlPreview:
                             font-family: monospace;
                             padding: 5px;
                         }
-                        div.blockquote { 
+                        div.blockquote {
                             padding: 10px;
                             color:lightblue;
                         }
@@ -469,19 +469,25 @@ class HtmlPreview:
                      '''.split('\n'))
         html = '\n'.join(lines)
 
-        with open('C:/Users/rene.schallner/AppData/Roaming/Sublime Text 3/Packages/sublime_zk/xxx.html', mode='w', encoding='utf-8') as f:
+        debug_html = 'C:/Users/rene.schallner/AppData/Roaming/Sublime Text 3/Packages/sublime_zk/xxx.html'
+        if sys.platform == 'darwin':
+            debug_html = '/Users/rs/Documents/GitHub/sublime_zk/xxx.html'
+        with open(debug_html, mode='w', encoding='utf-8') as f:
             f.write(html)
 
         view.show_popup(html, 0, -1, 800, 800)
 
     @staticmethod
-    def handle_local_imgs(text, folder, max_img_width=320):
+    def handle_local_imgs(text, folder, max_img_width=160):
         """Check for local images and try to copy them to imgs/"""
         new_text = text
-
+        print(text)
         for pre, path, post, opt in HtmlPreview.Img_Matcher.findall(text):
             if not path.startswith('http'):
+                orig_path = path
+                path = path.strip()
                 source_path = os.path.join(folder, path)
+                print('PATH: >{}<'.format(path))
                 if os.path.exists(source_path):
                     # scale img wide
                     size = ImageHandler.get_image_size(source_path)
@@ -492,21 +498,26 @@ class HtmlPreview:
                     imgattr = ''
                     w, h = size
                     max_width = max_img_width
-                    if w > max_width:
+
+                    imgattr = ''
+                    if opt:
+                        imgattr = opt[1:-1]
+                    elif w > max_width:
                         m = max_width / w
                         h *= m
                         w = max_width
                         h = int(h)
                         imgattr = 'width="{}" height="{}"'.format(w, h)
-
+                    print('imgattr', imgattr)
                     # now replace link
-                    orig_markdown = pre + path + post + opt
+                    orig_markdown = pre + orig_path + post + opt
                     alt_text = re.findall('(\[.*\])', pre)
                     if alt_text:
                         alt_text = alt_text[0]
                     else:
                         alt_text = ''
                     dest_markdown = '<img src="file://{}" {}/>'.format(source_path, imgattr)
+                    print('dest_markdown', dest_markdown)
                     new_text = new_text.replace(orig_markdown, dest_markdown)
         return new_text
 
