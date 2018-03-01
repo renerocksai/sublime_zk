@@ -27,6 +27,8 @@ try:
     import pymmd
     pymmd.load_mmd()
     def show_html_preview(view):
+        # TODO: maybe only for selection
+
         all_region = sublime.Region(0, view.size())
         all_markdown = view.substr(all_region)
 
