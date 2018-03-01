@@ -35,11 +35,12 @@ try:
         # minihtml has a problem with comments: expects --/> instead of -->
         # flags=re.MULTILINE does not work
 
-        # TODO: convert `code` to <code>
-        # TODO: convert fenced code blocks to <code> with <br>
         in_comment = False
+        in_code = False
         lines = []
         for line in all_markdown.split('\n'):
+            if line.startswith('~~~'):
+                line = '```' + line[3:]
             if in_comment:
                 if '-->' in line:
                     line = re.sub('.*-->', '', line)
@@ -58,7 +59,14 @@ try:
 
         # minihtml diesn't like quot
         html = html.replace('&quot;', '"')
-        html = '<code> hello <br> world </code>'
+        lines = []
+        for line in html.split('\n'):
+            if line.startswith('<pre>'):
+                in_code = not in_code
+            if in_code:
+                line = line + ' <br>'
+            lines.append(line)
+        html = '\n'.join(lines)
 
         print(html)
 
