@@ -33,13 +33,36 @@ try:
         all_markdown = view.substr(all_region)
 
         # minihtml has a problem with comments: expects --/> instead of -->
-        markdown = re.sub('<!--.*-->', '', all_markdown)
+        # flags=re.MULTILINE does not work
 
+        # TODO: convert `code` to <code>
+        # TODO: convert fenced code blocks to <code> with <br>
+        in_comment = False
+        lines = []
+        for line in all_markdown.split('\n'):
+            if in_comment:
+                if '-->' in line:
+                    line = re.sub('.*-->', '', line)
+                    in_comment = False
+                else:
+                    continue
+
+            if '<!--' in line and not '-->' in line:
+                in_comment = True
+
+            line = re.sub('<!--.*(-->|$)', '', line)
+            lines.append(line)
         # TODO: handle images like ImageHandler
-
+        markdown = '\n'.join(lines)
         html = pymmd.convert(markdown, ext=pymmd.SNIPPET)
-        view.show_popup(html, 0, -1, 640, 800)
+
+        # minihtml diesn't like quot
+        html = html.replace('&quot;', '"')
+        html = '<code> hello <br> world </code>'
+
         print(html)
+
+        view.show_popup(html, 0, -1, 800, 800)
     print('Sublime_ZK: HTML preview available.')
 except Exception:
     print('Sublime_ZK: HTML preview unavailable.')
