@@ -452,13 +452,15 @@ class HtmlPreview:
             if line.startswith('<body'):
                 lines.extend('''
                     <style>
-                        p {
-                            font-family: system;
-                        }
+                        body { font-size: 13; font-family: system; }
+
+                        h1, h2, h3, h4, h5, h6 { color: orange;}
+
                         code {
                             background-color: black;
                             color: lightgray;
                             font-family: monospace;
+                            font-size: 12;
                             padding: 5px;
                         }
                         div.blockquote {
@@ -481,7 +483,6 @@ class HtmlPreview:
     def handle_local_imgs(text, folder, max_img_width=160):
         """Check for local images and try to copy them to imgs/"""
         new_text = text
-        print(text)
         for pre, path, post, opt in HtmlPreview.Img_Matcher.findall(text):
             if not path.startswith('http'):
                 orig_path = path
