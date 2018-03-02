@@ -358,12 +358,13 @@ class HtmlPreview:
         for line in all_markdown.split('\n'):
             # pandoc tables: replace by code block
             if not line and in_pandoc_table:
+                print(line)
                 in_pandoc_table = False
                 lines.append('```')
                 lines.append('')
 
             chars = set([char for char in line])
-            if len(chars) == 2 and '-' in chars and ' ' in chars:
+            if len(chars) == 2 and '-' in chars and ' ' in chars and not in_comment and not in_pandoc_table and not in_code:
                 headerline = lines[-1]
                 lines = lines[:-1]
                 lines.append('')
@@ -372,7 +373,8 @@ class HtmlPreview:
                 in_pandoc_table = True
 
             # mmd tables
-            if line.startswith('|') and not in_pandoc_table:
+            if '|' in line and not in_pandoc_table and not in_comment and not in_code:
+                print(line)
                 lines.append('')
                 lines.append('```')
                 in_pandoc_table = True
@@ -391,6 +393,9 @@ class HtmlPreview:
             if '<!--' in line and not '-->' in line:
                 in_comment = True
 
+            if line.startswith('```'):
+                in_code = not in_code
+
             line = re.sub('<!--.*(-->|$)', '', line)
             lines.append(line)
 
@@ -402,18 +407,19 @@ class HtmlPreview:
         lines = []
         in_header = False
         code_block = ''
+        in_code = False
         for line in html.split('\n')[1:]:
             # fenced code blocks
             if line.startswith('<pre><code>'):
                 in_code = True
-                code_block = line.replace('<pre><code>', '') + '<br>'
+                code_block = line.replace('<pre><code>', '') + ' <br>'
                 line = '<pre><code><br>'
                 lines.append(line)
                 continue
             if line.startswith('</code>'):
                 in_code = False
                 code_block = code_block.replace(' ', '&nbsp;')
-                lines.append(code_block)
+                lines.append(code_block[:-4])
             if in_code:
                 code_block += line + '<br>'
                 continue
