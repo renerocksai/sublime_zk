@@ -1750,7 +1750,7 @@ class ZkTocCommand(sublime_plugin.TextCommand):
             toc_region = self.view.sel()[0]
         lines = [ZkConstants.TOC_HDR]
 
-        for h_region in self.view.find_by_selector('markup.heading.markdown'):
+        for h_region in self.view.find_by_selector('markup.heading'):
             heading = self.view.substr(h_region)
             ref = self.heading2ref(heading)
             ref_counter[ref] += 1
@@ -1778,13 +1778,14 @@ class ZkRenumberHeadingsCommand(sublime_plugin.TextCommand):
         levels = [0] * 6
         regions_to_skip = 0
         while True:
-            h_regions = self.view.find_by_selector('markup.heading.markdown')
+            h_regions = self.view.find_by_selector('markup.heading')
             h_regions = h_regions[regions_to_skip:]
             if not h_regions:
                 break
             regions_to_skip += 1
             h_region = h_regions[0]
             heading = self.view.substr(h_region)
+            # print(heading)
             match = re.match('(\s*)(#+)(\s*[1-9.]*\s)(.*)', heading)
             spaces, hashes, old_numbering, title = match.groups()
             level = len(hashes) - 1
@@ -1809,7 +1810,7 @@ class ZkDenumberHeadingsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         regions_to_skip = 0
         while True:
-            h_regions = self.view.find_by_selector('markup.heading.markdown')
+            h_regions = self.view.find_by_selector('markup.heading')
             h_regions = h_regions[regions_to_skip:]
             if not h_regions:
                 break
@@ -1821,7 +1822,7 @@ class ZkDenumberHeadingsCommand(sublime_plugin.TextCommand):
             h_region.a += len(spaces) + len(hashes)   # we're behind the hash
             if old_numbering.strip():   # there is an old numbering to replace
                 h_region.b = h_region.a + len(old_numbering)
-                self.view.replace(edit, h_region, '')
+            self.view.replace(edit, h_region, '')
 
 
 class ZkSelectPanesCommand(sublime_plugin.WindowCommand):
