@@ -106,15 +106,20 @@ Sublime Text comes with Package Control, a feature which allows you to easily in
 
 1. Install [Sublime Text 3](http://www.sublimetext.com/3)
 2. Use the Command Palette (Tools > Command Palette...) and run **Install Package Control**. Sublime Text will alert you when the installation has finished.
-3. Use the Command Palette and run **Package Control: Install Package** and search for `Zettelkasten - sublime_zk` from the list of available packages. Select it and press `Enter` to install the package.
-4. You can keep your packages up to date by running **Package Control: Upgrade Package** from the Command Palette.
-
-<!--
 3. Use the Command Palette and run **Package Control: Add Repository**
 4. Add the URL of this repository `https://github.com/renerocksai/sublime_zk` into the panel that appears at the bottom of the window and press `Enter`.
 5. Use the Command Palette and run **Package Control: Install Package** and search for `sublime_zk` from the list of available packages. Select it and press `Enter` to install the package.
 6. You can keep your packages up to date by running **Package Control: Upgrade Package** from the Command Palette.
--->
+
+**Note**: I'm still awaiting a go from package control. Once this has gone through, you will be able to use package control like this:
+
+1. Install [Sublime Text 3](http://www.sublimetext.com/3)
+2. Use the Command Palette (Tools > Command Palette...) and run **Install Package Control**. Sublime Text will alert you when the installation has finished.
+3. Use the Command Palette and run **Package Control: Install Package** and search for `Zettelkasten - sublime_zk` from the list of available packages. Select it and press `Enter` to install the package.
+4. You can keep your packages up to date by running **Package Control: Upgrade Package** from the Command Palette.
+
+
+
 
 ### Manual Installation
 
@@ -160,7 +165,15 @@ No further configuration is necessary. This Zettelkasten plugin works with Subli
 That's easier than it might look. This is how I do it:
 
 ##### Automatic approach
-Just start working and [create a new note](#creating-a-new-note)! Hit `shift+enter` in an empty SublimeText window with no project or file open. After entering the note's title, SublimeText will ask you where to save your new note and its corresponding project file. From then on, you'll be working in the very project directory that you just selected or created.
+Just start working and [create a new note](#creating-a-new-note)! In an empty SublimeText window with no project or file open:
+
+* bring up the command palette by pressing `[cmd]+[shift]+[p]` on macOS (`[ctrl]+[shift]+[p]` on Windows and Linux).
+* type `zk` to list the *Zettelkasten* commands.
+* select `ZK: New Zettel Note`
+
+After entering the note's title, SublimeText will ask you where to save your new note and its corresponding project file. From then on, you'll be working in the very project directory that you just selected or created.
+
+**Note:** Once your Zettelkasten project is created, you can use the shortcut `[shift]+[enter]` to create new notes.
 
 ##### Manual approach
 If you want to create an empty project first and then start creating notes or if you want to create a project for a folder that already contains notes, here is what I would do:
@@ -419,9 +432,16 @@ Please see [Working with Panes](#working-with-panes) how to configure the defaul
 ## Usage
 
 ### Creating a new note
+
 * Press `[shift]+[enter]`. This will prompt you for the title of the new note at the bottom of your SublimeText window.
 * Press `[ESC]` to cancel without creating a new note.
 * Enter the note title and press `[enter]`.
+
+**Note:** `[shift]+[enter]` only works if you are in a note file or Zettelkasten project already. If it doesn't work, you can create a new note with the command palette:
+
+* bring up the command palette by pressing `[cmd]+[shift]+[p]` on macOS (`[ctrl]+[shift]+[p]` on Windows and Linux).
+* type `zk` to list the *Zettelkasten* commands.
+* select `ZK: New Zettel Note`
 
 A new note will be created and assigned the timestamp based ID in the format described above.
 
