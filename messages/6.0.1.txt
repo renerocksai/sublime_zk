@@ -1,0 +1,18 @@
+                  ___.   .__  .__                            __
+        ________ _\_ |__ |  | |__| _____   ____      _______|  | __
+       /  ___/  |  \ __ \|  | |  |/     \_/ __ \     \___   /  |/ /
+       \___ \|  |  / \_\ \  |_|  |  Y Y  \  ___/      /    /|    <
+      /____  >____/|___  /____/__|__|_|  /\___  >    /_____ \__|_ \
+           \/          \/              \/     \/           \/    \/
+                                       The SublimeText Zettelkasten
+
+Please see the README on github:
+	https://github.com/renerocksai/sublime_zk#sublime-zk
+
+* I recommend installing `ag`, the silver searcher!
+	* see the README:
+		https://github.com/renerocksai/sublime_zk#installing-the-silver-searcher
+
+* for syntax coloring instructions
+	* see the README:
+	https://github.com/renerocksai/sublime_zk#syntax-coloring-for-tags-footnotes-and-pandoc-references
