@@ -501,8 +501,8 @@ class Autobib:
         p = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate(bytes(stdin, 'utf-8'))
         # make me windows-safe
-        stdout = stdout.decode('utf-8').replace('\r', '')
-        stderr = stderr.decode('utf-8').replace('\r', '')
+        stdout = stdout.decode('utf-8', errors='ignore').replace('\r', '')
+        stderr = stderr.decode('utf-8', errors='ignore').replace('\r', '')
         # print('pandoc says:', stderr)
         return stdout
 
@@ -611,13 +611,13 @@ class ExternalSearch:
             print('sublime_zk: search unsuccessful:')
             print(e.returncode)
             print(e.cmd)
-            for line in e.output.decode('utf-8').split('\n'):
+            for line in e.output.decode('utf-8', errors='ignore').split('\n'):
                 print('    ', line)
         except subprocess.TimeoutExpired:
             print('sublime_zk: search timed out:', ' '.join(args))
         if verbose:
-            print(output.decode('utf-8'))
-        return output.decode('utf-8').replace('\r', '')
+            print(output.decode('utf-8', errors='ignore'))
+        return output.decode('utf-8', errors='ignore').replace('\r', '')
 
     @staticmethod
     def externalize_note_links(ag_out, folder, extension, prefix=None):
@@ -1742,7 +1742,7 @@ class ZkTocCommand(sublime_plugin.TextCommand):
         Turn heading into a reference as in `[heading](#reference)`.
         """
         ref = unicodedata.normalize('NFKD', heading).encode('ascii', 'ignore')
-        ref = re.sub('[^\w\s-]', '', ref.decode('ascii')).strip().lower()
+        ref = re.sub('[^\w\s-]', '', ref.decode('ascii', errors='ignore')).strip().lower()
         return re.sub('[-\s]+', '-', ref)
 
     def run(self, edit):
