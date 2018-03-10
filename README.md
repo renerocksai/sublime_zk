@@ -106,10 +106,15 @@ Sublime Text comes with Package Control, a feature which allows you to easily in
 
 1. Install [Sublime Text 3](http://www.sublimetext.com/3)
 2. Use the Command Palette (Tools > Command Palette...) and run **Install Package Control**. Sublime Text will alert you when the installation has finished.
+3. Use the Command Palette and run **Package Control: Install Package** and search for `Zettelkasten - sublime_zk` from the list of available packages. Select it and press `Enter` to install the package.
+4. You can keep your packages up to date by running **Package Control: Upgrade Package** from the Command Palette.
+
+<!--
 3. Use the Command Palette and run **Package Control: Add Repository**
 4. Add the URL of this repository `https://github.com/renerocksai/sublime_zk` into the panel that appears at the bottom of the window and press `Enter`.
 5. Use the Command Palette and run **Package Control: Install Package** and search for `sublime_zk` from the list of available packages. Select it and press `Enter` to install the package.
 6. You can keep your packages up to date by running **Package Control: Upgrade Package** from the Command Palette.
+-->
 
 ### Manual Installation
 
