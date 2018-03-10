@@ -1,7 +1,7 @@
 [
-    { "keys": ["shift+enter"], "command": "zk_new_zettel"},
-    { "keys": ["ctrl+enter"], "command": "zk_follow_wiki_link"},
-    { "keys": ["alt+enter"], "command": "zk_show_referencing_notes"},
+    { "keys": ["shift+enter"], "command": "zk_new_zettel", "context": [ { "key": "sublime_zk", "operand": "true"}] },
+    { "keys": ["ctrl+enter"], "command": "zk_follow_wiki_link", "context": [ { "key": "sublime_zk", "operand": "true"}]},
+    { "keys": ["alt+enter"], "command": "zk_show_referencing_notes", "context": [ { "key": "sublime_zk", "operand": "true"}]},
     { "keys": ["[", "["], "command": "zk_get_wiki_link"},
     { "keys": ["#", "?"], "command": "zk_tag_selector"},
     { "keys": ["#", "!"], "command": "zk_show_all_tags"},

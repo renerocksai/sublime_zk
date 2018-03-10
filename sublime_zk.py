@@ -1892,6 +1892,11 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
     ignored_views = []
     highlight_semaphore = threading.Semaphore()
 
+    def on_query_context(self, view, key, operator, operand, match_all):
+        if key == 'sublime_zk':
+            if 'sublime_zk' in view.settings().get('syntax'):
+                return True
+
     def on_query_completions(self, view, prefix, locations):
         """
         Generate auto-completion entries for markdown files, based on
