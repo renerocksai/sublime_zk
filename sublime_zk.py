@@ -931,7 +931,7 @@ def get_all_notes_for(folder, extension):
     """
     candidates = []
     for root, dirs, files in os.walk(folder):
-        candidates.extend([f for f in files if f.endswith(extension)])
+        candidates.extend([os.path.join(root, f) for f in files if f.endswith(extension)])
     return candidates
 
 def find_all_tags_in(folder, extension):
@@ -1591,6 +1591,7 @@ class ZkShowAllTagsCommand(sublime_plugin.WindowCommand):
     in all notes
     """
     def run(self):
+        global F_EXT_SEARCH
         # sanity check: do we have a project
         if self.window.project_file_name():
             # yes we have a project!
@@ -1606,7 +1607,12 @@ class ZkShowAllTagsCommand(sublime_plugin.WindowCommand):
         extension = settings.get('wiki_extension')
         tags = find_all_tags_in(folder, extension)
         tags.sort()
-        lines = '\n'.join(tags)
+        lines = '\n'.join([' ' + tag for tag in tags])
+
+        if ExternalSearch.EXTERNALIZE and not F_EXT_SEARCH:
+            with open(ExternalSearch.external_file(folder), mode='w',
+                encoding='utf-8') as f:
+                f.write(lines)
         ExternalSearch.show_search_results(self.window, folder, 'Tags', lines,
                                                 'show_all_tags_in_new_pane')
 
