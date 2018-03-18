@@ -12,7 +12,7 @@
 
     // when creating a new note, put id into title?
      // false to disable
-    "id_in_title": true,
+    "id_in_title": false,
 
     // highlight links to other notes?
     // false to disable
