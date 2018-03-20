@@ -18,6 +18,9 @@
     // false to disable
     "highlight_note_links": true,
 
+    // prefix for #tags
+    "tag_prefix": "zk",
+
     // when highlighting: also show bookmark symbols in the gutter?
     // false to disable
     "show_bookmarks_in_gutter": true,

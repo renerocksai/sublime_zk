@@ -31,13 +31,17 @@ class ZkConstants:
     # characters at which a #tag is cut off (#tag, -> #tag)
     Tag_Stops = '.,\/!$%\^&\*;\{\}[]\'"=`~()<>\\'
 
+    TAG_PREFIX = '#'
+
     # search for tags in files
-    RE_TAGS = r"(?<=\s|^)(?<!`)(#+([^#\s.,\/!$%\^&\*;{}\[\]'\"=`~()<>”\\]" \
-                                                             r"|:[a-zA-Z0-9])+)"
+    def RE_TAGS():
+        prefix = ZkConstants.TAG_PREFIX
+        return r"(?<=\s|^)(?<!`)(" + prefix + r"+([^" + prefix + r"\s.,\/!$%\^&\*;{}\[\]'\"=`~()<>”\\]|:[a-zA-Z0-9])+)"
     # Same RE just for ST python's re module
     ## un-require line-start, sublimetext python's RE doesn't like it
-    RE_TAGS_PY = r"(?<=\s)(?<!`)(#+([^#\s.,\/!$%\^&\*;{}\[\]'\"=`~()<>”\\]" \
-                                                             r"|:[a-zA-Z0-9])+)"
+    def RE_TAGS_PY():
+        prefix = ZkConstants.TAG_PREFIX
+        return r"(?<=\s)(?<!`)(" + prefix + r"+([^" + prefix + r"\s.,\/!$%\^&\*;{}\[\]'\"=`~()<>”\\]|:[a-zA-Z0-9])+)"
 
     # match note links in text
     Link_Matcher = re.compile('(\[+|§)([0-9.]{12,18})(\]+|.?)')
@@ -82,6 +86,10 @@ def settings_changed():
     value = settings.get("seconds_in_id", None)
     if value is not None:
         SECONDS_IN_ID = value
+    value = settings.get("tag_prefix", None)
+    if value is not None:
+        ZkConstants.TAG_PREFIX = re.escape(value)
+
 
 def plugin_loaded():
     global F_EXT_SEARCH
@@ -480,7 +488,7 @@ class Autobib:
         """
         Splits pandoc output into citation and bib part
         """
-        print('pandoc_out:', repr(pandoc_out))
+        # print('pandoc_out:', repr(pandoc_out))
         pdsplit = pandoc_out.split('\n\n')
         citation = '(no citation generated)'
         bib =  '(no bib generated)'
@@ -519,7 +527,7 @@ class ExternalSearch:
         """
         Create a list of all #tags of all notes in folder.
         """
-        output = ExternalSearch.search_in(folder, ZkConstants.RE_TAGS,
+        output = ExternalSearch.search_in(folder, ZkConstants.RE_TAGS(),
             extension, tags=True)
         tags = set()
         for line in output.split('\n'):
@@ -539,7 +547,7 @@ class ExternalSearch:
         """
         args = [ExternalSearch.SEARCH_COMMAND, '--nocolor']
         args.extend(['--nonumbers', '-o', '--silent', '-G', '.*\\' + extension,
-            ZkConstants.RE_TAGS, folder])
+            ZkConstants.RE_TAGS(), folder])
         ag_out = ExternalSearch.run(args, folder)
         if not ag_out:
             return {}
@@ -921,7 +929,7 @@ def extract_tags(file):
     with open(file, mode='r', encoding='utf-8') as f:
         for line in f:
             line = line.strip()
-            for tag in re.findall(ZkConstants.RE_TAGS_PY, line):
+            for tag in re.findall(ZkConstants.RE_TAGS_PY(), line):
                 tags.add(tag[0])
     return tags
 
@@ -1948,7 +1956,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
             for citekey in citekeys:
                 citekey = fmt_key.format(citekey)
                 completions.append([citekey, fmt_completion.format(citekey)])
-        return (completions, sublime.INHIBIT_WORD_COMPLETIONS)
+        return (completions, 0)
 
     def on_activated(self, view):
         self.update_note_link_highlights(view)
@@ -1990,7 +1998,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
             print('NoteLinkHighlighter: ignoring view with %d links' % n_links)
             NoteLinkHighlighter.ignored_views.append(view.id())
 
-        tag_regions = view.find_all(ZkConstants.RE_TAGS_PY)
+        tag_regions = view.find_all(ZkConstants.RE_TAGS_PY())
         NoteLinkHighlighter.tag_regions[view.id()] = tag_regions
 
         NoteLinkHighlighter.note_links_for_view[view.id()] = note_links
@@ -2048,7 +2056,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         scope = 'markup.zettel.link'
 
         if tags == True:
-            flags = sublime.DRAW_NO_FILL | sublime.DRAW_NO_OUTLINE #| sublime.DRAW_SOLID_UNDERLINE
+            flags = sublime.DRAW_NO_FILL | sublime.DRAW_NO_OUTLINE | sublime.DRAW_SOLID_UNDERLINE
             key = 'tag ' + scope_name
             scope = 'markup.zettel.tag'
             symbol = ''

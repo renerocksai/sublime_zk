@@ -1490,6 +1490,20 @@
     </dict>
     <dict>
       <key>name</key>
+      <string>Markup: Zettelkasten tag</string>
+      <key>scope</key>
+      <string>markup.zettel.tag</string>
+      <key>settings</key>
+      <dict>
+        <key>fontStyle</key>
+        <string>italic</string>
+        <key>foreground</key>
+        <string>#e42e70</string>
+      </dict>
+    </dict>
+
+    <dict>
+      <key>name</key>
       <string>Markup: Zettelkasten Image attrs in image link</string>
       <key>scope</key>
       <string>meta.image.inline.markdown.imageattr</string>
