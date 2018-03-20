@@ -1892,6 +1892,9 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
     ignored_views = []
     highlight_semaphore = threading.Semaphore()
 
+    tag_regions = {}
+    tag_scopes = {}
+
     def on_query_context(self, view, key, operator, operand, match_all):
         if key == 'sublime_zk':
             if 'sublime_zk' in view.settings().get('syntax'):
@@ -1986,12 +1989,14 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         if n_links > max_note_link_limit:
             print('NoteLinkHighlighter: ignoring view with %d links' % n_links)
             NoteLinkHighlighter.ignored_views.append(view.id())
-            return
+
+        tag_regions = view.find_all(ZkConstants.RE_TAGS_PY)
+        NoteLinkHighlighter.tag_regions[view.id()] = tag_regions
 
         NoteLinkHighlighter.note_links_for_view[view.id()] = note_links
 
-        if (should_highlight):
-            self.highlight_note_links(view, note_links)
+        if should_highlight:
+            self.highlight_note_links(view, note_links, tag_regions)
 
     def update_note_link_highlights_async(self, view):
         NoteLinkHighlighter.highlight_semaphore.acquire()
@@ -2000,7 +2005,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         finally:
             NoteLinkHighlighter.highlight_semaphore.release()
 
-    def highlight_note_links(self, view, note_links):
+    def highlight_note_links(self, view, note_links, tag_regions):
         """
         Creates a set of regions from the intersection of note_links and scopes,
         underlines all of them.
@@ -2014,14 +2019,22 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         for note_link in note_links:
             scope_name = view.scope_name(note_link.a)
             scope_map.setdefault(scope_name, []).append(note_link)
-
         for scope_name in scope_map:
             self.underline_regions(view, scope_name, scope_map[scope_name],
-                show_bookmarks)
+                show_bookmarks, tags = False)
+        self.update_view_scopes(view, scope_map.keys(), tags=False)
 
-        self.update_view_scopes(view, scope_map.keys())
+        scope_map = {}
+        for tag_region in tag_regions:
+            scope_name = view.scope_name(tag_region.a)
+            scope_name = 'markup.zettel.tag'
+            scope_map.setdefault(scope_name, []).append(tag_region)
+        for scope_name in scope_map:
+            self.underline_regions(view, scope_name, scope_map[scope_name],
+                show_bookmarks, tags = True)
+        self.update_view_scopes(view, scope_map.keys(), tags=True)
 
-    def underline_regions(self, view, scope_name, regions, show_bookmarks):
+    def underline_regions(self, view, scope_name, regions, show_bookmarks, tags):
         """
         Apply underlining to provided regions.
         """
@@ -2030,26 +2043,38 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         else:
             symbol = ''
 
-        view.add_regions(
-            u'clickable-note_links ' + scope_name,
-            regions,
-            # the scope name for nice links different from external links
-            "markup.zettel.link",
-            symbol,
-            flags=sublime.DRAW_NO_FILL |
-                  sublime.DRAW_NO_OUTLINE | sublime.DRAW_SOLID_UNDERLINE)
+        flags = sublime.DRAW_NO_FILL | sublime.DRAW_NO_OUTLINE | sublime.DRAW_SOLID_UNDERLINE
+        key = u'clickable-note_links ' + scope_name
+        scope = 'markup.zettel.link'
 
-    def update_view_scopes(self, view, new_scopes):
+        if tags == True:
+            flags = sublime.DRAW_NO_FILL | sublime.DRAW_NO_OUTLINE #| sublime.DRAW_SOLID_UNDERLINE
+            key = 'tag ' + scope_name
+            scope = 'markup.zettel.tag'
+            symbol = ''
+
+        view.add_regions(key, regions, scope, symbol, flags)
+
+
+    def update_view_scopes(self, view, new_scopes, tags):
         """
         Store new set of underlined scopes for view.
         Erase underlining from scopes that were once used but are not anymore.
         """
-        old_scopes = NoteLinkHighlighter.scopes_for_view.get(view.id(), None)
-        if old_scopes:
-            unused_scopes = set(old_scopes) - set(new_scopes)
-            for unused_scope_name in unused_scopes:
-                view.erase_regions(u'clickable-note_links ' + unused_scope_name)
-        NoteLinkHighlighter.scopes_for_view[view.id()] = new_scopes
+        if not tags:
+            old_scopes = NoteLinkHighlighter.scopes_for_view.get(view.id(), None)
+            if old_scopes:
+                unused_scopes = set(old_scopes) - set(new_scopes)
+                for unused_scope_name in unused_scopes:
+                    view.erase_regions(u'clickable-note_links ' + unused_scope_name)
+            NoteLinkHighlighter.scopes_for_view[view.id()] = new_scopes
+        else:
+            old_scopes = NoteLinkHighlighter.tag_scopes.get(view.id(), None)
+            if old_scopes:
+                unused_scopes = set(old_scopes) - set(new_scopes)
+                for unused_scope_name in unused_scopes:
+                    view.erase_regions(u'tag ' + unused_scope_name)
+            NoteLinkHighlighter.tag_scopes[view.id()] = new_scopes
 
     def on_window_command(self, window, command_name, args):
         global DISTRACTION_FREE_MODE_ACTIVE
