@@ -983,11 +983,11 @@ def tag_at(text, pos=None):
     else:
         search_text = text[:pos + 1]
     # find first `#`
-    inner = search_text.rfind('#')
+    inner = search_text.rfind(ZkConstants.TAG_PREFIX)
     if inner >=0:
         # find next consecutive `#`
         for c in reversed(search_text[:inner]):
-            if c != '#':
+            if c not in ZkConstants.TAG_PREFIX:
                 break
             inner -=1
         # search end of tag
@@ -1228,7 +1228,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
                 return link_region
 
         # test if we are supposed to follow a tag
-        if '#' in linestart_till_cursor_str or '@' in linestart_till_cursor_str:
+        if ZkConstants.TAG_PREFIX in linestart_till_cursor_str or '@' in linestart_till_cursor_str:
             view = self.view
             cursor_pos = view.sel()[0].begin()
             line_region = view.line(cursor_pos)
@@ -1573,7 +1573,7 @@ class ZkTagSelectorCommand(sublime_plugin.TextCommand):
     def on_done(self, selection):
         if selection == -1:
             self.view.run_command(
-                'zk_insert_wiki_link', {'args': {'text': '#'}})   # re-used
+                'zk_insert_wiki_link', {'args': {'text': ZkConstants.TAG_PREFIX}})   # re-used
             return
 
         tag_txt = self.tags[selection]
