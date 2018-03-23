@@ -35,12 +35,12 @@ class ZkConstants:
 
     # search for tags in files
     def RE_TAGS():
-        prefix = ZkConstants.TAG_PREFIX
+        prefix = re.escape(ZkConstants.TAG_PREFIX)
         return r"(?<=\s|^)(?<!`)(" + prefix + r"+([^" + prefix + r"\s.,\/!$%\^&\*;{}\[\]'\"=`~()<>”\\]|:[a-zA-Z0-9])+)"
     # Same RE just for ST python's re module
     ## un-require line-start, sublimetext python's RE doesn't like it
     def RE_TAGS_PY():
-        prefix = ZkConstants.TAG_PREFIX
+        prefix = re.escape(ZkConstants.TAG_PREFIX)
         return r"(?<=\s)(?<!`)(" + prefix + r"+([^" + prefix + r"\s.,\/!$%\^&\*;{}\[\]'\"=`~()<>”\\]|:[a-zA-Z0-9])+)"
 
     # match note links in text
@@ -88,7 +88,7 @@ def settings_changed():
         SECONDS_IN_ID = value
     value = settings.get("tag_prefix", None)
     if value is not None:
-        ZkConstants.TAG_PREFIX = re.escape(value)
+        ZkConstants.TAG_PREFIX = value
 
 
 def plugin_loaded():
