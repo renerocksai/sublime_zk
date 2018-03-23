@@ -74,4 +74,9 @@
     // if false: YYYYMMDDHHMM   201712241830
     "seconds_in_id": false,
 
+    // Sort note lists (search results) by
+    // - title
+    // - ID       <-- default
+    "sort_notelists_by": "id"
+
 }

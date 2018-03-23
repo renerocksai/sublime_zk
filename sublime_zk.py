@@ -16,6 +16,7 @@ import struct
 import imghdr
 import unicodedata
 from collections import Counter
+from operator import itemgetter
 
 
 class ZkConstants:
@@ -639,6 +640,7 @@ class ExternalSearch:
                 mode='w', encoding='utf-8') as f:
                 if prefix:
                     f.write(u'{}\n\n'.format(prefix))
+                results = []
                 for line in sorted(ag_out.split('\n')):
                     if not line.strip():
                         continue
@@ -647,7 +649,16 @@ class ExternalSearch:
                         line = line.replace(extension, '')
                         note_id, title = line.split(' ', 1)
                         note_id = os.path.basename(note_id)
-
+                        results.append((note_id, title))
+                settings = get_settings()
+                sort_order = settings.get('sort_notelists_by', 'id').lower()
+                if sort_order not in ('id', 'title'):
+                    sort_order = 'id'
+                column = 0
+                if sort_order == 'title':
+                    column = 1
+                results.sort(key=itemgetter(column))
+                for note_id, title in results:
                         f.write(u'{}{}{} {}\n'.format(link_prefix, note_id,
                             link_postfix, title))
 
@@ -809,6 +820,7 @@ class TextProduction:
             note_list = ExternalSearch.search_tagged_notes(folder, extension,
                 tag, externalize=False)
             bullet_list = []
+            results = []
             for line in sorted(note_list):
                 if not line:
                     continue
@@ -817,8 +829,17 @@ class TextProduction:
                     line = line.replace(extension, '')
                     note_id, title = line.split(' ', 1)
                     note_id = os.path.basename(note_id)
-                    bullet_line = '* {}{}{} {}'.format(pre, note_id, post, title)
-                    bullet_list.append(bullet_line)
+                    results.append(note_id, title)
+            sort_order = settings.get('sort_notelists_by', 'id').lower()
+            if sort_order not in ('id', 'title'):
+                sort_order = 'id'
+            column = 0
+            if sort_order == 'title':
+                column = 1
+            results.sort(key=itemgetter(column))
+            for note_id, title in results:
+                bullet_line = '* {}{}{} {}'.format(pre, note_id, post, title)
+                bullet_list.append(bullet_line)
             view.insert(edit, line_region.b, '\n' + '\n'.join(bullet_list))
 
 
@@ -1654,14 +1675,24 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
             self.extension)
         link_prefix, link_postfix = get_link_pre_postfix()
         lines = ['Notes matching search-spec ' + input_text + '\n']
+        results = []
         for note_id in [n for n in note_ids if n]:  # Strip the None
             filn = note_file_by_id(note_id, self.folder, self.extension)
             if filn:
                 title = os.path.basename(filn).split(' ', 1)[1]
                 title = title.replace(self.extension, '')
-                line = link_prefix + note_id + link_postfix + ' '
-                line += title
-                lines.append(line)
+                results.append(note_id, title)
+        sort_order = settings.get('sort_notelists_by', 'id').lower()
+        if sort_order not in ('id', 'title'):
+            sort_order = 'id'
+        column = 0
+        if sort_order == 'title':
+            column = 1
+        results.sort(key=itemgetter(column))
+        for note_id, title in results:
+            line = link_prefix + note_id + link_postfix + ' '
+            line += title
+            lines.append(line)
         if ExternalSearch.EXTERNALIZE:
             with open(ExternalSearch.external_file(self.folder), mode='w',
                 encoding='utf-8') as f:
