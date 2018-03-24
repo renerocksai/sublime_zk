@@ -829,7 +829,7 @@ class TextProduction:
                     line = line.replace(extension, '')
                     note_id, title = line.split(' ', 1)
                     note_id = os.path.basename(note_id)
-                    results.append(note_id, title)
+                    results.append((note_id, title))
             sort_order = settings.get('sort_notelists_by', 'id').lower()
             if sort_order not in ('id', 'title'):
                 sort_order = 'id'
@@ -1681,7 +1681,7 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
             if filn:
                 title = os.path.basename(filn).split(' ', 1)[1]
                 title = title.replace(self.extension, '')
-                results.append(note_id, title)
+                results.append((note_id, title))
         sort_order = settings.get('sort_notelists_by', 'id').lower()
         if sort_order not in ('id', 'title'):
             sort_order = 'id'
