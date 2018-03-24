@@ -647,6 +647,8 @@ class ExternalSearch:
                     if line.endswith(extension):
                         line = os.path.basename(line)
                         line = line.replace(extension, '')
+                        if not ' ' in line:
+                            line += ' '
                         note_id, title = line.split(' ', 1)
                         note_id = os.path.basename(note_id)
                         results.append((note_id, title))
