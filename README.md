@@ -445,6 +445,8 @@ Please see [Working with Panes](#working-with-panes) how to configure the defaul
 * [Autocomplete tag](#experimental-tag-selector) <kbd>#</kbd> + <kbd>?</kbd>
 * [Find tag references](#) Selector in tag <kbd>ctrl</kbd> + <kbd>enter</kbd>
 * [Expand link inline](#inline-expansion-of-note-links) <kbd>ctrl</kbd> + <kbd>.</kbd>
+* [Expand tag inline](#inline-expansion-of-tags) (with referencing notes) <kbd>ctrl</kbd> + <kbd>.</kbd>
+* [Expand citekey inline](#inline-expansion-of-citekeys) (with referencing notes) <kbd>ctrl</kbd> + <kbd>.</kbd>
 * [Insert multimarkdown citation](#inserting-a-citation) <kbd>[</kbd> + <kbd>#</kbd> (needs `"citations-mmd-style": true`)
 * [Insert pandoc citation](#inserting-a-citation) <kbd>[</kbd> + <kbd>@</kbd> (needs `"citations-mmd-style": false`)
 
