@@ -445,8 +445,8 @@ Please see [Working with Panes](#working-with-panes) how to configure the defaul
 * [Autocomplete tag](#experimental-tag-selector) <kbd>#</kbd> + <kbd>?</kbd>
 * [Find tag references](#) Selector in tag <kbd>ctrl</kbd> + <kbd>enter</kbd>
 * [Expand link inline](#inline-expansion-of-note-links) <kbd>ctrl</kbd> + <kbd>.</kbd>
-* [Insert multimarkdown citation](#inserting-a-citation) <kbd>[</kbd> + <kbd>#</kbd>
-* [Insert pandoc citation](#inserting-a-citation) <kbd>[</kbd> + <kbd>@</kbd>
+* [Insert multimarkdown citation](#inserting-a-citation) <kbd>[</kbd> + <kbd>#</kbd> (needs `"citations-mmd-style": true`)
+* [Insert pandoc citation](#inserting-a-citation) <kbd>[</kbd> + <kbd>@</kbd> (needs `"citations-mmd-style": false`)
 
 ### Creating a new note
 
@@ -569,7 +569,7 @@ Here you can see what the list of notes to choose from looks like:
 #### Using auto-completion to insert note-links
 A different way to insert a link to another note is via auto-completion. This differs from the previous one in the following ways:
 
-* auto-completion is triggered via `[ctrl]+[space] (or `[alt]+[/]` on Linux)
+* auto-completion is triggered via `[ctrl]+[space]` (or `[alt]+[/]` on Linux)
 * the list of notes is displayed at the location of your cursor
 * the font of the list is smaller, making it overall less obtrusive
 
