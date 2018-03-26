@@ -67,6 +67,7 @@ See the [Usage](#usage) section below to see how this package might support your
     * [Auto inline image preview](#auto-inline-image-preview)
     * [Default panes](#default-panes)
 * [Usage](#usage)
+    * [Shortcut cheatsheet](#shortcut-cheatsheet)
     * [Creating a new note](#creating-a-new-note)
     * [Creating a new note and link from selected text](#creating-a-new-note-and-link-from-selected-text)
     * [Creating a link](#creating-a-link)
@@ -431,6 +432,22 @@ Please see [Working with Panes](#working-with-panes) how to configure the defaul
 
 ## Usage
 
+### Shortcut cheatsheet
+
+* [Create a new note](#creating-a-new-note) <kbd>shift</kbd> + <kbd>enter</kbd>
+* [New note from text](#creating-a-new-note-and-link-from-selected-text) Select text, then <kbd>shift</kbd> + <kbd>enter</kbd>
+* [Open link with keyboard](#creating-a-link) Selector on text + <kbd>ctrl</kbd> + <kbd>enter</kbd>
+* [Open link with mouse](#creating-a-link) <kbd>Alt</kbd> + double-click on link
+* [Autocomplete find document](#creating-a-link) <kbd>[</kbd> + <kbd>[</kbd>
+* [Autocomplete to insert link](#using-auto-completion-to-insert-note-links) <kbd>ctrl</kbd> + <kbd>space</kbd>
+* [Find references](#searching-for-friends) Selector in link + <kbd>alt</kbd> + <kbd>enter</kbd>
+* [View all tags](#getting-an-overview-of-all-your-tags) <kbd>#</kbd> + <kbd>!</kbd>
+* [Autocomplete tag](#experimental-tag-selector) <kbd>#</kbd> + <kbd>?</kbd>
+* [Find tag references](#) Selector in tag <kbd>ctrl</kbd> + <kbd>enter</kbd>
+* [Expand link inline](#inline-expansion-of-note-links) <kbd>ctrl</kbd> + <kbd>.</kbd>
+* [Insert multimarkdown citation](#inserting-a-citation) <kbd>[</kbd> + <kbd>#</kbd>
+* [Insert pandoc citation](#inserting-a-citation) <kbd>[</kbd> + <kbd>@</kbd>
+
 ### Creating a new note
 
 * Press `[shift]+[enter]`. This will prompt you for the title of the new note at the bottom of your SublimeText window.
@@ -552,7 +569,7 @@ Here you can see what the list of notes to choose from looks like:
 #### Using auto-completion to insert note-links
 A different way to insert a link to another note is via auto-completion. This differs from the previous one in the following ways:
 
-* auto-completion is triggered via [ctrl]+[space] (or `[alt]+[/]` on Linux)
+* auto-completion is triggered via `[ctrl]+[space] (or `[alt]+[/]` on Linux)
 * the list of notes is displayed at the location of your cursor
 * the font of the list is smaller, making it overall less obtrusive
 
