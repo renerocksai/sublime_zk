@@ -832,6 +832,7 @@ class TextProduction:
                     note_id, title = line.split(' ', 1)
                     note_id = os.path.basename(note_id)
                     results.append((note_id, title))
+            settings = get_settings()
             sort_order = settings.get('sort_notelists_by', 'id').lower()
             if sort_order not in ('id', 'title'):
                 sort_order = 'id'
