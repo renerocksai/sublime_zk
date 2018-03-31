@@ -43,7 +43,7 @@ See the [Usage](#usage) section below to see how this package might support your
 
 ## Contents
 * [Installation](#installation)
-    * [Automatic Installation & Updates](#automatic-installation-updates)
+    * [Automatic Installation & Updates](#automatic-installation--updates)
     * [Manual Installation](#manual-installation)
     * [Installing The Silver Searcher](#installing-the-silver-searcher)
     * [Installing Pandoc](#installing-pandoc)
@@ -111,6 +111,8 @@ Sublime Text comes with Package Control, a feature which allows you to easily in
 4. Add the URL of this repository `https://github.com/renerocksai/sublime_zk` into the panel that appears at the bottom of the window and press `Enter`.
 5. Use the Command Palette and run **Package Control: Install Package** and search for `sublime_zk` from the list of available packages. Select it and press `Enter` to install the package.
 6. You can keep your packages up to date by running **Package Control: Upgrade Package** from the Command Palette.
+
+**Note:** If you're on _macOS_ and have troubles installing through package control as described above, please see [this issue](https://github.com/renerocksai/sublime_zk/issues/50#issuecomment-377724551) for a fix.
 
 **Note**: I'm still awaiting a go from package control. Once this has gone through, you will be able to use package control like this:
 
