@@ -59,8 +59,8 @@ See the [Usage](#usage) section below to see how this package might support your
     * [IDs in titles of new notes](#ids-in-titles-of-new-notes)
     * [New Note templates](#new-note-templates)
     * [Highlight references to other notes](#highlight-references-to-other-notes)
-    * [Configuring SublimeText's line spacing](#configuring-sublimetexts-line-spacing)
     * [Syntax Coloring for #tags, footnotes, and pandoc references](#syntax-coloring-for-tags-footnotes-and-pandoc-references)
+    * [Configuring SublimeText's line spacing](#configuring-sublimetexts-line-spacing)
     * [Location of your .bib file](#location-of-your-bib-file)
     * [Citation Reference Style](#citation-reference-style)
     * [Inline image preview size](#inline-image-preview-size)
@@ -120,7 +120,6 @@ Sublime Text comes with Package Control, a feature which allows you to easily in
 > 2. Use the Command Palette (Tools > Command Palette...) and run **Install Package Control**. Sublime Text will alert you when the installation has finished.
 > 3. Use the Command Palette and run **Package Control: Install Package** and search for `Zettelkasten - sublime_zk` from the list of available packages. Select it and press `Enter` to install the package.
 > 4. You can keep your packages up to date by running **Package Control: Upgrade Package** from the Command Palette.
-
 
 
 
@@ -346,6 +345,72 @@ It also shows a bookmark symbol in the gutter to the left of your text. These fe
     "show_bookmarks_in_gutter": true,
 ```
 
+### Syntax Coloring for #tags, footnotes, and pandoc references
+
+To enable highlighting of #tags, footnotes, and pandoc references in your newly created note, and for all your Zettelkasten notes, switch Sublime Text's syntax to `Markdown Zettelkasten`. You can use the menu: 'View' -> 'Syntax' -> 'Open all with current extension as...', and select 'Markdown Zettelkasten'.
+
+**Note: To get you started, this package provides the color scheme `Monokai Extended - Zettelkasten`**. You can select it via the menu: Preferences -> Color Scheme... -> Monokai Extended - Zettelkasten. _(The original Monokai Extended for SublimeText has been created by [@jonschlinkert](https://github.com/jonschlinkert/sublime-monokai-extended))._
+
+If you want to use your own color scheme, you have to manually tweak it:
+
+* Google is your friend - make a copy of your existing color scheme
+* Add the following to your new color scheme
+* (Tweak the HTML color codes)
+
+```xml
+    <dict>
+      <key>name</key>
+      <string>Markup: Zettelkasten note link</string>
+      <key>scope</key>
+      <string>markup.zettel.link</string>
+      <key>settings</key>
+      <dict>
+        <key>fontStyle</key>
+        <string>underline</string>
+        <key>foreground</key>
+        <string>#7a9aff</string>
+      </dict>
+    </dict>
+    <dict>
+      <key>name</key>
+      <string>Markup: Zettelkasten note link title</string>
+      <key>scope</key>
+      <string>markup.zettel.linktitle</string>
+      <key>settings</key>
+      <dict>
+        <key>fontStyle</key>
+        <string>underline</string>
+        <key>foreground</key>
+        <string>#7a9aff</string>
+      </dict>
+    </dict>
+    <dict>
+      <key>name</key>
+      <string>Markup: Zettelkasten tag</string>
+      <key>scope</key>
+      <string>markup.zettel.tag</string>
+      <key>settings</key>
+      <dict>
+        <key>fontStyle</key>
+        <string>italic</string>
+        <key>foreground</key>
+        <string>#e42e70</string>
+      </dict>
+    </dict>
+    <dict>
+      <key>name</key>
+      <string>Markup: Zettelkasten Image attrs in image link</string>
+      <key>scope</key>
+      <string>meta.image.inline.markdown.imageattr</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key>
+        <string>#F0E68C</string>
+      </dict>
+    </dict>
+    <dict>
+```
+
 ### Configuring SublimeText's line spacing
 When looking at the screenshot at the beginning of this document, you might have noticed the line spacing. I find it very pleasant to work with text this way. To configure SublimeText to use this line spacing:
 
@@ -492,32 +557,6 @@ As a bonus feature, you can even select multiple lines and create a new note com
 * all the other selected lines will become the note's body (text).
 
 ![new-note-from-multiline-sel](https://user-images.githubusercontent.com/30892199/36332808-fd458c9c-1373-11e8-9fe3-fa6755876499.gif)
-
-
-
-### Syntax Coloring for #tags, footnotes, and pandoc references
-To enable highlighting of #tags, footnotes, and pandoc references in your newly created note, and for all your Zettelkasten notes, switch Sublime Text's syntax to `Markdown Zettelkasten`. You can use the menu: 'View' -> 'Syntax' -> 'Open all with current extension as...', and select 'Markdown Zettelkasten'.
-
-This package uses a custom scope for note links. While underlining them is done in the plug-in, you have to manually tweak your color scheme. Google is your friend - here is an example that needs to be added to (a copy of) your favourite color scheme:
-
-```xml
-    <dict>
-      <key>name</key>
-      <string>Markup: Zettelkasten note link</string>
-      <key>scope</key>
-      <string>markup.zettel.link</string>
-      <key>settings</key>
-      <dict>
-        <key>fontStyle</key>
-        <string>underline</string>
-        <key>foreground</key>
-        <string>#6080ef</string>
-      </dict>
-    </dict>
-```
-
-**Note:** To get you started, this package provides the color scheme "Monokai Extended - Zettelkasten". You can select it via the menu: Preferences -> Color Scheme... -> Monokai Extended - Zettelkasten.
-_(The original Monokai Extended for SublimeText has been created by [@jonschlinkert](https://github.com/jonschlinkert/sublime-monokai-extended))._
 
 
 ### Creating a link
