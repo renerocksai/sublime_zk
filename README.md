@@ -408,7 +408,6 @@ If you want to use your own color scheme, you have to manually tweak it:
         <string>#F0E68C</string>
       </dict>
     </dict>
-    <dict>
 ```
 
 ### Configuring SublimeText's line spacing
@@ -538,7 +537,7 @@ The new note will look like this:
 ```markdown
 # AI is going to kill us all
 tags =
-
+.
 ```
 
 ### Creating a new note and link from selected text
@@ -685,7 +684,7 @@ The new note will be pre-filled with the following text:
 ```markdown
 # AI is going to kill us all
 tags =
-
+.
 ```
 
 #### Supported link styles
@@ -706,6 +705,7 @@ When inserting links manually, you are can choose between the following supporte
 
 ## Single-Pair with title
 [201711111709 one pair of brackets is enough]
+.
 ```
 
 This is how they are rendered in SublimeText:
@@ -1064,7 +1064,7 @@ You can define a specific preview size per image by adding image attributes insi
 ```markdown
 ![xxx](img/zettelkasten-book-de.jpg){width=100% height=100%}
 ![xxx](img/zettelkasten-book-de.jpg){width=200px height=200px}
-
+.
 ```
 
 **Note:**
@@ -1109,6 +1109,7 @@ Funny characters can be a challenge in the `(#references)`.
 ## as can duplicate headings
 
 # as can duplicate headings
+.
 ```
 
 Example after TOC:
@@ -1138,6 +1139,7 @@ Funny characters can be a challenge in the `(#references)`.
 ## as can duplicate headings
 
 # as can duplicate headings
+.
 ```
 
 **Note:** Whenever you need to refresh the table of contents, just repeat the above command.
@@ -1176,6 +1178,7 @@ Funny characters can be a challenge in the `(#references)`.
 ## 1.3  as can duplicate headers
 
 # 2  as can duplicate headers
+.
 ```
 
 **Note:** You can refresh the section numbers at any time by repeating the above command.
