@@ -412,7 +412,7 @@ class Autobib:
     @staticmethod
     def parse_authors(line):
         line = Autobib.remove_latex_commands(line)
-        authors = line.split('and')
+        authors = line.split(' and')
         author_tuples = []
         for author in authors:
             first = ''
