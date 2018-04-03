@@ -10,6 +10,63 @@ file_extensions:
 scope: text.html.markdown.multimarkdown.custom
 contexts:
   main:
+    - match: (?=(?<!\s)---(\s*coffee|\s*json)?\n$)
+      push: front-matter
+    - match: ""
+      set: body
+  front-matter:
+    - match: ^\s*---\s*$
+      with_prototype:
+        - include: scope:source.yaml#prototype
+      push:
+        - meta_scope: markup.raw.yaml.front-matter
+        - meta_content_scope: source.yaml
+        - match: ^\s*---\s*
+          pop: true
+        - include: scope:source.yaml
+    - match: ^\s*---\s*coffee\s*$
+      push:
+        - meta_scope: markup.raw.coffee.front-matter
+        - meta_content_scope: source.coffee
+        - match: ^\s*---\s*
+          pop: true
+        - include: scope:source.coffee
+    - match: ^\s*---\s*json\s*$
+      push:
+        - meta_scope: markup.raw.json.front-matter
+        - meta_content_scope: source.json
+        - match: ^\s*---\s*
+          pop: true
+        - include: scope:source.json
+    - match: ""
+      pop: true
+      set: body
+  body:
+    - match: |-
+        (?x)^
+        (?= [ ]{,3}>.
+        | ([ ]{4}|\t)(?!$)
+        | [#]{1,6}\s*+
+        | [ ]{,3}(?<marker>[-*_])([ ]{,2}\k<marker>){2,}[ \t]*+$
+        )
+      comment: |
+        We could also use an empty end match and set
+                applyEndPatternLast, but then we must be sure that the begin
+                pattern will only match stuff matched by the sub-patterns.
+      push:
+        - meta_scope: meta.block-level.markdown
+        - match: |-
+            (?x)^
+            (?! [ ]{,3}>.
+            | ([ ]{4}|\t)
+            | [#]{1,6}\s*+
+            | [ ]{,3}(?<marker>[-*_])([ ]{,2}\k<marker>){2,}[ \t]*+$
+            )
+          pop: true
+        - include: block_quote
+        - include: block_raw
+        - include: heading
+        - include: separator
     - match: ''
       push: scope:text.html.markdown.multimarkdown
       with_prototype:
@@ -34,14 +91,14 @@ contexts:
         - match: '(\[[a-zA-Z:\. ]*)(@)([^]]*)(\])'
           captures:
             '1': punctuation.definition.footnote.begin.markdown
-            '2': support.function.footnote.markdown
-            '3': support.function.footnote.markdown
+            '2': constant.other.reference.link.markdown
+            '3': constant.other.reference.link.markdown
             '4': punctuation.definition.footnote.begin.markdown
         - match: '([\s]+|^)(@)([\S]+)'
           captures:
             '1': text.html.markdown.multimarkdown.custom
-            '2': support.function.footnote.markdown
-            '3': support.function.footnote.markdown
+            '2': constant.other.reference.link.markdown
+            '3': constant.other.reference.link.markdown
         # all sorts of #tags
         - match: '(\s)(#+([^#\W]|[-§]|:[a-zA-Z0-9])+)' # better real just tags matching
           captures:
