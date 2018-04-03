@@ -713,7 +713,7 @@
 			<key>name</key>
 			<string>Markdown Quote</string>
 			<key>scope</key>
-			<string>markup.quote.markdown</string>  <!-- + comment -->
+			<string>markup.quote.markdown, markup.quote.markdown comment</string>  <!-- + comment for MarkdownHighlighting -->
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -728,9 +728,10 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#fff</string>
+				<string>#657b83</string>
 			</dict>
 		</dict>
+
 
 
 		<!-- comment -->
