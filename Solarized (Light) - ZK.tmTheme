@@ -18,7 +18,7 @@
 				<key>foreground</key>
 				<string>#657b83</string>
 				<key>gutter</key>
-				<string>#eee8d5</string>
+				<string>#fdf6e3</string>
 				<key>invisibles</key>
 				<string>#eee8d5</string>
 				<key>lineHighlight</key>
@@ -541,7 +541,7 @@
 	      <key>name</key>
 	      <string>Markup: Raw block</string>
 	      <key>scope</key>
-	      <string>markup.raw.block</string>
+	      <string>markup.raw.block, markup.raw.inline.markdown</string>
 	      <key>settings</key>
 	      <dict>
 	        <key>foreground</key>
@@ -705,8 +705,11 @@
 			<dict>
 				<key>foreground</key>
 				<string>#657b83</string>
+				<key>fontStyle</key>
+				<string>italic</string>
 			</dict>
 		</dict>
+
 		<dict>
 			<key>name</key>
 			<string>Markdown Quote gt</string>
@@ -739,7 +742,7 @@
 			<key>name</key>
 			<string>Comment</string>
 			<key>scope</key>
-			<string>markup.list</string>
+			<string>markup.list.numbered.bullet, markup.list.unnumbered.bullet</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -747,12 +750,13 @@
 			</dict>
 		</dict>
 
+
 		<!-- emphasis & bold -->
 		<dict>
 			<key>name</key>
 			<string>Markdown em</string>
 			<key>scope</key>
-			<string>markup.italic</string>
+			<string>punctuation.definition.italic.begin.markdown, punctuation.definition.italic.end.markdown</string>
 			<key>settings</key>
 			<dict>
 				<key>fontStyle</key>
@@ -765,7 +769,7 @@
 			<key>Name</key>
 			<string>Markdown strong</string>
 			<key>scope</key>
-			<string>markup.bold</string>
+			<string>punctuation.definition.bold.begin.markdown, punctuation.definition.bold.end.markdown</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>

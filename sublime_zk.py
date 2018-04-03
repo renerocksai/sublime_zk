@@ -1685,6 +1685,7 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
                 title = os.path.basename(filn).split(' ', 1)[1]
                 title = title.replace(self.extension, '')
                 results.append((note_id, title))
+        settings = get_settings()
         sort_order = settings.get('sort_notelists_by', 'id').lower()
         if sort_order not in ('id', 'title'):
             sort_order = 'id'
