@@ -583,7 +583,7 @@
 	      <key>name</key>
 	      <string>link</string>
 	      <key>scope</key>
-	      <string>markup.underline.link.markdown</string>
+	      <string>markup.underline.link.markdown, markup.underline.link.markdown comment</string>
 	      <key>settings</key>
 	      <dict>
 	        <key>fontStyle</key>
@@ -605,6 +605,19 @@
 	        <string>#cb4b16</string>
 	      </dict>
 	    </dict>
+		<dict>
+	      <key>name</key>
+	      <string>link</string>
+	      <key>scope</key>
+	      <string>meta.link.inline.description.markdown storage.class</string>
+	      <key>settings</key>
+	      <dict>
+	        <key>fontStyle</key>
+	        <string>underline</string>
+	        <key>foreground</key>
+	        <string>#cb4b16</string>
+	      </dict>
+	    </dict>
 
 
 	    <!-- tags -->
@@ -612,7 +625,7 @@
 	      <key>name</key>
 	      <string>Markup: Zettelkasten tag</string>
 	      <key>scope</key>
-	      <string>markup.zettel.tag</string>
+	      <string>markup.zettel.tag, markup.zettel.tag markup.italic</string>
 	      <key>settings</key>
 	      <dict>
 	        <key>fontStyle</key>
