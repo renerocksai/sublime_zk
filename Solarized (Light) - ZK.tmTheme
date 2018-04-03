@@ -583,6 +583,19 @@
 	      <key>name</key>
 	      <string>link</string>
 	      <key>scope</key>
+	      <string>meta.link.inline.description.markdown, string.other.link.title, meta.link.inline.description.markdown storage.class</string>
+	      <key>settings</key>
+	      <dict>
+	        <key>fontStyle</key>
+	        <string>underline</string>
+	        <key>foreground</key>
+	        <string>#2aa198</string>
+	      </dict>
+	    </dict>
+		<dict>
+	      <key>name</key>
+	      <string>link</string>
+	      <key>scope</key>
 	      <string>markup.underline.link.markdown, markup.underline.link.markdown comment</string>
 	      <key>settings</key>
 	      <dict>
@@ -590,32 +603,6 @@
 	        <string>underline</string>
 	        <key>foreground</key>
 	        <string>#268bd2</string>
-	      </dict>
-	    </dict>
-		<dict>
-	      <key>name</key>
-	      <string>link</string>
-	      <key>scope</key>
-	      <string>meta.link.inline.description.markdown</string>
-	      <key>settings</key>
-	      <dict>
-	        <key>fontStyle</key>
-	        <string>underline</string>
-	        <key>foreground</key>
-	        <string>#cb4b16</string>
-	      </dict>
-	    </dict>
-		<dict>
-	      <key>name</key>
-	      <string>link</string>
-	      <key>scope</key>
-	      <string>meta.link.inline.description.markdown storage.class</string>
-	      <key>settings</key>
-	      <dict>
-	        <key>fontStyle</key>
-	        <string>underline</string>
-	        <key>foreground</key>
-	        <string>#cb4b16</string>
 	      </dict>
 	    </dict>
 
@@ -645,7 +632,7 @@
 	      <key>settings</key>
 	      <dict>
 	        <key>foreground</key>
-	        <string>#cb4b16</string>
+	        <string>#2aa198</string>
 	      </dict>
 		 </dict>
 	    <dict>
@@ -663,7 +650,7 @@
 	      <key>name</key>
 	      <string>Markup: Zettelkasten Image attrs in image link</string>
 	      <key>scope</key>
-	      <string>meta.image.inline.markdown.imageattr</string>
+	      <string>meta.image.inline.markdown.imageattr,punctuation.definition.imageattr</string>
 	      <key>settings</key>
 	      <dict>
 	        <key>foreground</key>
