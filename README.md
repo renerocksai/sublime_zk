@@ -39,7 +39,9 @@ See the [Usage](#usage) section below to see how this package might support your
 * [Inline Local Image Display](#inline-local-image-display)
 * [Automatic Table Of Contents](#automatic-table-of-contents)
 * [Automatic Section Numbering](#automatic-section-numbering)
-* **NEW**: [Support for Panes](#working-with-panes)
+* [Support for Panes](#working-with-panes)
+* **NEW:** [Color Schemes](#monokai-extended-color-scheme)
+
 
 ## Contents
 * [Installation](#installation)
@@ -60,6 +62,11 @@ See the [Usage](#usage) section below to see how this package might support your
     * [New Note templates](#new-note-templates)
     * [Highlight references to other notes](#highlight-references-to-other-notes)
     * [Syntax Coloring for #tags, footnotes, and pandoc references](#syntax-coloring-for-tags-footnotes-and-pandoc-references)
+        * [Monokai Extended Color Scheme](#monokai-extended-color-scheme)
+        * [Solarized Color Scheme](#solarized-color-scheme)
+        * [Commodore 64 Color Scheme](#commodore-64-color-scheme)
+        * [Honorable Mention: Zettel Coffee Color Scheme](#honorable-mention-zettel-coffee-color-scheme)
+        * [Rolling your own Color Scheme](#rolling-your-own-color-scheme)
     * [Configuring SublimeText's line spacing](#configuring-sublimetexts-line-spacing)
     * [Location of your .bib file](#location-of-your-bib-file)
     * [Citation Reference Style](#citation-reference-style)
@@ -209,6 +216,7 @@ The following setting influences the note ID format:
 There are numerous times where the plugin inserts a `[[link]]` to a note into your text on your behalf. You may not only choose the single or double-bracketness of the links, you may also choose whether the **note title** should follow the inserted link.
 
 The setting `"insert_links_with_titles"` takes care of that and is set to `false` by default:
+
 ```
 // links like "[[199901012359]] and note title" instead of "[[199901012359]]"
 "insert_links_with_titles": false,
@@ -349,9 +357,78 @@ It also shows a bookmark symbol in the gutter to the left of your text. These fe
 
 To enable highlighting of #tags, footnotes, and pandoc references in your newly created note, and for all your Zettelkasten notes, switch Sublime Text's syntax to `Markdown Zettelkasten`. You can use the menu: 'View' -> 'Syntax' -> 'Open all with current extension as...', and select 'Markdown Zettelkasten'.
 
-**Note: To get you started, this package provides the color scheme `Monokai Extended - Zettelkasten`**. You can select it via the menu: Preferences -> Color Scheme... -> Monokai Extended - Zettelkasten. _(The original Monokai Extended for SublimeText has been created by [@jonschlinkert](https://github.com/jonschlinkert/sublime-monokai-extended))._
+#### Monokai Extended Color Scheme
 
-If you want to use your own color scheme, you have to manually tweak it:
+This package provides the color scheme `Monokai Extended - Zettelkasten`. You can select it via the menu: Preferences -> Color Scheme... -> Monokai Extended - Zettelkasten. _(The original Monokai Extended for SublimeText has been created by [@jonschlinkert](https://github.com/jonschlinkert/sublime-monokai-extended))._
+
+The _Monokai Extended - Zettelkasten_ color scheme is used for illustrations in this README.
+
+To enable this color scheme for (just) your Zettelkasten notes automatically, stick the following into the `sublime_zk.sublime-settings`:
+
+```json
+    "color_scheme": "Packages/sublime_zk/Solarized (Light) - ZK.tmTheme",
+```
+
+#### Solarized Color Scheme
+
+![solarized](https://user-images.githubusercontent.com/30892199/38279419-7f1219e8-37a0-11e8-80e2-9ec9dd17f3a3.png)
+
+This color scheme is installed under the name `Solarized (Light)-ZK`.
+
+If you want the best Solarized aesthetics, [download](https://assets.ubuntu.com/v1/fad7939b-ubuntu-font-family-0.83.zip) the [Ubuntu Mono](https://design.ubuntu.com/font/) fonts and install the following 4 by double-clicking them:
+
+* `UbuntuMono-R.ttf`
+* `UbuntuMono-RI.ttf`
+* `UbuntuMono-B.ttf`
+* `UbuntuMono-BI.ttf`
+
+and then experiment with these settings in `sublime_zk.sublime-settings`:
+
+```json
+    // Solarized like The Archive
+    "font_face": "Ubuntu Mono",
+    "color_scheme": "Packages/sublime_zk/Solarized (Light) - ZK.tmTheme",
+    "font_size": 16,
+    "line_padding_bottom": 4,
+    "line_padding_top": 4,
+    "line_numbers": false,
+    "gutter": true,
+    "margin": 60,
+```
+
+
+#### Commodore 64 Color Scheme
+
+If you know what a Commodore 64 is, you might enjoy this theme :smile:
+
+![c64](https://user-images.githubusercontent.com/30892199/38334682-49ee899c-385c-11e8-8a60-d3be99609f10.png)
+
+For a perfect C64 experience, [download](http://style64.org/file/C64_TrueType_v1.2-STYLE.zip) the [best C64 True Type Font](http://style64.org/release/c64-truetype-v1.2-style), unzip it, and install the `C64 Pro Mono.ttf` by double clicking it.
+
+I used the following `sublime_zk.sublime-settings` for the screen-shot:
+
+```json
+    "font_face": "C64 Pro Mono",     // only if you have them installed
+    "color_scheme": "Packages/sublime_zk/C64-ZK.tmTheme",
+    "font_size": 12,
+    "line_padding_bottom": 4,
+    "line_padding_top": 4,
+    "line_numbers": false,
+    "gutter": true,
+    "margin": 80,
+    "wrap_width": 80,
+```
+
+
+#### Honorable Mention: Zettel Coffee Color Scheme
+
+If you're interested in a color scheme that attempts to resemble the nvALT scheme, then check out [Zettel Coffee](https://forum.zettelkasten.de/discussion/comment/1214/#Comment_1214).
+
+
+
+#### Rolling your own Color Scheme
+
+If you want to use your own color scheme, you have to tweak it manually:
 
 * Google is your friend - make a copy of your existing color scheme
 * Add the following to your new color scheme
