@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>comment</key>
+	<string>Rene Schallner</string>
+	<key>name</key>
+	<string>Commodore 64</string>
+	<key>semanticClass</key>
+	<string>terminal.c64</string>
+	<key>colorSpaceName</key>
+	<string>sRGB</string>
+	<key>settings</key>
+	<array>
+		<dict>
+			<key>name</key>
+			<string>GitGutter deleted</string>
+			<key>scope</key>
+			<string>markup.deleted.git_gutter</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#9494e0</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>GitGutter changed</string>
+			<key>scope</key>
+			<string>markup.changed.git_gutter</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#9494e0</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>GitGutter inserted</string>
+			<key>scope</key>
+			<string>markup.inserted.git_gutter</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#9494e0</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#4443a6</string>
+				<key>caret</key>
+				<string>#9494e0</string>
+				<key>foreground</key>
+				<string>#9494e0</string>
+				<key>invisibles</key>
+				<string>#5151ad</string>
+				<key>lineHighlight</key>
+				<string>#5151ad</string>
+				<key>selection</key>
+				<string>#5151ad</string>
+				<key>gutter</key>
+				<string>#4443a6</string>
+
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Text</string>
+			<key>scope</key>
+			<string>variable.parameter.function</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#9494e0</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Comments</string>
+			<key>scope</key>
+			<string>comment, punctuation.definition.comment</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#9494e0</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Punctuation</string>
+			<key>scope</key>
+			<string>punctuation.definition.string, punctuation.definition.variable, punctuation.definition.string, punctuation.definition.parameters, punctuation.definition.string, punctuation.definition.array</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#9494e0</string>
+			</dict>
+		</dict>
+
+
+		<!-- more specific stuff -->
+
+
+		<!-- emphasis & bold -->
+		<dict>
+			<key>name</key>
+			<string>Markdown em</string>
+			<key>scope</key>
+			<string>markup.italic</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>italic</string>
+				<key>foreground</key>
+				<string>#9494e0</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Markdown em</string>
+			<key>scope</key>
+			<string>punctuation.definition.italic.begin.markdown, punctuation.definition.italic.end.markdown</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>italic</string>
+				<key>foreground</key>
+				<string>#9494e0</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>Name</key>
+			<string>Markdown strong</string>
+			<key>scope</key>
+			<string>punctuation.definition.bold.begin.markdown, punctuation.definition.bold.end.markdown</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#6463c6</string>
+				<key>fontStyle</key>
+				<string>default</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>Name</key>
+			<string>Markdown stronger</string>
+			<key>scope</key>
+			<string>markup.bold.markdown</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#9494e0</string>
+				<key>foreground</key>
+				<string>#4443a6</string>
+				<key>fontStyle</key>
+				<string>bold</string>
+			</dict>
+		</dict>
+
+		<!-- headings -->
+		<dict>
+			<key>Name</key>
+			<string>Markdown heading</string>
+			<key>scope</key>
+			<string>markup.heading, punctuation.definition.heading.markdown</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#9494e0</string>
+				<key>foreground</key>
+				<string>#4443a6</string>
+				<key>fontStyle</key>
+				<string>bold</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>Name</key>
+			<string>Markdown heading</string>
+			<key>scope</key>
+			<string>entity.name.section.markdown</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#9494e0</string>
+				<key>foreground</key>
+				<string>#4443a6</string>
+				<key>fontStyle</key>
+				<string>bold</string>
+			</dict>
+		</dict>
+
+
+
+
+		<!-- code blocks -->
+	    <dict>
+	      <key>name</key>
+	      <string>Markdown: Raw Block fenced</string>
+	      <key>scope</key>
+	      <string>markup.raw.block.fenced.markdown, markup.raw.code-fence.markdown</string>
+	      <key>settings</key>
+	      <dict>
+				<key>background</key>
+				<string>black</string>
+				<key>foreground</key>
+				<string>gray</string>
+				<key>fontStyle</key>
+				<string>bold</string>
+	      </dict>
+	    </dict>
+
+	    <!-- just blocks -->
+	    <dict>
+	      <key>name</key>
+	      <string>Markup: Raw block</string>
+	      <key>scope</key>
+	      <string>markup.raw.block, markup.raw.inline.markdown</string>
+	      <key>settings</key>
+	      <dict>
+				<key>background</key>
+				<string>black</string>
+				<key>foreground</key>
+				<string>gray</string>
+				<key>fontStyle</key>
+				<string>bold</string>
+	      </dict>
+	    </dict>
+
+
+		<!-- note links -->
+		<dict>
+	      <key>name</key>
+	      <string>Markup: Zettelkasten note link</string>
+	      <key>scope</key>
+	      <string>markup.zettel.link</string>
+	      <key>settings</key>
+	      <dict>
+	        <key>fontStyle</key>
+	        <string>underline</string>
+			<key>foreground</key>
+			<string>#9494e0</string>
+	      </dict>
+	    </dict>
+	    <dict>
+	      <key>name</key>
+	      <string>Markup: Zettelkasten note link title</string>
+	      <key>scope</key>
+	      <string>markup.zettel.linktitle</string>
+	      <key>settings</key>
+	      <dict>
+	        <key>fontStyle</key>
+	        <string>underline</string>
+	        <key>foreground</key>
+	        <string>#9494e0</string>
+	      </dict>
+	    </dict>
+
+	    <!-- normal links -->
+		<dict>
+	      <key>name</key>
+	      <string>link</string>
+	      <key>scope</key>
+	      <string>meta.link.inline.description.markdown, string.other.link.title, meta.link.inline.description.markdown storage.class</string>
+	      <key>settings</key>
+	      <dict>
+	        <key>foreground</key>
+	        <string>#9494e0</string>
+	      </dict>
+	    </dict>
+		<dict>
+	      <key>name</key>
+	      <string>link</string>
+	      <key>scope</key>
+	      <string>markup.underline.link.markdown, markup.underline.link.markdown comment</string>
+	      <key>settings</key>
+	      <dict>
+	        <key>fontStyle</key>
+	        <string>underline italic</string>
+	        <key>foreground</key>
+	        <string>#9494e0</string>
+	      </dict>
+	    </dict>
+
+
+	    <!-- tags -->
+	    <dict>
+	      <key>name</key>
+	      <string>Markup: Zettelkasten tag</string>
+	      <key>scope</key>
+	      <string>markup.zettel.tag, markup.zettel.tag markup.italic</string>
+	      <key>settings</key>
+	      <dict>
+	        <key>fontStyle</key>
+	        <string>italic</string>
+	        <key>foreground</key>
+	        <string>#9494e0</string>
+	      </dict>
+	    </dict>
+
+
+		 <!-- images -->
+	    <dict>
+	      <key>name</key>
+	      <string>Markup: Image caption</string>
+	      <key>scope</key>
+	      <string>meta.image.inline.description.markdown</string>
+	      <key>settings</key>
+	      <dict>
+	        <key>foreground</key>
+	        <string>gray</string>
+	      </dict>
+		 </dict>
+	    <dict>
+	      <key>name</key>
+	      <string>Markup: Image Link</string>
+	      <key>scope</key>
+	      <string>markup.underline.link.image.markdown</string>
+	      <key>settings</key>
+	      <dict>
+	        <key>fontStyle</key>
+	        <string>underline italic</string>
+	        <key>foreground</key>
+	        <string>#9494e0</string>
+	      </dict>
+		 </dict>
+	   	<dict>
+	      <key>name</key>
+	      <string>Markup: Zettelkasten Image attrs in image link</string>
+	      <key>scope</key>
+	      <string>meta.image.inline.markdown.imageattr,punctuation.definition.imageattr</string>
+	      <key>settings</key>
+	      <dict>
+	        <key>foreground</key>
+	        <string>#9494e0</string>
+	      </dict>
+		 </dict>
+
+		<!-- citekeys -->
+	    <dict>
+	      <key>name</key>
+	      <string>Constant: User-defined</string>
+	      <key>scope</key>
+	      <string>text.html.markdown.multimarkdown.custom text.html.markdown.multimarkdown meta.content.multimarkdown constant.other.reference.link.markdown</string>
+	      <key>settings</key>
+	      <dict>
+			<key>fontStyle</key>
+			<string>italic</string>
+	        <key>foreground</key>
+	        <string>gray</string>
+	      </dict>
+	    </dict>
+	    <dict>
+	      <key>name</key>
+	      <string>Constant: User-defined</string>
+	      <key>scope</key>
+	      <string>meta.link.reference.def.markdown constant.other.reference.link.markdown</string>
+	      <key>settings</key>
+	      <dict>
+	        <key>foreground</key>
+	        <string>gray</string>
+	      </dict>
+	    </dict>
+
+		<!-- footnotes -->
+		<dict>
+			<key>name</key>
+			<string>Markdown Footnote</string>
+			<key>scope</key>
+			<string>support.function.footnote.markdown</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>yellow</string>
+			</dict>
+		</dict>
+
+		<!-- quotes  -->
+		<dict>
+			<key>name</key>
+			<string>Markdown Quote</string>
+			<key>scope</key>
+			<string>markup.quote.markdown, markup.quote.markdown comment</string>  <!-- + comment for MarkdownHighlighting -->
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>italic</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Markdown Quote gt</string>
+			<key>scope</key>
+			<string>comment punctuation.definition.blockquote.markdown, punctuation.definition.blockquote.markdown</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>italic</string>
+				<key>foreground</key>
+				<string>gray</string>
+			</dict>
+		</dict>
+
+
+
+		<!-- comment -->
+		<dict>
+			<key>name</key>
+			<string>Comment</string>
+			<key>scope</key>
+			<string>comment</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>9494e0</string>
+			</dict>
+		</dict>
+
+		<!-- list -->
+		<dict>
+			<key>name</key>
+			<string>Comment</string>
+			<key>scope</key>
+			<string>markup.list.numbered.bullet, markup.list.unnumbered.bullet</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>gray</string>
+			</dict>
+		</dict>
+
+
+		
+
+	</array>
+	<key>uuid</key>
+	<string>626ece60-29e7-11e3-8224-0800200c9a66</string>
+</dict>
+</plist>

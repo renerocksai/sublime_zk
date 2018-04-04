@@ -777,6 +777,17 @@
 			</dict>
 		</dict>
 
+		<dict>
+			<key>Name</key>
+			<string>Markdown stronger</string>
+			<key>scope</key>
+			<string>text.html.markdown.multimarkdown.custom text.html.markdown.multimarkdown meta.content.multimarkdown meta.paragraph.markdown markup.bold.markdown</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>bold</string>
+			</dict>
+		</dict>
 
 		<!-- Sublime Bracket Highlighter -->
 		<dict>
