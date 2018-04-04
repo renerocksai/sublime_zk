@@ -366,7 +366,7 @@ The _Monokai Extended - Zettelkasten_ color scheme is used for illustrations in 
 To enable this color scheme for (just) your Zettelkasten notes automatically, stick the following into the `sublime_zk.sublime-settings`:
 
 ```json
-    "color_scheme": "Packages/sublime_zk/Solarized (Light) - ZK.tmTheme",
+    "color_scheme": "Packages/sublime_zk/Monokai Extended-zk.tmTheme",
 ```
 
 #### Solarized Color Scheme
