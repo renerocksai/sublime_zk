@@ -359,6 +359,8 @@ To enable highlighting of #tags, footnotes, and pandoc references in your newly 
 
 #### Monokai Extended Color Scheme
 
+![default](https://user-images.githubusercontent.com/30892199/32641875-b241e6fa-c5d0-11e7-819a-4705396f633b.png)
+
 This package provides the color scheme `Monokai Extended - Zettelkasten`. You can select it via the menu: Preferences -> Color Scheme... -> Monokai Extended - Zettelkasten. _(The original Monokai Extended for SublimeText has been created by [@jonschlinkert](https://github.com/jonschlinkert/sublime-monokai-extended))._
 
 The _Monokai Extended - Zettelkasten_ color scheme is used for illustrations in this README.
@@ -421,6 +423,8 @@ I used the following `sublime_zk.sublime-settings` for the screen-shot:
 
 
 #### Honorable Mention: Zettel Coffee Color Scheme
+
+![zettelcoffee](https://forum.zettelkasten.de/uploads/editor/xa/ogkjlnccbv5m.png)
 
 If you're interested in a color scheme that attempts to resemble the nvALT scheme, then check out [Zettel Coffee](https://forum.zettelkasten.de/discussion/comment/1214/#Comment_1214).
 
