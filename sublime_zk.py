@@ -60,14 +60,16 @@ class ZkConstants:
 
 class ZKMode:
     ZKM_Results_Syntax_File = 'Packages/sublime_zk/zk-mode/sublime_zk_results.sublime-syntax'
+    ZKM_SavedSearches_Syntax_File = 'Packages/sublime_zk/zk-mode/sublime_zk_search.sublime-syntax'
+    ZKM_SavedSearches_File = '.saved_searches.zks'
+
+    @staticmethod
+    def saved_searches_file(folder):
+        """ Return the name of the external search results file. """
+        return os.path.join(folder, ZKMode.ZKM_SavedSearches_File)
 
     @staticmethod
     def do_layout(window):
-        window.run_command('set_layout', {
-            'cols': [0.0, 0.7, 1.0],
-            'rows': [0.0, 1.0],
-            'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
-        })
         window.run_command('set_layout', {
             'cols': [0.0, 0.7, 1.0],
             'rows': [0.0, 0.8, 1.0],
@@ -124,7 +126,23 @@ ctrl  + .      ...  Create list of referencing notes in the
                                                 'show_all_tags_in_new_pane')
 
         # now open saved searches
+        searches_file = ZKMode.saved_searches_file(folder)
+        if not os.path.exists(searches_file):
+            with open(searches_file, mode='w', encoding='utf-8') as f:
+                f.write("""
+# Saved Searches
 
+All Notes: [!
+All Tags:  #!
+
+## tag1 or tag2
+Tag1andTag2: #tag1 #tag2
+## tag1 and not tag2
+Complex: #tag1, !#tag2
+""")
+        new_view = window.open_file(searches_file)
+        window.set_view_index(new_view, 2, 0)
+        new_view.set_syntax_file(ZKMode.ZKM_SavedSearches_Syntax_File)
         window.focus_group(PANE_FOR_OPENING_NOTES)
 
 
