@@ -1503,6 +1503,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         if the_file:
             new_view = window.open_file(the_file)
             window.set_view_index(new_view, PANE_FOR_OPENING_NOTES, 0)
+            new_view.set_syntax_file(ZkConstants.Syntax_File)
         else:
             # suppose you have entered "[[my new note]]", then we are going to
             # create "201710201631 my new note.md". We will also add a link
@@ -1529,6 +1530,8 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
             origin_id, origin_title = get_note_id_and_title_of(self.view)
             create_note(the_file, selected_text, origin_id, origin_title)
             new_view = window.open_file(the_file)
+            new_view.set_syntax_file(ZkConstants.Syntax_File)
+
 
     def want_event(self):
         # unused
