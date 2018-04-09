@@ -8,7 +8,7 @@
                                        The SublimeText Zettelkasten
 """
 import sublime, sublime_plugin, os, re, subprocess, glob, datetime
-from collections import defaultdict
+from collections import defaultdict, deque
 import threading
 import io
 from subprocess import Popen, PIPE
@@ -68,6 +68,11 @@ class ZKMode:
             'rows': [0.0, 1.0],
             'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
         })
+        window.run_command('set_layout', {
+            'cols': [0.0, 0.7, 1.0],
+            'rows': [0.0, 0.8, 1.0],
+            'cells': [[0, 0, 1, 2], [1, 0, 2, 1], [1,1,2,2]]
+        })
 
     @staticmethod
     def enter(window):
@@ -96,17 +101,19 @@ class ZKMode:
         lines = """
 # Welcome to Zettelkasten Mode!
 
-#!  ...  Show all Tags
-#?  ...  Browse & insert tag
-[!  ...  Show all notes
-[[  ...  Browse notes & insert link
+ #!  ...  Show all Tags
+ [!  ...  Show all notes
+ #?  ...  Browse & insert tag
+ [[  ...  Browse notes & insert link
 
 shift + enter  ...  Create new note
 ctrl  + enter  ...  Follow link under cursor and open note
-ctrl  + enter  ...  Follow #tag or citekey under cursor and show referencing notes
+ctrl  + enter  ...  Follow #tag or citekey under cursor and 
+                    show referencing notes
 alt   + enter  ...  Show notes referencing link under cursor
-ctrl  + .      ...  Create list of referencing notes in the current note
-            (link, #tag, or citekey under cursor)
+ctrl  + .      ...  Create list of referencing notes in the 
+                    current note
+                    (link, #tag, or citekey under cursor)
 """.split('\n')
         if not os.path.exists(results_file):
             # create it
@@ -115,6 +122,9 @@ ctrl  + .      ...  Create list of referencing notes in the current note
         # now open and show the file
         ExternalSearch.show_search_results(window, folder, 'Welcome', lines,
                                                 'show_all_tags_in_new_pane')
+
+        # now open saved searches
+
         window.focus_group(PANE_FOR_OPENING_NOTES)
 
 
@@ -196,6 +206,9 @@ class TagSearch:
         Return ids of all notes matching the search_spec.
         """
         note_tag_map = find_all_notes_all_tags_in(folder, extension)
+        print('Note Tag Map for ', folder, extension)
+        for k,v in note_tag_map.items():
+            print('{} : {}'.format(k, v))
         for sterm in [s.strip() for s in search_spec.split(',')]:
             # iterate through all notes and apply the search-term
             sterm_results = {}
@@ -598,8 +611,9 @@ class ExternalSearch:
         if ExternalSearch.EXTERNALIZE:
             with open(ExternalSearch.external_file(folder), mode='w',
                     encoding='utf-8') as f:
+                f.write('\n# All Tags\n\n')
                 for tag in sorted(tags):
-                    f.write(u' {}\n'.format(tag))
+                    f.write(u'* {}\n'.format(tag))
         return list(tags)
 
     @staticmethod
@@ -607,7 +621,7 @@ class ExternalSearch:
         """
         Return a dict {note_id: tags}.
         """
-        args = [ExternalSearch.SEARCH_COMMAND, '--nocolor']
+        args = [ExternalSearch.SEARCH_COMMAND, '--nocolor', '--ackmate']
         args.extend(['--nonumbers', '-o', '--silent', '-G', '.*\\' + extension,
             ZkConstants.RE_TAGS(), folder])
         ag_out = ExternalSearch.run(args, folder)
@@ -615,13 +629,27 @@ class ExternalSearch:
             return {}
         note_tags = defaultdict(list)
         note_id = None
-        # ag output different to terminal output
-        for line in ag_out.split('\n'):
-            if not ':' in line:
+
+        lines = deque(ag_out.split('\n'))
+        lindex = 0
+        num_lines = len(lines)
+
+        while lines:
+            line = lines.popleft()
+            if not line.startswith(':'):
                 continue
-            filn, tag = line.rsplit(':', 1)
-            note_id = get_note_id_of_file(filn)
-            note_tags[note_id].append(tag)
+            note_id = get_note_id_of_file(line[1:])
+            line = lines.popleft()
+            while line: # until newline 
+                # parse findspec
+                positions, txt_line = line.split(':', 1)
+                for position in positions.split(','):
+                    start, width = position.split()
+                    start = int(start)
+                    width = int(width)
+                    tag = txt_line[start:start+width]
+                    note_tags[note_id].append(tag.strip())
+                line = lines.popleft()
         return note_tags
 
     @staticmethod
@@ -672,7 +700,7 @@ class ExternalSearch:
         Return output of stdout as string.
         """
         output = b''
-        verbose = False
+        verbose = True
         if verbose:
             print('cmd:', ' '.join(args))
         try:
@@ -722,7 +750,7 @@ class ExternalSearch:
                     column = 1
                 results.sort(key=itemgetter(column))
                 for note_id, title in results:
-                        f.write(u'{}{}{} {}\n'.format(link_prefix, note_id,
+                        f.write(u'* {}{}{} {}\n'.format(link_prefix, note_id,
                             link_postfix, title))
 
     @staticmethod
@@ -1701,7 +1729,10 @@ class ZkShowAllTagsCommand(sublime_plugin.WindowCommand):
         extension = settings.get('wiki_extension')
         tags = find_all_tags_in(folder, extension)
         tags.sort()
-        lines = '\n'.join([' ' + tag for tag in tags])
+        lines = '# All Tags\n'
+        print(lines)
+        lines += '\n'.join(['* ' + tag for tag in tags])
+        print(lines)
 
         if ExternalSearch.EXTERNALIZE and not F_EXT_SEARCH:
             with open(ExternalSearch.external_file(folder), mode='w',
@@ -1735,7 +1766,7 @@ class ZkShowAllNotesCommand(sublime_plugin.WindowCommand):
                         note_id_matcher.match(os.path.basename(f))]
         note_files_str = '\n'.join(note_files)
         ExternalSearch.externalize_note_links(note_files_str, folder, extension,
-            prefix='# All Notes:')
+            prefix='\n# All Notes:')
         lines = open(ExternalSearch.external_file(folder), mode='r', 
             encoding='utf-8', errors='ignore').read().split('\n')
         ExternalSearch.show_search_results(self.window, folder, 'Notes', lines,
@@ -1778,7 +1809,7 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
         note_ids = TagSearch.advanced_tag_search(input_text, self.folder,
             self.extension)
         link_prefix, link_postfix = get_link_pre_postfix()
-        lines = ['Notes matching search-spec ' + input_text + '\n']
+        lines = ['\n# Notes matching search-spec ' + input_text + '\n']
         results = []
         for note_id in [n for n in note_ids if n]:  # Strip the None
             filn = note_file_by_id(note_id, self.folder, self.extension)
@@ -1795,7 +1826,7 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
             column = 1
         results.sort(key=itemgetter(column))
         for note_id, title in results:
-            line = link_prefix + note_id + link_postfix + ' '
+            line = '* ' + link_prefix + note_id + link_postfix + ' '
             line += title
             lines.append(line)
         if ExternalSearch.EXTERNALIZE:
