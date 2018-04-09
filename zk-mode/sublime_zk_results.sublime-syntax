@@ -42,31 +42,6 @@ contexts:
       pop: true
       set: body
   body:
-    - match: |-
-        (?x)^
-        (?= [ ]{,3}>.
-        | ([ ]{4}|\t)(?!$)
-        | [#]{1,6}\s*+
-        | [ ]{,3}(?<marker>[-*_])([ ]{,2}\k<marker>){2,}[ \t]*+$
-        )
-      comment: |
-        We could also use an empty end match and set
-                applyEndPatternLast, but then we must be sure that the begin
-                pattern will only match stuff matched by the sub-patterns.
-      push:
-        - meta_scope: meta.block-level.markdown
-        - match: |-
-            (?x)^
-            (?! [ ]{,3}>.
-            | ([ ]{4}|\t)
-            | [#]{1,6}\s*+
-            | [ ]{,3}(?<marker>[-*_])([ ]{,2}\k<marker>){2,}[ \t]*+$
-            )
-          pop: true
-        - include: block_quote
-        - include: block_raw
-        - include: heading
-        - include: separator
     - match: ''
       push: scope:text.html.markdown.multimarkdown
       with_prototype:

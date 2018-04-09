@@ -1502,6 +1502,36 @@
       </dict>
     </dict>
 
+
+    <dict>
+      <key>name</key>
+      <string>Markup: Zettelkasten search name</string>
+      <key>scope</key>
+      <string>markup.zettel.search.name</string>
+      <key>settings</key>
+      <dict>
+        <key>fontStyle</key>
+        <string>italic</string>
+      </dict>
+    </dict>
+    <dict>
+      <key>name</key>
+      <string>Markup: Zettelkasten search spec</string>
+      <key>scope</key>
+      <string>markup.zettel.search.spec</string>
+      <key>settings</key>
+      <dict>
+        <key>fontStyle</key>
+        <string>italic</string>
+        <key>foreground</key>
+        <string>black</string>
+        <key>background</key>
+        <string>#99ccff</string>
+
+      </dict>
+    </dict>
+
+
     <dict>
       <key>name</key>
       <string>Markup: Zettelkasten Image attrs in image link</string>

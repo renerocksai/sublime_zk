@@ -42,31 +42,6 @@ contexts:
       pop: true
       set: body
   body:
-    - match: |-
-        (?x)^
-        (?= [ ]{,3}>.
-        | ([ ]{4}|\t)(?!$)
-        | [#]{1,6}\s*+
-        | [ ]{,3}(?<marker>[-*_])([ ]{,2}\k<marker>){2,}[ \t]*+$
-        )
-      comment: |
-        We could also use an empty end match and set
-                applyEndPatternLast, but then we must be sure that the begin
-                pattern will only match stuff matched by the sub-patterns.
-      push:
-        - meta_scope: meta.block-level.markdown
-        - match: |-
-            (?x)^
-            (?! [ ]{,3}>.
-            | ([ ]{4}|\t)
-            | [#]{1,6}\s*+
-            | [ ]{,3}(?<marker>[-*_])([ ]{,2}\k<marker>){2,}[ \t]*+$
-            )
-          pop: true
-        - include: block_quote
-        - include: block_raw
-        - include: heading
-        - include: separator
     - match: ''
       push: scope:text.html.markdown.multimarkdown
       with_prototype:
@@ -77,33 +52,6 @@ contexts:
             '2': support.function.footnote.markdown
             '3': support.function.footnote.markdown
             '4': punctuation.definition.footnote.begin.markdown
-        # [#key]: values , ... for autobib insertion mmd style
-        - match: '(\[)(#)([^]]*)(\])(:)([ ]*)(.*)'
-          captures:
-            '1': punctuation.definition.constant.markdown
-            '2': constant.other.reference.link.markdown
-            '3': constant.other.reference.link.markdown
-            '4': punctuation.definition.constant.markdown
-            '5': punctuation.separator.key-value.markdown
-            '6': meta.link.reference.def.markdown
-            '7': markup.underline.link.markdown
-        # [@pandoc] and [see @pandoc]
-        - match: '(\[[a-zA-Z:\. ]*)(@)([^]]*)(\])'
-          captures:
-            '1': punctuation.definition.footnote.begin.markdown
-            '2': constant.other.reference.link.markdown
-            '3': constant.other.reference.link.markdown
-            '4': punctuation.definition.footnote.begin.markdown
-        - match: '([\s]+|^)(@)([\S]+)'
-          captures:
-            '1': text.html.markdown.multimarkdown.custom
-            '2': constant.other.reference.link.markdown
-            '3': constant.other.reference.link.markdown
-        # all sorts of #tags
-        - match: '(\s)(#+([^#\W]|[-§]|:[a-zA-Z0-9])+)' # better real just tags matching
-          captures:
-            '1': markup.zettel.space
-            '2': markup.zettel.tag markup.italic
         # a [201701010202] note link
         - match: '([\[]?\[)([0-9.]{12,18})([^]]*)(\][\]]?)'
           captures:
@@ -116,20 +64,8 @@ contexts:
           captures:
             '1': punctuation.definition.footnote.begin.markdown
             '2': markup.zettel.link
-        # todo
-        - match: '(?i)(todo:)'
+        # a search spec
+        - match: '(^.*:\s*)(.*)'
           captures:
-            '1': string.unquoted.plain.out.yaml
-        # image links ![desc](url){attrs}
-        - match: '(!\[)(.*)(\])(\()(.*)(\))(\{)?([^\}]*)(\})?'
-          captures:
-            '1': meta.image.inline.markdown punctuation.definition.image.begin.markdown
-            '2': meta.image.inline.description.markdown
-            '3': meta.image.inline.markdown punctuation.definition.image.end.markdown
-            '4': meta.image.inline.markdown punctuation.definition.metadata.begin.markdown
-            '5': meta.image.inline.markdown markup.underline.link.image.markdown
-            '6': meta.image.inline.markdown punctuation.definition.metadata.end.markdown
-            '7': meta.image.inline.markdown punctuation.definition.imageattr.begin.markdown
-            '8': meta.image.inline.markdown.imageattr
-            '9': meta.image.inline.markdown punctuation.definition.imageattr.end.markdown
-
+            '1': markup.zettel.search.name
+            '2': markup.zettel.search.spec
