@@ -25,6 +25,7 @@ class ZkConstants:
     """
     Settings_File = 'sublime_zk.sublime-settings'
     Syntax_File = 'Packages/sublime_zk/sublime_zk.sublime-syntax'
+    ZKM_Results_Syntax_File = 'Packages/sublime_zk/zk-mode/sublime_zk_results.sublime-syntax'
     Link_Prefix = '['
     Link_Prefix_Len = len(Link_Prefix)
     Link_Postfix = ']'
@@ -521,7 +522,7 @@ class ExternalSearch:
     Static class to group all external search related functions.
     """
     SEARCH_COMMAND = 'ag'
-    EXTERNALIZE = '.search_results.md'   # '' to skip
+    EXTERNALIZE = '.search_results.zkr'   # '' to skip
 
     @staticmethod
     def search_all_tags(folder, extension):
@@ -679,6 +680,7 @@ class ExternalSearch:
         if ExternalSearch.EXTERNALIZE:
             new_view = window.open_file(ExternalSearch.external_file(folder))
             window.set_view_index(new_view, PANE_FOR_OPENING_RESULTS, 0)
+            new_view.set_syntax_file(ZkConstants.ZKM_Results_Syntax_File)
         else:
             settings = get_settings()
             new_pane = settings.get(new_pane_setting)

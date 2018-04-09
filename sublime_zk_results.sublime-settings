@@ -1,0 +1,9 @@
+{
+    "color_scheme": "Packages/sublime_zk/Solarized (Light) - ZK.tmTheme",
+    "extensions":
+    [
+        "zkr"
+    ],
+    "font_face": "consolas",
+    "font_size": 10,
+}
