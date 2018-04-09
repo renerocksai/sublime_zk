@@ -25,7 +25,6 @@ class ZkConstants:
     """
     Settings_File = 'sublime_zk.sublime-settings'
     Syntax_File = 'Packages/sublime_zk/sublime_zk.sublime-syntax'
-    ZKM_Results_Syntax_File = 'Packages/sublime_zk/zk-mode/sublime_zk_results.sublime-syntax'
     Link_Prefix = '['
     Link_Prefix_Len = len(Link_Prefix)
     Link_Postfix = ']'
@@ -57,6 +56,64 @@ class ZkConstants:
     # TOC markers
     TOC_HDR = '<!-- table of contents (auto) -->'
     TOC_END = '<!-- (end of auto-toc) -->'
+
+
+class ZKMode:
+    ZKM_Results_Syntax_File = 'Packages/sublime_zk/zk-mode/sublime_zk_results.sublime-syntax'
+
+    @staticmethod
+    def do_layout():
+        window = sublime.active_window()
+        window.run_command('set_layout', {
+            'cols': [0.0, 0.5, 1.0],
+            'rows': [0.0, 1.0],
+            'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
+        })
+
+    @staticmethod
+    def enter():
+        global PANE_FOR_OPENING_RESULTS
+        global PANE_FOR_OPENING_NOTES
+
+        PANE_FOR_OPENING_RESULTS = 1
+        PANE_FOR_OPENING_NOTES = 0
+
+        # check if we have a folder
+        window = sublime.active_window()
+        if window.project_file_name():
+            folder = os.path.dirname(window.project_file_name())
+        else:
+            # no project. try to create one
+            window.run_command('save_project_as')
+            # if after that we still have no project (user canceled save as)
+            folder = os.path.dirname(window.project_file_name())
+            if not folder:
+                # I don't know how to save_as the file so there's nothing sane I
+                # can do here. Non-obtrusively warn the user that this failed
+                window.status_message(
+                'Zettelkasten mode cannot be entered without a project or an open folder!')
+                return False
+
+        results_file = external_file(folder)
+        if not os.path.exists(results_file):
+            # create it
+            with open(results_file, mode='w', encoding='utf-8') as f:
+                f.write("""
+# Welcome to Zettelkasten Mode!
+
+#!  ...  Show all Tags
+#?  ...  Browse & insert tag
+[!  ...  Show all notes
+[[  ...  Browse notes & insert link
+
+shift + enter  ...  Create new note
+ctrl  + enter  ...  Follow link under cursor and open note
+ctrl  + enter  ...  Follow #tag or citekey under cursor and show referencing notes
+alt   + enter  ...  Show notes referencing link under cursor
+ctrl  + .      ...  Create list of referencing notes in the current note
+                    (link, #tag, or citekey under cursor)
+""")
+        # now open and show the file
 
 
 # global magic
@@ -680,7 +737,7 @@ class ExternalSearch:
         if ExternalSearch.EXTERNALIZE:
             new_view = window.open_file(ExternalSearch.external_file(folder))
             window.set_view_index(new_view, PANE_FOR_OPENING_RESULTS, 0)
-            new_view.set_syntax_file(ZkConstants.ZKM_Results_Syntax_File)
+            new_view.set_syntax_file(ZKMode.ZKM_Results_Syntax_File)
         else:
             settings = get_settings()
             new_pane = settings.get(new_pane_setting)
@@ -1648,6 +1705,37 @@ class ZkShowAllTagsCommand(sublime_plugin.WindowCommand):
                 encoding='utf-8') as f:
                 f.write(lines)
         ExternalSearch.show_search_results(self.window, folder, 'Tags', lines,
+                                                'show_all_tags_in_new_pane')
+
+class ZkShowAllNotesCommand(sublime_plugin.WindowCommand):
+    """
+    Command that creates a new view containing a sorted list of all notes
+    """
+    def run(self):
+        global F_EXT_SEARCH
+        # sanity check: do we have a project
+        if self.window.project_file_name():
+            # yes we have a project!
+            folder = os.path.dirname(self.window.project_file_name())
+        # sanity check: do we have an open folder
+        elif self.window.folders():
+            # yes we have an open folder!
+            folder = os.path.abspath(self.window.folders()[0])
+        else:
+            # don't know where to grep
+            return
+        settings = get_settings()
+        extension = settings.get('wiki_extension')
+        note_files = get_all_notes_for(folder, extension)
+        note_id_matcher = re.compile('[0-9.]{12,18}')
+        note_files = [f for f in note_files if 
+                        note_id_matcher.match(os.path.basename(f))]
+        note_files_str = '\n'.join(note_files)
+        ExternalSearch.externalize_note_links(note_files_str, folder, extension,
+            prefix='# All Notes:')
+        lines = open(ExternalSearch.external_file(folder), mode='r', 
+            encoding='utf-8', errors='ignore').read().split('\n')
+        ExternalSearch.show_search_results(self.window, folder, 'Notes', lines,
                                                 'show_all_tags_in_new_pane')
 
 
