@@ -62,16 +62,15 @@ class ZKMode:
     ZKM_Results_Syntax_File = 'Packages/sublime_zk/zk-mode/sublime_zk_results.sublime-syntax'
 
     @staticmethod
-    def do_layout():
-        window = sublime.active_window()
+    def do_layout(window):
         window.run_command('set_layout', {
-            'cols': [0.0, 0.5, 1.0],
+            'cols': [0.0, 0.7, 1.0],
             'rows': [0.0, 1.0],
             'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
         })
 
     @staticmethod
-    def enter():
+    def enter(window):
         global PANE_FOR_OPENING_RESULTS
         global PANE_FOR_OPENING_NOTES
 
@@ -79,7 +78,6 @@ class ZKMode:
         PANE_FOR_OPENING_NOTES = 0
 
         # check if we have a folder
-        window = sublime.active_window()
         if window.project_file_name():
             folder = os.path.dirname(window.project_file_name())
         else:
@@ -93,12 +91,9 @@ class ZKMode:
                 window.status_message(
                 'Zettelkasten mode cannot be entered without a project or an open folder!')
                 return False
-
-        results_file = external_file(folder)
-        if not os.path.exists(results_file):
-            # create it
-            with open(results_file, mode='w', encoding='utf-8') as f:
-                f.write("""
+        ZKMode.do_layout(window)
+        results_file = ExternalSearch.external_file(folder)
+        lines = """
 # Welcome to Zettelkasten Mode!
 
 #!  ...  Show all Tags
@@ -111,9 +106,17 @@ ctrl  + enter  ...  Follow link under cursor and open note
 ctrl  + enter  ...  Follow #tag or citekey under cursor and show referencing notes
 alt   + enter  ...  Show notes referencing link under cursor
 ctrl  + .      ...  Create list of referencing notes in the current note
-                    (link, #tag, or citekey under cursor)
-""")
+            (link, #tag, or citekey under cursor)
+""".split('\n')
+        if not os.path.exists(results_file):
+            # create it
+            with open(results_file, mode='w', encoding='utf-8') as f:
+                f.write('\n'.join(lines))
         # now open and show the file
+        ExternalSearch.show_search_results(window, folder, 'Welcome', lines,
+                                                'show_all_tags_in_new_pane')
+        window.focus_group(PANE_FOR_OPENING_NOTES)
+
 
 
 # global magic
@@ -1737,6 +1740,14 @@ class ZkShowAllNotesCommand(sublime_plugin.WindowCommand):
             encoding='utf-8', errors='ignore').read().split('\n')
         ExternalSearch.show_search_results(self.window, folder, 'Notes', lines,
                                                 'show_all_tags_in_new_pane')
+
+
+class ZkEnterZkModeCommand(sublime_plugin.WindowCommand):
+    """
+    Enters the Zettelkasten Mode
+    """
+    def run(self):
+        ZKMode.enter(self.window)
 
 
 class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
