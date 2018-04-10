@@ -1242,7 +1242,7 @@ This will:
 
 The Zettelkasten Mode allows for easy mouse navigation through your note archive.
 
-** Remember: ALT + DOUBLECLICK** is sometimes more convenient than <kbd>CTRL</kbd> + <kbd>ENTER</kbd>
+**Remember: ALT + DOUBLECLICK** is sometimes more convenient than <kbd>CTRL</kbd> + <kbd>ENTER</kbd>
 
 If your search results are empty, a little welcome text with some useful keyboard shortcuts will be displayed. If you don't have any [saved searches](#saved-searches) yet, a few sample searches will be created. This is shown in the screen-shot below:
 
