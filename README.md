@@ -41,7 +41,7 @@ See the [Usage](#usage) section below to see how this package might support your
 * [Automatic Section Numbering](#automatic-section-numbering)
 * [Support for Panes](#working-with-panes)
 * **NEW:** [Color Schemes](#monokai-extended-color-scheme)
-
+* **!!! NEW !!!** [Zettelkasten Mode](#zettelkasten-mode)
 
 ## Contents
 * [Installation](#installation)
@@ -82,6 +82,7 @@ See the [Usage](#usage) section below to see how this package might support your
         * [Implicitly creating a new note via a link](#implicitly-creating-a-new-note-via-a-link)
         * [Supported link styles](#supported-link-styles)
     * [Searching for friends](#searching-for-friends)
+    * [Listing all notes](#listing-all-notes)
     * [Working with tags](#working-with-tags)
         * [Getting an overview of all your tags](#getting-an-overview-of-all-your-tags)
         * [Experimental tag selector](#experimental-tag-selector)
@@ -355,7 +356,7 @@ It also shows a bookmark symbol in the gutter to the left of your text. These fe
 
 ### Syntax Coloring for #tags, footnotes, and pandoc references
 
-To enable highlighting of #tags, footnotes, and pandoc references in your newly created note, and for all your Zettelkasten notes, switch Sublime Text's syntax to `Markdown Zettelkasten`. You can use the menu: 'View' -> 'Syntax' -> 'Open all with current extension as...', and select 'Markdown Zettelkasten'.
+To enable highlighting of #tags, footnotes, and pandoc references in your newly created note, and for all your Zettelkasten notes, switch Sublime Text's syntax to `sublime_zk > Markdown Zettelkasten`. You can use the menu: 'View' -> 'Syntax' -> 'Open all with current extension as...', and select 'sublime_zk > Markdown Zettelkasten'.
 
 #### Monokai Extended Color Scheme
 
@@ -589,6 +590,7 @@ Please see [Working with Panes](#working-with-panes) how to configure the defaul
 * [Autocomplete to insert link](#using-auto-completion-to-insert-note-links) <kbd>ctrl</kbd> + <kbd>space</kbd>
 * [Find references](#searching-for-friends) Selector in link + <kbd>alt</kbd> + <kbd>enter</kbd>
 * [View all tags](#getting-an-overview-of-all-your-tags) <kbd>#</kbd> + <kbd>!</kbd>
+* [View all notes](#listing-all-notes) <kbd>[</kbd> + <kbd>!</kbd>
 * [Autocomplete tag](#experimental-tag-selector) <kbd>#</kbd> + <kbd>?</kbd>
 * [Find tag references](#) Selector in tag <kbd>ctrl</kbd> + <kbd>enter</kbd>
 * [Expand link inline](#inline-expansion-of-note-links) <kbd>ctrl</kbd> + <kbd>.</kbd>
@@ -811,7 +813,9 @@ Just press `[enter]` to start the search. The resulting notes will be displayed 
 
 **Note:** The *Find Results* tab will be re-used in subsequent searches. In the screenshot above I have used a split layout; the results will always show up in the tab at the bottom.
 
+### Listing all notes
 
+The shortcut <kbd>[</kbd> + <kbd>!</kbd> produces a list of all notes in the search results. This is probably most useful in [Zettelkasten Mode](#zettelkasten-mode). 
 
 ### Working with tags
 
@@ -1272,7 +1276,7 @@ The animation below shows both section (re-)numbering and auto-TOC:
 
 ### Working with Panes
 
-This only applies if you have split your window into multiple panes. By default, notes are opened in the first pane and if you have `ag` installed, search results are opened in the second pane. So in a 2-column layout notes are left and results are right. In a 2-row layout notes are at the top, results at the bottom. Notes are opened when clicking on a note-link or creating a new note, results are displayed by the various search operations, tag list, etc.
+This only applies if you have split your window into multiple panes and you are not using the [Zettelkasten Mode](#zettelkasten-mode). By default, notes are opened in the first pane and if you have `ag` installed, search results are opened in the second pane. So in a 2-column layout notes are left and results are right. In a 2-row layout notes are at the top, results at the bottom. Notes are opened when clicking on a note-link or creating a new note, results are displayed by the various search operations, tag list, etc.
 
 If you have a more complex layout or you want to change the default target panes, there is a command for you:
 
@@ -1301,6 +1305,69 @@ The plugin will remember your choices as long as SublimeText is running. To make
     "pane_for_opening_results": 1,
 ```
 
+## Zettelkasten Mode
+
+For a sublime Zettelkasten experience, you can enter the Zettelkasten mode:
+
+* bring up the command palette by pressing `[cmd]+[shift]+[p]` on macOS (`[ctrl]+[shift]+[p]` on Windows and Linux).
+* type `zk` to list the *Zettelkasten* commands.
+* select 'ZK: Enter Zettelkasten Mode'
+
+This will:
+
+* split your SublimeText window into 3 parts:
+    * the left parts where your tabbed notes are displayed
+    * the top right part where search results are displayed
+    * the bottom right part where your [saved searches](#saved-searches) are displayed
+
+The Zettelkasten Mode allows for easy mouse navigation through your note archive.
+
+**Remember: ALT + DOUBLECLICK** is sometimes more convenient than <kbd>CTRL</kbd> + <kbd>ENTER</kbd>
+
+If your search results are empty, a little welcome text with some useful keyboard shortcuts will be displayed. If you don't have any [saved searches](#saved-searches) yet, a few sample searches will be created. This is shown in the screen-shot below:
+
+![zkmode_2](https://user-images.githubusercontent.com/30892199/38537649-13d898d8-3c90-11e8-887c-126876f7a2ec.png)
+
+**Note:** If you have upgraded this package and entered the Zettelkasten Mode for the first time, SublimeText may be confused about the syntax of your notes. In that case, open a note and use the menu: 'View' -> 'Syntax' -> 'Open all with current extension as...', and select 'sublime_zk > Markdown Zettelkasten'.
+
+### Saved Searches
+
+The Zettelkasten mode introduces a saved searches file. This is a simple Text file where you can name and store search terms.
+
+Its syntax is very simple; to define a search, you just add a line, consisting of the following parts:
+
+* an optional search name
+* a colon `:`
+* a search-spec (see [advanced tag search](#advanced-tag-search) for more information)
+    * `#!` (all tags) and `[!` (all notes) are also valid search-specs
+
+The `search-spec` will be highlighted in the file, so you know exactly what will be searched for.
+
+You can place Markdown headings anywhere in the file, too, like this:
+
+```markdown
+# Tag Searches
+just one  tag:          #tag
+tag1 or  tag2:          #tag1  #tag2
+tag1 and tag2:          #tag1, #tag2
+
+# A bit more complex
+tag1 but not tag2:                 #tag1, !#tag2
+tag1 or anything that's not tag2 : #tag1 !#tag2
+
+# Wildcard searches
+anything starting with auto : #auto*
+anything starting with auto but nothing starting with plane: #auto*, !#plane*
+```
+
+You can execute the search in one of two ways:
+
+* Place the cursor on a search line (no need to hit the search spec) and press <kbd>ctrl</kbd> + <kbd>enter</kbd>
+* Press <kbd>ALT</kbd> and double-click in a search line
+
+In the animation below, the mouse was used.
+
+![zk_mode_demo](https://user-images.githubusercontent.com/30892199/38536016-0905acf6-3c87-11e8-986a-43b09b014847.gif)
 
 ## Credits
 

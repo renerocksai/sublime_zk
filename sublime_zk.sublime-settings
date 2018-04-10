@@ -77,6 +77,8 @@
     // Sort note lists (search results) by
     // - title
     // - ID       <-- default
-    "sort_notelists_by": "id"
+    "sort_notelists_by": "id",
 
+    // set to true to enable super awesome zettelkasten mode
+    "zettelkasten_mode" : true,
 }

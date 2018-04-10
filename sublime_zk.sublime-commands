@@ -15,4 +15,6 @@
     { "caption": "ZK: Remove Heading Numbers", "command": "zk_denumber_headings" },
     { "caption": "ZK: Select Panes for opening notes/results", "command": "zk_select_panes" },
     { "caption": "ZK: Insert Link", "command": "zk_get_wiki_link" },
+    { "caption": "ZK: Show all Notes", "command": "zk_show_all_notes" },
+    { "caption": "ZK: Enter Zettelkasten Mode", "command": "zk_enter_zk_mode" },
 ]

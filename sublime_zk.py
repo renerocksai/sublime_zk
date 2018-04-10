@@ -8,7 +8,7 @@
                                        The SublimeText Zettelkasten
 """
 import sublime, sublime_plugin, os, re, subprocess, glob, datetime
-from collections import defaultdict
+from collections import defaultdict, deque
 import threading
 import io
 from subprocess import Popen, PIPE
@@ -56,6 +56,95 @@ class ZkConstants:
     # TOC markers
     TOC_HDR = '<!-- table of contents (auto) -->'
     TOC_END = '<!-- (end of auto-toc) -->'
+
+
+class ZKMode:
+    ZKM_Results_Syntax_File = 'Packages/sublime_zk/zk-mode/sublime_zk_results.sublime-syntax'
+    ZKM_SavedSearches_Syntax_File = 'Packages/sublime_zk/zk-mode/sublime_zk_search.sublime-syntax'
+    ZKM_SavedSearches_File = '.saved_searches.zks'
+
+    @staticmethod
+    def saved_searches_file(folder):
+        """ Return the name of the external search results file. """
+        return os.path.join(folder, ZKMode.ZKM_SavedSearches_File)
+
+    @staticmethod
+    def do_layout(window):
+        window.run_command('set_layout', {
+            'cols': [0.0, 0.7, 1.0],
+            'rows': [0.0, 0.8, 1.0],
+            'cells': [[0, 0, 1, 2], [1, 0, 2, 1], [1,1,2,2]]
+        })
+
+    @staticmethod
+    def enter(window):
+        global PANE_FOR_OPENING_RESULTS
+        global PANE_FOR_OPENING_NOTES
+
+        PANE_FOR_OPENING_RESULTS = 1
+        PANE_FOR_OPENING_NOTES = 0
+
+        # check if we have a folder
+        if window.project_file_name():
+            folder = os.path.dirname(window.project_file_name())
+        else:
+            # no project. try to create one
+            window.run_command('save_project_as')
+            # if after that we still have no project (user canceled save as)
+            folder = os.path.dirname(window.project_file_name())
+            if not folder:
+                # I don't know how to save_as the file so there's nothing sane I
+                # can do here. Non-obtrusively warn the user that this failed
+                window.status_message(
+                'Zettelkasten mode cannot be entered without a project or an open folder!')
+                return False
+        ZKMode.do_layout(window)
+        results_file = ExternalSearch.external_file(folder)
+        lines = """# Welcome to Zettelkasten Mode!
+
+ #!  ...  Show all Tags
+ [!  ...  Show all notes
+ #?  ...  Browse & insert tag
+ [[  ...  Browse notes & insert link
+
+shift + enter  ...  Create new note
+ctrl  + enter  ...  Follow link under cursor and open note
+ctrl  + enter  ...  Follow #tag or citekey under cursor and 
+                    show referencing notes
+alt   + enter  ...  Show notes referencing link under cursor
+ctrl  + .      ...  Create list of referencing notes in the 
+                    current note
+                    (link, #tag, or citekey under cursor)
+""".split('\n')
+        if not os.path.exists(results_file):
+            # create it
+            with open(results_file, mode='w', encoding='utf-8') as f:
+                f.write('\n'.join(lines))
+        # now open and show the file
+        ExternalSearch.show_search_results(window, folder, 'Welcome', lines,
+                                                'show_all_tags_in_new_pane')
+
+        # now open saved searches
+        searches_file = ZKMode.saved_searches_file(folder)
+        if not os.path.exists(searches_file):
+            with open(searches_file, mode='w', encoding='utf-8') as f:
+                f.write("""# Saved Searches
+
+All Notes:      [!
+All Tags:       #!
+
+## tag1 or tag2
+Tag1orTag2:    #tag1 #tag2
+
+## tag1 and not tag2
+Complex:        #tag1, !#tag2
+""")
+        new_view = window.open_file(searches_file)
+        window.set_view_index(new_view, 2, 0)
+        new_view.set_syntax_file(ZKMode.ZKM_SavedSearches_Syntax_File)
+        window.focus_group(PANE_FOR_OPENING_NOTES)
+        window.set_sidebar_visible(False)
+
 
 
 # global magic
@@ -134,7 +223,16 @@ class TagSearch:
         """
         Return ids of all notes matching the search_spec.
         """
+        if search_spec.startswith('[!'):
+            sublime.active_window().run_command('zk_show_all_notes')
+            return
+        elif search_spec.startswith('#!'):
+            sublime.active_window().run_command('zk_show_all_tags')
+            return
         note_tag_map = find_all_notes_all_tags_in(folder, extension)
+        print('Note Tag Map for ', folder, extension)
+        for k,v in note_tag_map.items():
+            print('{} : {}'.format(k, v))
         for sterm in [s.strip() for s in search_spec.split(',')]:
             # iterate through all notes and apply the search-term
             sterm_results = {}
@@ -521,7 +619,7 @@ class ExternalSearch:
     Static class to group all external search related functions.
     """
     SEARCH_COMMAND = 'ag'
-    EXTERNALIZE = '.search_results.md'   # '' to skip
+    EXTERNALIZE = '.search_results.zkr'   # '' to skip
 
     @staticmethod
     def search_all_tags(folder, extension):
@@ -537,8 +635,9 @@ class ExternalSearch:
         if ExternalSearch.EXTERNALIZE:
             with open(ExternalSearch.external_file(folder), mode='w',
                     encoding='utf-8') as f:
+                f.write('# All Tags\n\n')
                 for tag in sorted(tags):
-                    f.write(u' {}\n'.format(tag))
+                    f.write(u'* {}\n'.format(tag))
         return list(tags)
 
     @staticmethod
@@ -546,7 +645,7 @@ class ExternalSearch:
         """
         Return a dict {note_id: tags}.
         """
-        args = [ExternalSearch.SEARCH_COMMAND, '--nocolor']
+        args = [ExternalSearch.SEARCH_COMMAND, '--nocolor', '--ackmate']
         args.extend(['--nonumbers', '-o', '--silent', '-G', '.*\\' + extension,
             ZkConstants.RE_TAGS(), folder])
         ag_out = ExternalSearch.run(args, folder)
@@ -554,13 +653,27 @@ class ExternalSearch:
             return {}
         note_tags = defaultdict(list)
         note_id = None
-        # ag output different to terminal output
-        for line in ag_out.split('\n'):
-            if not ':' in line:
+
+        lines = deque(ag_out.split('\n'))
+        lindex = 0
+        num_lines = len(lines)
+
+        while lines:
+            line = lines.popleft()
+            if not line.startswith(':'):
                 continue
-            filn, tag = line.rsplit(':', 1)
-            note_id = get_note_id_of_file(filn)
-            note_tags[note_id].append(tag)
+            note_id = get_note_id_of_file(line[1:])
+            line = lines.popleft()
+            while line: # until newline 
+                # parse findspec
+                positions, txt_line = line.split(':', 1)
+                for position in positions.split(','):
+                    start, width = position.split()
+                    start = int(start)
+                    width = int(width)
+                    tag = txt_line[start:start+width]
+                    note_tags[note_id].append(tag.strip())
+                line = lines.popleft()
         return note_tags
 
     @staticmethod
@@ -612,7 +725,7 @@ class ExternalSearch:
         """
         output = b''
         verbose = False
-        if verbose:
+        if verbose or True:
             print('cmd:', ' '.join(args))
         try:
             output = subprocess.check_output(args, shell=False, timeout=10000)
@@ -661,7 +774,7 @@ class ExternalSearch:
                     column = 1
                 results.sort(key=itemgetter(column))
                 for note_id, title in results:
-                        f.write(u'{}{}{} {}\n'.format(link_prefix, note_id,
+                        f.write(u'* {}{}{} {}\n'.format(link_prefix, note_id,
                             link_postfix, title))
 
     @staticmethod
@@ -679,6 +792,7 @@ class ExternalSearch:
         if ExternalSearch.EXTERNALIZE:
             new_view = window.open_file(ExternalSearch.external_file(folder))
             window.set_view_index(new_view, PANE_FOR_OPENING_RESULTS, 0)
+            new_view.set_syntax_file(ZKMode.ZKM_Results_Syntax_File)
         else:
             settings = get_settings()
             new_pane = settings.get(new_pane_setting)
@@ -1081,15 +1195,18 @@ def pandoc_citekey_at(text, pos=None):
             return text[inner:end], (inner, end)
     return '', (None, None)
 
-def select_link_in(view):
+def select_link_in(view, event=None):
     """
     Used by different commands to select the link under the cursor, if
     any.
     Return the
     """
-    region = view.sel()[0]
+    if event is None:
+        region = view.sel()[0]
+        cursor_pos = region.begin()
+    else:
+        cursor_pos = view.window_to_text((event['x'], event['y']))
 
-    cursor_pos = region.begin()
     line_region = view.line(cursor_pos)
     line_start = line_region.begin()
 
@@ -1231,7 +1348,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         new_view = self.view.window().open_file(the_file)
         self.view.window().set_view_index(new_view, PANE_FOR_OPENING_NOTES, 0)
 
-    def select_link(self):
+    def select_link(self, event=None):
         """
         Select a note-link under the cursor.
         If it's a tag, follow it by searching for tagged notes.
@@ -1242,7 +1359,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         """
         global F_EXT_SEARCH
         global PANE_FOR_OPENING_RESULTS
-        linestart_till_cursor_str, link_region = select_link_in(self.view)
+        linestart_till_cursor_str, link_region = select_link_in(self.view, event)
         link_text = ''
         link_is_citekey = False
         if link_region:
@@ -1254,7 +1371,11 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         # test if we are supposed to follow a tag
         if ZkConstants.TAG_PREFIX in linestart_till_cursor_str or '@' in linestart_till_cursor_str:
             view = self.view
-            cursor_pos = view.sel()[0].begin()
+            if event is None:
+                region = self.view.sel()[0]
+                cursor_pos = region.begin()
+            else:
+                cursor_pos = self.view.window_to_text((event['x'], event['y']))
             line_region = view.line(cursor_pos)
             line_start = line_region.begin()
             full_line = view.substr(line_region)
@@ -1321,8 +1442,64 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         extension = settings.get('wiki_extension')
         id_in_title = settings.get('id_in_title')
 
+        print('EVENT', event)
+        if event is None:
+            region = self.view.sel()[0]
+            cursor_pos = region.begin()
+        else:
+            cursor_pos = self.view.window_to_text((event['x'], event['y']))
+            print('cursor pos', cursor_pos)
+        # FIRST check if it's a saved search!!!
+        if self.view.match_selector(cursor_pos, 'markup.zettel.search'):
+                line_region = self.view.line(cursor_pos)
+                line = self.view.substr(line_region)
+                search_spec = line.split(':', 1)[1].strip()
+                print('search_spec >' + search_spec + '<')
+                self.folder = folder
+                self.extension = extension
+                input_text = search_spec
+                self.window = self.view.window()
+                #
+                # VERBATIM FROM ZkMultiTagSearchCommand.on_done:
+                #
+                note_ids = TagSearch.advanced_tag_search(input_text, self.folder,
+                    self.extension)
+                print('note_ids', note_ids)
+                if note_ids is None:
+                    return
+                link_prefix, link_postfix = get_link_pre_postfix()
+                lines = ['# Notes matching search-spec ' + input_text + '\n']
+                results = []
+                for note_id in [n for n in note_ids if n]:  # Strip the None
+                    filn = note_file_by_id(note_id, self.folder, self.extension)
+                    if filn:
+                        title = os.path.basename(filn).split(' ', 1)[1]
+                        title = title.replace(self.extension, '')
+                        results.append((note_id, title))
+                settings = get_settings()
+                sort_order = settings.get('sort_notelists_by', 'id').lower()
+                if sort_order not in ('id', 'title'):
+                    sort_order = 'id'
+                column = 0
+                if sort_order == 'title':
+                    column = 1
+                results.sort(key=itemgetter(column))
+                for note_id, title in results:
+                    line = '* ' + link_prefix + note_id + link_postfix + ' '
+                    line += title
+                    lines.append(line)
+                if ExternalSearch.EXTERNALIZE:
+                    with open(ExternalSearch.external_file(self.folder), mode='w',
+                        encoding='utf-8') as f:
+                        f.write('\n'.join(lines))
+                ExternalSearch.show_search_results(self.window, self.folder,
+                    'Tag-Search', lines, 'show_all_tags_in_new_pane')
+                # END OF VERBATIM
+                return
+
+
         window = self.view.window()
-        location = self.select_link()
+        location = self.select_link(event)
 
         if location is None:
             # no link found, not between brackets
@@ -1338,6 +1515,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         if the_file:
             new_view = window.open_file(the_file)
             window.set_view_index(new_view, PANE_FOR_OPENING_NOTES, 0)
+            new_view.set_syntax_file(ZkConstants.Syntax_File)
         else:
             # suppose you have entered "[[my new note]]", then we are going to
             # create "201710201631 my new note.md". We will also add a link
@@ -1364,6 +1542,8 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
             origin_id, origin_title = get_note_id_and_title_of(self.view)
             create_note(the_file, selected_text, origin_id, origin_title)
             new_view = window.open_file(the_file)
+            new_view.set_syntax_file(ZkConstants.Syntax_File)
+
 
     def want_event(self):
         # unused
@@ -1639,7 +1819,10 @@ class ZkShowAllTagsCommand(sublime_plugin.WindowCommand):
         extension = settings.get('wiki_extension')
         tags = find_all_tags_in(folder, extension)
         tags.sort()
-        lines = '\n'.join([' ' + tag for tag in tags])
+        lines = '# All Tags\n'
+        print(lines)
+        lines += '\n'.join(['* ' + tag for tag in tags])
+        print(lines)
 
         if ExternalSearch.EXTERNALIZE and not F_EXT_SEARCH:
             with open(ExternalSearch.external_file(folder), mode='w',
@@ -1647,6 +1830,45 @@ class ZkShowAllTagsCommand(sublime_plugin.WindowCommand):
                 f.write(lines)
         ExternalSearch.show_search_results(self.window, folder, 'Tags', lines,
                                                 'show_all_tags_in_new_pane')
+
+class ZkShowAllNotesCommand(sublime_plugin.WindowCommand):
+    """
+    Command that creates a new view containing a sorted list of all notes
+    """
+    def run(self):
+        global F_EXT_SEARCH
+        # sanity check: do we have a project
+        if self.window.project_file_name():
+            # yes we have a project!
+            folder = os.path.dirname(self.window.project_file_name())
+        # sanity check: do we have an open folder
+        elif self.window.folders():
+            # yes we have an open folder!
+            folder = os.path.abspath(self.window.folders()[0])
+        else:
+            # don't know where to grep
+            return
+        settings = get_settings()
+        extension = settings.get('wiki_extension')
+        note_files = get_all_notes_for(folder, extension)
+        note_id_matcher = re.compile('[0-9.]{12,18}')
+        note_files = [f for f in note_files if 
+                        note_id_matcher.match(os.path.basename(f))]
+        note_files_str = '\n'.join(note_files)
+        ExternalSearch.externalize_note_links(note_files_str, folder, extension,
+            prefix='# All Notes:')
+        lines = open(ExternalSearch.external_file(folder), mode='r', 
+            encoding='utf-8', errors='ignore').read().split('\n')
+        ExternalSearch.show_search_results(self.window, folder, 'Notes', lines,
+                                                'show_all_tags_in_new_pane')
+
+
+class ZkEnterZkModeCommand(sublime_plugin.WindowCommand):
+    """
+    Enters the Zettelkasten Mode
+    """
+    def run(self):
+        ZKMode.enter(self.window)
 
 
 class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
@@ -1676,8 +1898,10 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
     def on_done(self, input_text):
         note_ids = TagSearch.advanced_tag_search(input_text, self.folder,
             self.extension)
+        if note_ids is None:
+            return
         link_prefix, link_postfix = get_link_pre_postfix()
-        lines = ['Notes matching search-spec ' + input_text + '\n']
+        lines = ['# Notes matching search-spec ' + input_text + '\n']
         results = []
         for note_id in [n for n in note_ids if n]:  # Strip the None
             filn = note_file_by_id(note_id, self.folder, self.extension)
@@ -1694,7 +1918,7 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
             column = 1
         results.sort(key=itemgetter(column))
         for note_id, title in results:
-            line = link_prefix + note_id + link_postfix + ' '
+            line = '* ' + link_prefix + note_id + link_postfix + ' '
             line += title
             lines.append(line)
         if ExternalSearch.EXTERNALIZE:
