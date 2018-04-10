@@ -1511,7 +1511,7 @@
       <key>settings</key>
       <dict>
         <key>fontStyle</key>
-        <string>italic</string>
+        <string>italic bold</string>
       </dict>
     </dict>
     <dict>

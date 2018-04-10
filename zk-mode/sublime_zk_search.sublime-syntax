@@ -1,7 +1,7 @@
 %YAML 1.2
 ---
 # http://www.sublimetext.com/docs/3/syntax.html
-name: Zettelkasten-Results
+name: Zettelkasten-Saved-Searches
 file_extensions:
   - md
   - mdown

@@ -134,7 +134,7 @@ All Notes:      [!
 All Tags:       #!
 
 ## tag1 or tag2
-Tag1andTag2:    #tag1 #tag2
+Tag1orTag2:    #tag1 #tag2
 
 ## tag1 and not tag2
 Complex:        #tag1, !#tag2
@@ -1195,15 +1195,18 @@ def pandoc_citekey_at(text, pos=None):
             return text[inner:end], (inner, end)
     return '', (None, None)
 
-def select_link_in(view):
+def select_link_in(view, event=None):
     """
     Used by different commands to select the link under the cursor, if
     any.
     Return the
     """
-    region = view.sel()[0]
+    if event is None:
+        region = view.sel()[0]
+        cursor_pos = region.begin()
+    else:
+        cursor_pos = view.window_to_text((event['x'], event['y']))
 
-    cursor_pos = region.begin()
     line_region = view.line(cursor_pos)
     line_start = line_region.begin()
 
@@ -1345,7 +1348,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         new_view = self.view.window().open_file(the_file)
         self.view.window().set_view_index(new_view, PANE_FOR_OPENING_NOTES, 0)
 
-    def select_link(self):
+    def select_link(self, event=None):
         """
         Select a note-link under the cursor.
         If it's a tag, follow it by searching for tagged notes.
@@ -1356,7 +1359,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         """
         global F_EXT_SEARCH
         global PANE_FOR_OPENING_RESULTS
-        linestart_till_cursor_str, link_region = select_link_in(self.view)
+        linestart_till_cursor_str, link_region = select_link_in(self.view, event)
         link_text = ''
         link_is_citekey = False
         if link_region:
@@ -1368,7 +1371,11 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         # test if we are supposed to follow a tag
         if ZkConstants.TAG_PREFIX in linestart_till_cursor_str or '@' in linestart_till_cursor_str:
             view = self.view
-            cursor_pos = view.sel()[0].begin()
+            if event is None:
+                region = self.view.sel()[0]
+                cursor_pos = region.begin()
+            else:
+                cursor_pos = self.view.window_to_text((event['x'], event['y']))
             line_region = view.line(cursor_pos)
             line_start = line_region.begin()
             full_line = view.substr(line_region)
@@ -1435,9 +1442,14 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         extension = settings.get('wiki_extension')
         id_in_title = settings.get('id_in_title')
 
+        print('EVENT', event)
+        if event is None:
+            region = self.view.sel()[0]
+            cursor_pos = region.begin()
+        else:
+            cursor_pos = self.view.window_to_text((event['x'], event['y']))
+            print('cursor pos', cursor_pos)
         # FIRST check if it's a saved search!!!
-        region = self.view.sel()[0]
-        cursor_pos = region.begin()
         if self.view.match_selector(cursor_pos, 'markup.zettel.search'):
                 line_region = self.view.line(cursor_pos)
                 line = self.view.substr(line_region)
@@ -1487,7 +1499,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
 
 
         window = self.view.window()
-        location = self.select_link()
+        location = self.select_link(event)
 
         if location is None:
             # no link found, not between brackets
