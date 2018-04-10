@@ -39,7 +39,8 @@ See the [Usage](#usage) section below to see how this package might support your
 * [Inline Local Image Display](#inline-local-image-display)
 * [Automatic Table Of Contents](#automatic-table-of-contents)
 * [Automatic Section Numbering](#automatic-section-numbering)
-* **NEW**: [Support for Panes](#working-with-panes)
+* [Support for Panes](#working-with-panes)
+* **!!! NEW !!!** [Zettelkasten Mode](#zettelkasten-mode)
 
 ## Contents
 * [Installation](#installation)
