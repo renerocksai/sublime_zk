@@ -1246,7 +1246,7 @@ The Zettelkasten Mode allows for easy mouse navigation through your note archive
 
 If your search results are empty, a little welcome text with some useful keyboard shortcuts will be displayed. If you don't have any [saved searches](#saved-searches) yet, a few sample searches will be created. This is shown in the screen-shot below:
 
-![zkmode_to](https://user-images.githubusercontent.com/30892199/38537242-d5104bca-3c8d-11e8-9993-77737777fbad.png)
+![zkmode_2](https://user-images.githubusercontent.com/30892199/38537649-13d898d8-3c90-11e8-887c-126876f7a2ec.png)
 
 **Note:** If you have upgraded this package and entered the Zettelkasten Mode for the first time, SublimeText may be confused about the syntax of your notes. In that case, open a note and use the menu: 'View' -> 'Syntax' -> 'Open all with current extension as...', and select 'sublime_zk > Markdown Zettelkasten'.
 
