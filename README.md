@@ -104,6 +104,7 @@ See the [Usage](#usage) section below to see how this package might support your
         * [Automatic Table Of Contents](#automatic-table-of-contents)
         * [Automatic Section Numbering](#automatic-section-numbering)
     * [Working with Panes](#working-with-panes)
+    * [The Ultimate Zettelkasten Mode](#zettelkasten-mode)
 * [Credits](#credits)
 
 
