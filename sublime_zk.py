@@ -109,10 +109,10 @@ class ZKMode:
 
 shift + enter  ...  Create new note
 ctrl  + enter  ...  Follow link under cursor and open note
-ctrl  + enter  ...  Follow #tag or citekey under cursor and 
+ctrl  + enter  ...  Follow #tag or citekey under cursor and
                     show referencing notes
 alt   + enter  ...  Show notes referencing link under cursor
-ctrl  + .      ...  Create list of referencing notes in the 
+ctrl  + .      ...  Create list of referencing notes in the
                     current note
                     (link, #tag, or citekey under cursor)
 """.split('\n')
@@ -554,14 +554,18 @@ class Autobib:
         """
         Find all mentioned citekeys in text
         """
+        citekey_stops = r"[@',\#}{~%\[\]\s]"
         citekeys_re = [re.escape('@' + citekey) for citekey in citekeys]
         citekeys_re.extend([re.escape('[#' + citekey) for citekey in citekeys])
-        founds_raw = re.findall('|'.join(list(citekeys_re)), text)
+        citekeys_re = [ckre + citekey_stops for ckre in citekeys_re]
+        # print('\n'.join(citekeys_re))
+        finder = re.compile('|'.join(citekeys_re))
+        founds_raw = finder.findall(text)
         founds = []
         for citekey in founds_raw:
             if citekey.startswith('[#'):
                 citekey = citekey[1:]
-            founds.append(citekey)
+            founds.append(citekey[:-1])   # don't add stop char
         founds = set(founds)
         return founds
 
@@ -664,7 +668,7 @@ class ExternalSearch:
                 continue
             note_id = get_note_id_of_file(line[1:])
             line = lines.popleft()
-            while line: # until newline 
+            while line: # until newline
                 # parse findspec
                 positions, txt_line = line.split(':', 1)
                 for position in positions.split(','):
@@ -839,6 +843,7 @@ class TextProduction:
         footer = '<!-- (End of note ' + note_id + ') -->'
         if not content:
             header = '<!-- Note not found: ' + note_id + ' -->'
+            result_lines.append(header)
         else:
             filename = os.path.basename(note_file).replace(extension, '')
             filename = filename.split(' ', 1)[1]
@@ -846,7 +851,7 @@ class TextProduction:
             header = '<!-- !    ' + header + '    -->'
             result_lines.append(header)
             result_lines.extend(content.split('\n'))
-        result_lines.append(footer)
+            result_lines.append(footer)
         return result_lines
 
     @staticmethod
@@ -1852,12 +1857,12 @@ class ZkShowAllNotesCommand(sublime_plugin.WindowCommand):
         extension = settings.get('wiki_extension')
         note_files = get_all_notes_for(folder, extension)
         note_id_matcher = re.compile('[0-9.]{12,18}')
-        note_files = [f for f in note_files if 
+        note_files = [f for f in note_files if
                         note_id_matcher.match(os.path.basename(f))]
         note_files_str = '\n'.join(note_files)
         ExternalSearch.externalize_note_links(note_files_str, folder, extension,
             prefix='# All Notes:')
-        lines = open(ExternalSearch.external_file(folder), mode='r', 
+        lines = open(ExternalSearch.external_file(folder), mode='r',
             encoding='utf-8', errors='ignore').read().split('\n')
         ExternalSearch.show_search_results(self.window, folder, 'Notes', lines,
                                                 'show_all_tags_in_new_pane')
@@ -2062,9 +2067,10 @@ class ZkRenumberHeadingsCommand(sublime_plugin.TextCommand):
             match = re.match('(\s*)(#+)(\s*[1-9.]*\s)(.*)', heading)
             spaces, hashes, old_numbering, title = match.groups()
             level = len(hashes) - 1
-            levels[level] += 1
             if level < current_level:
-                levels[:current_level] + [0] * (6 - level)
+                levels[level + 1:] = [0] * (6 - level -1)
+            levels[level] += 1
+            current_level = level
                 # print('resetting levels to', levels)
             numbering = ' ' + '.'.join([str(l) for l in levels[:level+1]]) + ' '
             h_region.a += len(spaces) + len(hashes)   # we're behind the hash
