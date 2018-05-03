@@ -1280,6 +1280,71 @@ def get_note_id_and_title_of(view):
     return origin_id, origin_title
 
 
+def post_open_note(view, pane):
+    """
+    New view has been created for a note. Move it to the destination pane.
+    If the pane is -1, create a new pane to the right and move the view
+    there
+    """
+
+    def increment_if_greater_or_equal(x, threshold):
+        if x >= threshold:
+            return x+1
+        return x
+
+
+    def push_right_cells_after(cells, threshold):
+        return [    [increment_if_greater_or_equal(x0, threshold),y0,
+                    increment_if_greater_or_equal(x1, threshold),y1] for (x0,y0,x1,y1) in cells]
+
+    if pane > -1:
+        view.window().set_view_index(view, pane, 0)  #,0..make it first view
+    else:
+        window = view.window()
+        layout = window.get_layout()
+        cells = layout["cells"]
+        rows = layout["rows"]
+        cols = layout["cols"]
+
+        print('layout before', layout)
+        num_groups = len(layout['cells'])
+        current_group = num_groups - 1 # window.active_group()
+        old_cell = cells.pop(current_group)
+        new_cell = []
+
+        XMIN, YMIN, XMAX, YMAX = list(range(4))
+        cells = push_right_cells_after(cells, old_cell[XMAX])
+        cols.insert(old_cell[XMAX], 1 / (num_groups + 1))
+        new_cell = [old_cell[XMAX], old_cell[YMIN], old_cell[XMAX]+1, old_cell[YMAX]]
+        old_cell = [old_cell[XMIN], old_cell[YMIN], old_cell[XMAX], old_cell[YMAX]]
+
+        num_cols = len(cols)
+        if num_cols > 2:
+            new_cols = [0.0]
+            delta = 1 / (num_cols)     # num_cols -1 for an even split
+            start = 0.0
+            for col in cols[1:-1]:
+                start += delta
+                new_cols.append(start)
+            new_cols.append(1.0)
+            cols = new_cols
+
+        print('new cell', new_cell)
+        print('old cell', old_cell)
+
+        focused_cell = old_cell
+        unfocused_cell = new_cell
+        cells.insert(current_group, focused_cell)
+        cells.append(unfocused_cell)
+        layout = {"cols": cols, "rows": rows, "cells": cells}
+        window.run_command('set_layout', layout)
+        num_groups = len(layout['cells'])
+        window.focus_group(min(current_group, num_groups-1))
+        window.set_view_index(view, num_groups-1, 0)  #,0..make it first view
+        print(window.get_layout())
+
+
+
 class ZkExpandLinkCommand(sublime_plugin.TextCommand):
     """
     Command for expanding overview notes.
@@ -1351,7 +1416,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
             return
         the_file = os.path.join(self.folder, self.tagged_note_files[selection])
         new_view = self.view.window().open_file(the_file)
-        self.view.window().set_view_index(new_view, PANE_FOR_OPENING_NOTES, 0)
+        post_open_note(new_view, PANE_FOR_OPENING_NOTES)
 
     def select_link(self, event=None):
         """
@@ -1519,7 +1584,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
 
         if the_file:
             new_view = window.open_file(the_file)
-            window.set_view_index(new_view, PANE_FOR_OPENING_NOTES, 0)
+            post_open_note(new_view, PANE_FOR_OPENING_NOTES)
             new_view.set_syntax_file(ZkConstants.Syntax_File)
         else:
             # suppose you have entered "[[my new note]]", then we are going to
@@ -1699,7 +1764,7 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
             view.run_command('zk_replace_selected_text', {'args': {'text': link_txt}})
         create_note(the_file, new_title, self.origin, self.o_title, self.note_body)
         new_view = self.window.open_file(the_file)
-        self.window.set_view_index(new_view, PANE_FOR_OPENING_NOTES, 0)
+        post_open_note(new_view, PANE_FOR_OPENING_NOTES)
 
 
 class ZkGetWikiLinkCommand(sublime_plugin.TextCommand):
