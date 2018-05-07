@@ -359,6 +359,8 @@ It also shows a bookmark symbol in the gutter to the left of your text. These fe
 
 To enable highlighting of #tags, footnotes, and pandoc references in your newly created note, and for all your Zettelkasten notes, switch Sublime Text's syntax to `sublime_zk > Markdown Zettelkasten`. You can use the menu: 'View' -> 'Syntax' -> 'Open all with current extension as...', and select 'sublime_zk > Markdown Zettelkasten'.
 
+**DISCLAIMER:** As of 2018-05-07 evening, this package had to incorporate pretty much the entire [MarkdownExtended](https://github.com/jonschlinkert/sublime-markdown-extended) syntax from Jon Schlinkert. This was necessary because SublimeText build 3170 would not accept the previous syntax definition _(that just referenced any existing Markdown syntax)._
+
 #### Monokai Extended Color Scheme
 
 ![default](https://user-images.githubusercontent.com/30892199/32641875-b241e6fa-c5d0-11e7-819a-4705396f633b.png)
@@ -816,7 +818,7 @@ Just press `[enter]` to start the search. The resulting notes will be displayed 
 
 ### Listing all notes
 
-The shortcut <kbd>[</kbd> + <kbd>!</kbd> produces a list of all notes in the search results. This is probably most useful in [Zettelkasten Mode](#zettelkasten-mode). 
+The shortcut <kbd>[</kbd> + <kbd>!</kbd> produces a list of all notes in the search results. This is probably most useful in [Zettelkasten Mode](#zettelkasten-mode).
 
 ### Working with tags
 

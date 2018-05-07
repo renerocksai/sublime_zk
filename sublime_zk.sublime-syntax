@@ -1329,6 +1329,7 @@ contexts:
         - match: \$\$
           scope: string.other.math.latex punctuation.definition.string.end.latex
           pop: true
+
     # footnotes
     - match: '(\[)(\^)([^]]*)(\])'
       captures:
