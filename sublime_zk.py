@@ -73,7 +73,7 @@ class ZKMode:
         window.run_command('set_layout', {
             'cols': [0.0, 0.7, 1.0],
             'rows': [0.0, 0.8, 1.0],
-            'cells': [[0, 0, 1, 2], [1, 0, 2, 1], [1,1,2,2]]
+            'cells': [[0, 0, 1, 2], [1, 0, 2, 1], [1, 1, 2, 2]]
         })
 
     @staticmethod
