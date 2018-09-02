@@ -11,6 +11,7 @@ import sublime, sublime_plugin, os, re, subprocess, glob, datetime
 from collections import defaultdict, deque
 import threading
 import io
+import random
 from subprocess import Popen, PIPE
 import struct
 import imghdr
@@ -2434,3 +2435,37 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
                     view.run_command('zk_hide_images')
                     view.run_command('zk_show_images')
 
+
+class ZkShowRandomNoteCommand(sublime_plugin.TextCommand):
+    """
+    Command to show a random note
+    """
+    def on_done(self, selection):
+        """
+        Called when a note was selected from the overlay:
+        Open the selected note, if any.
+        """
+        if selection == -1:
+            return
+        the_file = os.path.join(self.folder, self.friend_note_files[selection])
+        self.view.window().open_file(the_file)
+
+    def run(self, edit):
+        """
+        Try to select note link if present.
+        Search for notes as described above.
+        """
+        settings = get_settings()
+        extension = settings.get('wiki_extension')
+        folder = get_path_for(self.view)
+        if not folder:
+            return
+        self.folder = folder
+        all_notes = ExternalSearch.search_in(
+            folder, '*', extension, tags=False)
+        random_note_files = random.choice(all_notes)
+        random_note_file = os.path.basename(random_note_files)
+        self.view.window().show_quick_panel(
+            [random_note_file, ],
+            self.on_done)
+        return

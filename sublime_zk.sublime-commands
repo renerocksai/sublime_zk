@@ -17,4 +17,5 @@
     { "caption": "ZK: Insert Link", "command": "zk_get_wiki_link" },
     { "caption": "ZK: Show all Notes", "command": "zk_show_all_notes" },
     { "caption": "ZK: Enter Zettelkasten Mode", "command": "zk_enter_zk_mode" },
+    { "caption": "ZK: Show random Note", "command": "zk_show_random_note" },
 ]
