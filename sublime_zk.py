@@ -2436,36 +2436,36 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
                     view.run_command('zk_show_images')
 
 
-class ZkShowRandomNoteCommand(sublime_plugin.TextCommand):
+class ZkShowRandomNoteCommand(sublime_plugin.WindowCommand):
     """
-    Command to show a random note
+    Command that creates a new view containing a sorted list of all notes
     """
-    def on_done(self, selection):
-        """
-        Called when a note was selected from the overlay:
-        Open the selected note, if any.
-        """
-        if selection == -1:
+    def run(self):
+        global F_EXT_SEARCH
+        # sanity check: do we have a project
+        if self.window.project_file_name():
+            # yes we have a project!
+            folder = os.path.dirname(self.window.project_file_name())
+        # sanity check: do we have an open folder
+        elif self.window.folders():
+            # yes we have an open folder!
+            folder = os.path.abspath(self.window.folders()[0])
+        else:
+            # don't know where to grep
             return
-        the_file = os.path.join(self.folder, self.friend_note_files[selection])
-        self.view.window().open_file(the_file)
-
-    def run(self, edit):
-        """
-        Try to select note link if present.
-        Search for notes as described above.
-        """
         settings = get_settings()
         extension = settings.get('wiki_extension')
-        folder = get_path_for(self.view)
-        if not folder:
-            return
-        self.folder = folder
-        all_notes = ExternalSearch.search_in(
-            folder, '*', extension, tags=False)
-        random_note_files = random.choice(all_notes)
-        random_note_file = os.path.basename(random_note_files)
-        self.view.window().show_quick_panel(
-            [random_note_file, ],
-            self.on_done)
-        return
+        note_files = get_all_notes_for(folder, extension)
+        note_id_matcher = re.compile('[0-9.]{12,18}')
+        note_files = [f for f in note_files if
+                        note_id_matcher.match(os.path.basename(f))]
+        note_files = [
+            random.choice(note_files), ]
+        assert len(note_files) == 1
+        note_files_str = '\n'.join(note_files)
+        ExternalSearch.externalize_note_links(note_files_str, folder, extension,
+            prefix='# Random Note:')
+        lines = open(ExternalSearch.external_file(folder), mode='r',
+            encoding='utf-8', errors='ignore').read().split('\n')
+        ExternalSearch.show_search_results(self.window, folder, 'Notes', lines,
+                                                'show_all_tags_in_new_pane')
