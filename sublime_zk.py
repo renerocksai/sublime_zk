@@ -11,6 +11,7 @@ import sublime, sublime_plugin, os, re, subprocess, glob, datetime
 from collections import defaultdict, deque
 import threading
 import io
+import random
 from subprocess import Popen, PIPE
 import struct
 import imghdr
@@ -73,7 +74,7 @@ class ZKMode:
         window.run_command('set_layout', {
             'cols': [0.0, 0.7, 1.0],
             'rows': [0.0, 0.8, 1.0],
-            'cells': [[0, 0, 1, 2], [1, 0, 2, 1], [1,1,2,2]]
+            'cells': [[0, 0, 1, 2], [1, 0, 2, 1], [1, 1, 2, 2]]
         })
 
     @staticmethod
@@ -2434,3 +2435,37 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
                     view.run_command('zk_hide_images')
                     view.run_command('zk_show_images')
 
+
+class ZkShowRandomNoteCommand(sublime_plugin.WindowCommand):
+    """
+    Command that creates a new view containing a sorted list of all notes
+    """
+    def run(self):
+        global F_EXT_SEARCH
+        # sanity check: do we have a project
+        if self.window.project_file_name():
+            # yes we have a project!
+            folder = os.path.dirname(self.window.project_file_name())
+        # sanity check: do we have an open folder
+        elif self.window.folders():
+            # yes we have an open folder!
+            folder = os.path.abspath(self.window.folders()[0])
+        else:
+            # don't know where to grep
+            return
+        settings = get_settings()
+        extension = settings.get('wiki_extension')
+        note_files = get_all_notes_for(folder, extension)
+        note_id_matcher = re.compile('[0-9.]{12,18}')
+        note_files = [f for f in note_files if
+                        note_id_matcher.match(os.path.basename(f))]
+        note_files = [
+            random.choice(note_files), ]
+        assert len(note_files) == 1
+        note_files_str = '\n'.join(note_files)
+        ExternalSearch.externalize_note_links(note_files_str, folder, extension,
+            prefix='# Random Note:')
+        lines = open(ExternalSearch.external_file(folder), mode='r',
+            encoding='utf-8', errors='ignore').read().split('\n')
+        ExternalSearch.show_search_results(self.window, folder, 'Notes', lines,
+                                                'show_all_tags_in_new_pane')
