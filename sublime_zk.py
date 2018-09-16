@@ -316,13 +316,17 @@ class ImageHandler:
             rel_p = view.substr(region)
 
             if rel_p.startswith('http'):
-                FMT = u'''
-                    <img src="data:image/png;base64,{}" class="centerImage" {}>
-                '''
+
                 img = rel_p
                 local_filename, headers = urllib.request.urlretrieve(rel_p)
                 size = ImageHandler.get_image_size(local_filename)
-                img = get_as_base64(img)
+                if size:
+                    w, h, ttype = size
+
+                    FMT = u'''
+                        <img src="data:image/{}" class="centerImage" {}>
+                    '''
+                img = ttype + ";base64," + get_as_base64(img)
             else:
                 FMT = '''
                     <img src="file://{}" class="centerImage" {}>
@@ -331,7 +335,7 @@ class ImageHandler:
                 size = ImageHandler.get_image_size(img)
             if not size:
                 continue
-            w, h = size
+            w, h, t = size
             line_region = view.line(region)
             imgattr = ImageHandler.check_imgattr(view, line_region, region)
             if not imgattr:
@@ -406,18 +410,22 @@ class ImageHandler:
         """
         with open(img, 'rb') as f:
             head = f.read(24)
+            ttype = None
 
             # print('head:\n', repr(head))
             if len(head) != 24:
                 return
             if imghdr.what(img) == 'png':
+                ttype = "png"
                 check = struct.unpack('>i', head[4:8])[0]
                 if check != 0x0d0a1a0a:
                     return
                 width, height = struct.unpack('>ii', head[16:24])
             elif imghdr.what(img) == 'gif':
+                ttype = "gif"
                 width, height = struct.unpack('<HH', head[6:10])
             elif imghdr.what(img) == 'jpeg':
+                ttype = "jpeg"
                 try:
                     f.seek(0)  # Read 0xff next
                     size = 2
@@ -436,7 +444,7 @@ class ImageHandler:
                     return
             else:
                 return
-            return width, height
+            return width, height, ttype
 
 
 class Autobib:
