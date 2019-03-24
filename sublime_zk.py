@@ -1806,9 +1806,12 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
         settings = get_settings()
         extension = settings.get('wiki_extension')
         id_in_title = settings.get('id_in_title')
-
+        subfolder = settings.get('default_subfolder')
+        if subfolder:
+            folder = os.path.join(folder, subfolder)
+        
         new_id = timestamp()
-        the_file = os.path.join(folder,  new_id + ' ' + input_text + extension)
+        the_file = os.path.join(folder, new_id + ' ' + input_text + extension)
         new_title = input_text
         if id_in_title:
             new_title = new_id + ' ' + input_text
