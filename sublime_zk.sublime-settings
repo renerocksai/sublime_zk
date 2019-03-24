@@ -81,4 +81,9 @@
 
     // set to true to enable super awesome zettelkasten mode
     "zettelkasten_mode" : true,
+    
+    // Default subfolder to create new notes in
+    // Just the name, no separators.
+    // Make sure the folder exists
+    "default_subfolder": "",
 }
