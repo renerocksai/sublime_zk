@@ -1,5 +1,4 @@
 {
-
     // The preferred markdown extension
     "wiki_extension": ".md",
 
@@ -81,4 +80,7 @@
 
     // set to true to enable super awesome zettelkasten mode
     "zettelkasten_mode" : true,
+
+    // set to false if you want to disable query completions while typing
+    "enable_autocomplete": false,
 }

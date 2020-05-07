@@ -2321,6 +2321,10 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         """
         Generate auto-completion entries for markdown files, based on
         """
+        settings = get_settings()
+        if not settings.get('enable_autocomplete', True):
+            return ([], 0)
+
         point = locations[0]
         if view.match_selector(point, 'text.html.markdown') == 0:
             return
@@ -2335,7 +2339,6 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
             return []
 
         # we have a path and are in markdown!
-        settings = get_settings()
         prefix, postfix = get_link_pre_postfix()
         extension = settings.get('wiki_extension')
         completions = []
