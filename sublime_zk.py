@@ -1096,7 +1096,7 @@ def note_file_by_id(note_id, folder, extension):
     candidates = []
     for root, dirs, files in os.walk(folder):
         candidates.extend([os.path.join(root, f)
-                           for f in files if f.startswith(note_id)])
+                           for f in files if f.startswith(note_id) and f.endswith(extension)])
     if len(candidates) > 0:
         return candidates[0]
 
