@@ -1744,6 +1744,84 @@ class ZkShowReferencingNotesCommand(sublime_plugin.TextCommand):
         return
 
 
+class ZkShowParentNotesCommand(sublime_plugin.TextCommand):
+    """
+    Command searching for notes referencing the current note
+    ** directly adapted from ZkShowReferencingNotesCommand
+    * if ag is not installed, opens a find-in-files for link under cursor.
+    * if ag is installed, it will show results:
+      * in an overlay if external search results are disabled
+      * else in the external search file
+    """
+
+    def on_done(self, selection):
+        """
+        Called when a note was selected from the overlay:
+        Open the selected note, if any.
+        """
+        if selection == -1:
+            return
+        the_file = os.path.join(self.folder, self.friend_note_files[selection])
+        new_view = self.view.window().open_file(the_file)
+
+    def run(self, edit):
+        """
+        Try to select note link if present. Search for notes as described above.
+        """
+        print("ZK: finding all parent notes")
+        global F_EXT_SEARCH
+        global PANE_FOR_OPENING_RESULTS
+        current_note_name = self.view.file_name()
+        note_id = get_note_id_of_file(current_note_name)
+
+        print('*** current note id: ', note_id)
+
+        # linestart_till_cursor_str, link_region = select_link_in(self.view)
+
+        # print(linestart_till_cursor_str, link_region)
+        if not note_id:
+            return
+
+        settings = get_settings()
+        if F_EXT_SEARCH:
+            extension = settings.get('wiki_extension')
+            folder = get_path_for(self.view)
+            if not folder:
+                return
+            self.folder = folder
+            # note_id = cut_after_note_id(self.view.substr(link_region))
+            self.friend_note_files = ExternalSearch.search_friend_notes(
+                folder, extension, note_id)
+            self.friend_note_files = [os.path.basename(f) for f in
+                                      self.friend_note_files]
+            if ExternalSearch.EXTERNALIZE:
+                nv = self.view.window().open_file(ExternalSearch.external_file(
+                    folder))
+                self.view.window().set_view_index(nv,
+                                                  PANE_FOR_OPENING_RESULTS, 0)
+
+            else:
+                self.view.window().show_quick_panel(self.friend_note_files,
+                                                    self.on_done)
+        else:
+            new_tab = settings.get('show_search_results_in_new_tab')
+
+            # hack for the find in files panel: select tag in view, copy it
+            selection = self.view.sel()
+            selection.clear()
+            # note_id = cut_after_note_id(self.view.substr(link_region))
+            selection.add(sublime.Region(link_region.a,
+                                         link_region.a + len(note_id)))
+            self.view.window().run_command("copy")
+            self.view.window().run_command("show_panel",
+                                           {"panel": "find_in_files",
+                                            "where": get_path_for(self.view),
+                                               "use_buffer": new_tab, })
+            # now paste the note-id --> it will land in the "find" field
+            self.view.window().run_command("paste")
+        return
+
+
 class ZkReplaceSelectedTextCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, args):
