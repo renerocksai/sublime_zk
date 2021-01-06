@@ -846,6 +846,49 @@ class ExternalSearch:
             # return back to note
             window.focus_group(0)
 
+class FKScore:
+    """
+    Can't import libraries outside the Python 3.3.6 built-in so must use external
+    library by proxy of an external script passing back value using an external
+    Python binary.
+    """
+    EXTERNAL_FK_SCRIPT = 'spacyCountSylls.py'
+
+    @staticmethod
+    def getCommandToUse(filn):
+        """
+        Returns the script command to run.
+        """
+        user_settings = get_settings()
+        args = [user_settings.get('venv_spacy_fk_abspath'),
+                user_settings.get('spacy_fk_script_abspath') +\
+                '/'+ FKScore.EXTERNAL_FK_SCRIPT, '--fkonly',
+                filn]
+        return(FKScore.run(args))
+
+    @staticmethod
+    def run(args):
+        """
+        Execute FK python script.
+        Return output of stdout as string.
+        """
+        output = b''
+        verbose = False
+        if verbose or True:
+            print('cmd:', ' '.join(args))
+        try:
+            output = subprocess.check_output(args, shell=False, timeout=10000)
+        except subprocess.CalledProcessError as e:
+            print('sublime_zk: couldn\'t get syllable count:')
+            print(e.returncode)
+            print(e.cmd)
+            for line in e.output.decode('utf-8', errors='ignore').split('\n'):
+                print('    ', line)
+        except subprocess.TimeoutExpired:
+            print('sublime_zk: FK script timed out:', ' '.join(args))
+        if verbose:
+            print(output.decode('utf-8', errors='ignore'))
+        return output.decode('utf-8', errors='ignore').replace('\n', '')
 
 class TextProduction:
     """
@@ -1750,6 +1793,21 @@ class ZkReplaceSelectedTextCommand(sublime_plugin.TextCommand):
         text = args['text']
         region = self.view.sel()[0]
         self.view.replace(edit, region, text)
+
+
+class ZkFleschKincaidCommand(sublime_plugin.TextCommand):
+    """
+    Compute the Flesch-Kincaid value of some text input.
+
+    https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests
+    """
+    def run(self, edit):
+        view = self.view.window().active_view()
+        if view:
+            score = FKScore()
+            res = score.getCommandToUse(view.file_name())
+            if res != '':
+                view.insert(edit, view.sel()[0].end(), res)
 
 
 class ZkNewZettelCommand(sublime_plugin.WindowCommand):

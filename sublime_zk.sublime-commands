@@ -1,5 +1,6 @@
 [
     { "caption": "ZK: New Zettel Note", "command": "zk_new_zettel" },
+    { "caption": "ZK: Flesch-Kincaid", "command": "zk_flesch_kincaid" },
     { "caption": "ZK: Insert Citation", "command": "zk_insert_citation" },
     { "caption": "ZK: Pick tag from list", "command": "zk_tag_selector" },
     { "caption": "ZK: Find all tags in archive", "command": "zk_show_all_tags" },
