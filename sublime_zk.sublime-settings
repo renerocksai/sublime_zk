@@ -2,6 +2,13 @@
     // Specify CSL style for the bibliography generation.
     "csl_style": "",
 
+    // Interpreter abspath for spacyCountSylls.py if using
+    // venv, else system binary.
+    "venv_spacy_fk_abspath": "",
+
+    // And the path to fk script in $USER/.config/sublime_zk/Packages
+    "spacy_fk_script_abspath": "",
+
     // The preferred markdown extension
     "wiki_extension": ".md",
 

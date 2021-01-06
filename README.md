@@ -1379,6 +1379,61 @@ In the animation below, the mouse was used.
 
 ![zk_mode_demo](https://user-images.githubusercontent.com/30892199/38536016-0905acf6-3c87-11e8-986a-43b09b014847.gif)
 
+## Zettel Stats
+
+While metrics/stats are not described in Sonke Ahrens' *How to Take Smart Notes* (nor were used by Niklas Luhmann
+himself), Ahrens doesn't provide a technical description of how to actually ***implement*** or ***do*** Zettelkasten
+digitally and so far as I can tell only about 30% of the book describes the analogue principles of Zettelkasten from
+which you are supposed to figure out a digital interpretation yourself to follow.
+
+Being thin on instruction is
+[one of the justifiable criticisms](https://www.goodreads.com/review/show/3292737177?book_show_action=true&from_review_page=1)
+of the book. This plugin is one interpretation of how to go about it and
+I've forked it to update it in ways that will be useful to me (but which may be useful to others too).
+
+One of the ways this plugin
+can be developed further to be useful to me is in **measurement**. So I have started with Flesch-Kincaid and more
+will follow at a later date.
+
+[TBC]
+
+### Flesch-Kincaid Scoring
+
+[Wikipedia article](https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests)
+
+Sharing zettels is conducive to the deliberate practice Ahrens describes (see pp. 65, 82-90, 115-129).
+The point of adding a FK feature is to give readers an indication of reading ease for zettels I might convert to a blog post.
+
+To use it press `ctrl+alt+p` and filter by `zk:`; selecting `Flesh-Kincaid` option will place the readability score at the cursor position.
+
+Example use: place `readability: \n` in the `"new_note_template"` string value in the User settings. After writing a zettel, compute
+the FK. When refactoring zettel into HTML (Pandoc) repurpose the `readability:` field from zettel header.
+
+##### Accuracy:
+
+Note: the actual FK score depends on accuracy of counting English word syllables. There are many algorithms and libraries
+for this purpose, but the [SpacySyllables](https://github.com/sloev/spacy-syllables) class and
+[CMUdict](https://www.nltk.org/_modules/nltk/corpus/reader/cmudict.html) were used here. What matters is precision.
+This paper:
+
+`James Matthew Lloyd Williamson, Alexandra Martin. "Analysis of patient information leaflets provided
+by a District General Hospital by the Flesch and Flesch-Kincaid method." International Journal of
+Clinical Practice, Wiley, 2010, 64 (13), pp.1824.` 
+([PDF](https://hal.archives-ouvertes.fr/hal-00592305/file/PEER_stage2_10.1111%252Fj.1742-1241.2010.02408.x.pdf))
+
+^Was used for the scores on `pp. 12-15` as a reference point. There is <10% error rate in the calculated FK score.
+If you wish you can check against the `fk_accuracy_test_data` dir if interested.
+
+(`fk_accuracy_test_data/examples` has pp. 12-15 data. I recommend finding one of the clinical
+journal papers and converting from PDF to plaintext (e.g. with `pdftotext`). See also: [note 10](https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#cite_note-10)
+and [11](https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#cite_note-11))
+
+#### To enable FK
+
+Clone the external (helper script)[https://github.com/bjhamilton/fkhelperscript] and put the absolute path to it in the `spacy_fk_script_abspath` setting value.
+
+Depending on whether you use Python virtual environments or not, you should then update the `venv_spacy_fk_abspath` with the Python binary which will be used to execute this helperscript.
+
 ## Credits
 
 Credits, where credits are due:
