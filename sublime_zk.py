@@ -9,7 +9,7 @@
 """
 import sublime
 import sublime_plugin
-import os
+import os, sys
 import re
 import subprocess
 import glob
@@ -451,7 +451,7 @@ class Autobib:
     """
     Static class to group all auto-bibliography functions.
     """
-    citekey_matcher = re.compile('^@.*{([^,]*)[,]?')
+    citekey_matcher = re.compile('^@(?!Comment).*{([^,]*)[,]?') # JabRef meta
     author_matcher = re.compile(r'^\s*author\s*=\s*(.*)', re.IGNORECASE)
     title_matcher = re.compile(r'^\s*title\s*=\s*(.*)', re.IGNORECASE)
     year_matcher = re.compile(r'^\s*year\s*=\s*(.*)', re.IGNORECASE)
@@ -588,14 +588,29 @@ class Autobib:
         citekeys_re = [ckre + citekey_stops for ckre in citekeys_re]
         # print('\n'.join(citekeys_re))
         finder = re.compile('|'.join(citekeys_re))
-        founds_raw = finder.findall(text)
-        founds = []
-        for citekey in founds_raw:
-            if citekey.startswith('[#'):
-                citekey = citekey[1:]
-            founds.append(citekey[:-1])   # don't add stop char
-        founds = set(founds)
-        return founds
+        if re.search(r'ieee', get_settings().get('csl_style'), re.IGNORECASE):
+            from collections import OrderedDict
+            founds_raw = OrderedDict()
+            for n,v in enumerate(finder.findall(text)):
+                if v not in founds_raw.values():
+                    founds_raw[n] = v
+        else:
+            founds_raw = finder.findall(text)
+        try:
+            for n,_ in founds_raw.copy().items():
+                if founds_raw[n].startswith('[#'):
+                    founds_raw[n] = founds_raw[n][1:]
+                founds_raw[n]= founds_raw[n][:-1] # don't add stop char
+            return(founds_raw)
+        except: # not using ieee.csl
+            founds = []
+            for citekey in founds_raw: # list not odict
+                if citekey.startswith('[#'):
+                    citekey = citekey[1:]
+                founds.append(citekey[:-1]) # as above
+            founds = set(founds)
+            print('found keys: ', founds)
+            return founds
 
     @staticmethod
     def create_bibliography(text, bibfile, pandoc='pandoc'):
@@ -606,12 +621,27 @@ class Autobib:
         if not citekeys:
             return {}
         citekeys = Autobib.find_citations(text, citekeys)
-        citekey2bib = {}
-        for citekey in citekeys:
-            pandoc_input = citekey.replace('#', '@', 1)
-            pandoc_out = Autobib.run(pandoc, bibfile, pandoc_input)
-            citation, bib = Autobib.parse_pandoc_out(pandoc_out)
-            citekey2bib[citekey] = bib
+        if re.search(r'ieee', get_settings().get('csl_style'), re.IGNORECASE):
+            # Call to run() is sequential resulting in the IEEE citation-number requirement
+            # failing to increase beyond 1 in the bib output due to single lookup each loop, so
+            # using an odict as a counter outside of loop to pretend to be citation-number from
+            # Pandoc. See:
+            # https://github.com/citation-style-language/styles/blob/dffb23f0ac9c924871d31813ebb2e45d26dabb02/ieee.csl#L281
+            from collections import OrderedDict
+            citekey2bib = OrderedDict()
+            for n,citekey in citekeys.items():
+                pandoc_input = citekey.replace('#', '@', 1)
+                pandoc_out = Autobib.run(pandoc, bibfile, pandoc_input)
+                citation, bib = Autobib.parse_pandoc_out(pandoc_out)
+                citekey2bib[n] = (citekey, re.sub('^\[\d+\]', '['+str(n+1)+']', bib))
+        else:
+            citekey2bib = {}
+            for citekey in citekeys:
+                pandoc_input = citekey.replace('#', '@', 1)
+                pandoc_out = Autobib.run(pandoc, bibfile, pandoc_input)
+                citation, bib = Autobib.parse_pandoc_out(pandoc_out)
+                citekey2bib[citekey] = bib
+        #print('ieee bib: ', citekey2bib)
         return citekey2bib
 
     @staticmethod
@@ -633,7 +663,13 @@ class Autobib:
 
     @staticmethod
     def run(pandoc_bin, bibfile, stdin):
-        args = [pandoc_bin, '-t', 'plain', '--bibliography', bibfile]
+        # Be able to specify CSL style for Harvard, IEEE, Vancouver, APA, etc.
+        # See: https://github.com/citation-style-language/styles
+        if get_settings().get('csl_style') != '':
+            args = [pandoc_bin, '-C', '-t', 'plain', '--csl='+get_settings().get('csl_style'),
+                    '--bibliography', bibfile]
+        else:
+            args = [pandoc_bin, '-C', '-t', 'plain', '--bibliography', bibfile]
         # using universal_newlines here gets us into decoding troubles as the
         # encoding then is guessed and can be ascii which can't deal with
         # unicode characters. hence, we handle \r ourselves
@@ -1315,7 +1351,7 @@ def get_note_id_of_file(filn):
 
 def get_note_id_and_title_of(view):
     """
-    Return the note id  and title of the given view.
+    Return the note id and title of the given view.
     """
     filn = view.file_name()
     origin_id = None
@@ -1393,7 +1429,6 @@ def post_open_note(view, pane):
         # ,0..make it first view
         window.set_view_index(view, num_groups - 1, 0)
         print(window.get_layout())
-
 
 class ZkExpandLinkCommand(sublime_plugin.TextCommand):
     """
@@ -1784,9 +1819,23 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
     def on_done(self, input_text):
         global PANE_FOR_OPENING_NOTES
         # sanity check: do we have a project
-        if self.window.project_file_name():
+        if self.window.project_file_name(): # full path to zkn.sublime-project file
             # yes we have a project!
-            folder = os.path.dirname(self.window.project_file_name())
+            #
+            # But also want to place new notes in same sub-dir of zettel from
+            # which new zettel made, else just place in project dir.
+            if sys.platform == 'linux':
+                if len(os.path.dirname(self.window.active_view().file_name()).split('/')[1:]) > \
+                        len(os.path.dirname(self.window.project_file_name()).split('/')[1:]):
+                    x = len(os.path.dirname(self.window.active_view().file_name()).split('/')[1:]) - \
+                        len(os.path.dirname(self.window.project_file_name()).split('/')[1:])
+
+                    folder = os.path.dirname(self.window.project_file_name()) + \
+                             '/' + '/'.join(os.path.dirname(self.window.active_view().file_name()).split('/')[-x:])
+                else:
+                    folder = os.path.dirname(self.window.project_file_name())
+            else:
+                folder = os.path.dirname(self.window.project_file_name())
         # sanity check: do we have an open folder
         elif self.window.folders():
             # yes we have an open folder!
@@ -2089,10 +2138,16 @@ class ZkAutoBibCommand(sublime_plugin.TextCommand):
             if mmd_style:
                 marker_line += ' -->'
             bib_lines = [marker_line + '\n']
-            for citekey in sorted(ck2bib):
-                bib = ck2bib[citekey]
-                line = '[{}]: {}\n'.format(citekey, bib)
-                bib_lines.append(line)
+            if isinstance(ck2bib, list):
+                for citekey in sorted(ck2bib):
+                    bib = ck2bib[citekey]
+                    line = '[{}]: {}\n'.format(citekey, bib)
+                    bib_lines.append(line)
+            else: # odict() type because ieee.csl
+                for n,v in ck2bib.items():
+                    citekey,bib = ck2bib[n]
+                    line = '[{}]: {}\n'.format(citekey, bib)
+                    bib_lines.append(line)
             if not mmd_style:
                 bib_lines.append('-->')
             new_lines = []

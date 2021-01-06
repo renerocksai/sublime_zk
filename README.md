@@ -558,6 +558,13 @@ The following line in the plugin's settings turns MultiMarkdown mode on:
 "citations-mmd-style": true,
 ```
 
+#### Pandoc and CSL:
+
+Pandoc can generate bibliographies according to a referencing style. See: https://pandoc.org/MANUAL.html#specifying-a-citation-style
+
+You can control this behaviour by setting the `"csl_style": "/path/to/csl/style.csl"` setting in either User or the sublime_zk settings.
+Many CSL templates are freely [available](https://citationstyles.org/).
+
 ### Inline image preview size
 This plugin can [show local images](#inline-local-image-display) directly inside your note. To make sure that huge images won't steal too much of your screen, you can limit their size by width. Larger images will always be scaled to not exceed the maximum width.
 
