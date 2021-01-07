@@ -1,4 +1,6 @@
 {
+    // Specify CSL style for the bibliography generation.
+    "csl_style": "",
 
     // The preferred markdown extension
     "wiki_extension": ".md",
