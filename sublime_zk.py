@@ -667,7 +667,7 @@ class ExternalSearch:
         if ExternalSearch.EXTERNALIZE:
             with open(ExternalSearch.external_file(folder), mode='w',
                       encoding='utf-8') as f:
-                f.write('# All Tags\n\n')
+                f.write('# All Tags\n\n**\n')
                 for tag in sorted(tags):
                     f.write(u'* {}\n'.format(tag))
         return list(tags)
@@ -793,9 +793,9 @@ class ExternalSearch:
                     if line.endswith(extension):
                         line = os.path.basename(line)
                         line = line.replace(extension, '')
-                        if not ' ' in line:
-                            line += ' '
-                        note_id, title = line.split(' ', 1)
+                        if not '-' in line:
+                            line += '-'
+                        note_id, title = line.split('-', 1)
                         note_id = os.path.basename(note_id)
                         results.append((note_id, title))
                 settings = get_settings()
@@ -876,8 +876,8 @@ class TextProduction:
             result_lines.append(header)
         else:
             filename = os.path.basename(note_file).replace(extension, '')
-            filename = filename.split(' ', 1)[1]
-            header = link_prefix + note_id + link_postfix + ' ' + filename
+            filename = filename.split('-', 1)[1]
+            header = link_prefix + note_id + link_postfix + '-' + filename
             header = '<!-- !    ' + header + '    -->'
             result_lines.append(header)
             result_lines.extend(content.split('\n'))
@@ -980,7 +980,7 @@ class TextProduction:
                 if line.endswith(extension):
                     line = os.path.basename(line)
                     line = line.replace(extension, '')
-                    note_id, title = line.split(' ', 1)
+                    note_id, title = line.split('-', 1)
                     note_id = os.path.basename(note_id)
                     results.append((note_id, title))
             settings = get_settings()
@@ -1040,12 +1040,11 @@ def note_template_handle_date_spec(template, note_id):
     for pre, fmt, post in re.findall('({timestamp:\s*)([^\}]*)(})', template):
         spec = pre + fmt + post
         new_template = new_template.replace(spec, timestamp.strftime(fmt))
-
     return new_template
 
 
 def create_note(filn, title, origin_id=None, origin_title=None, body=None):
-    note_id = os.path.basename(filn).split()[0]
+    note_id = os.path.basename(filn).split("-")[0]
     params = {
         'title': title,
         'file': os.path.basename(filn),
@@ -1600,7 +1599,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
             for note_id in [n for n in note_ids if n]:  # Strip the None
                 filn = note_file_by_id(note_id, self.folder, self.extension)
                 if filn:
-                    title = os.path.basename(filn).split(' ', 1)[1]
+                    title = os.path.basename(filn).split('-', 1)[1]
                     title = title.replace(self.extension, '')
                     results.append((note_id, title))
             settings = get_settings()
@@ -1612,7 +1611,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
                 column = 1
             results.sort(key=itemgetter(column))
             for note_id, title in results:
-                line = '* ' + link_prefix + note_id + link_postfix + ' '
+                line = '* ' + link_prefix + note_id + link_postfix + '-'
                 line += title
                 lines.append(line)
             if ExternalSearch.EXTERNALIZE:
@@ -1637,6 +1636,7 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
         # the ID)
         note_id = cut_after_note_id(selected_text)
         the_file = note_file_by_id(note_id, folder, extension)
+        print(the_file)
 
         if the_file:
             new_view = window.open_file(the_file)
@@ -1647,7 +1647,10 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
             # create "201710201631 my new note.md". We will also add a link
             # "[[201710201631]]" into the current document
             new_id = timestamp()
-            the_file = new_id + ' ' + selected_text + extension
+
+            old_selected = selected_text
+            selected_text = "-".join(selected_text.lower().split())
+            the_file = new_id + '-' + selected_text + extension
             the_file = os.path.join(folder, the_file)
 
             replace_str = new_id
@@ -1657,16 +1660,16 @@ class ZkFollowWikiLinkCommand(sublime_plugin.TextCommand):
                 if not settings.get('double_brackets', True):
                     postfix = ']'
                 location.b += len(postfix)   # we have to replace that, too
-                replace_str += postfix + ' ' + selected_text
+                replace_str += postfix + '-' + selected_text
 
             self.view.replace(edit, location, replace_str)
 
             if id_in_title:
-                selected_text = new_id + ' ' + selected_text
+                selected_text = new_id + '-' + selected_text
 
             # try to find out our own note id
             origin_id, origin_title = get_note_id_and_title_of(self.view)
-            create_note(the_file, selected_text, origin_id, origin_title)
+            create_note(the_file, old_selected, origin_id, origin_title)
             new_view = window.open_file(the_file)
             new_view.set_syntax_file(ZkConstants.Syntax_File)
 
@@ -1807,18 +1810,23 @@ class ZkNewZettelCommand(sublime_plugin.WindowCommand):
         extension = settings.get('wiki_extension')
         id_in_title = settings.get('id_in_title')
 
+        # convert spaces to -'s
+        # convert to lower-case
+        o_input = input_text
+        input_text = "-".join(input_text.lower().split())
+
         new_id = timestamp()
-        the_file = os.path.join(folder,  new_id + ' ' + input_text + extension)
-        new_title = input_text
+        the_file = os.path.join(folder,  new_id + '-' + input_text + extension)
+        new_title = o_input
         if id_in_title:
-            new_title = new_id + ' ' + input_text
+            new_title = new_id + '-' + input_text
 
         if self.insert_link:
             prefix, postfix = get_link_pre_postfix()
             link_txt = prefix + new_id + postfix
             do_insert_title = settings.get('insert_links_with_titles', False)
             if do_insert_title:
-                link_txt += ' ' + input_text
+                link_txt += '-' + input_text
             view = self.window.active_view()
             view.run_command('zk_replace_selected_text', {
                              'args': {'text': link_txt}})
@@ -1842,11 +1850,11 @@ class ZkGetWikiLinkCommand(sublime_plugin.TextCommand):
 
         settings = get_settings()
         prefix, postfix = get_link_pre_postfix()
-        note_id, title = self.modified_files[selection].split(' ', 1)
+        note_id, title = self.modified_files[selection].split('-', 1)
         link_txt = prefix + note_id + postfix
         do_insert_title = settings.get('insert_links_with_titles', False)
         if do_insert_title:
-            link_txt += ' ' + title
+            link_txt += '-' + title
 
         self.view.run_command(
             'zk_insert_wiki_link', {'args': {'text': link_txt}})
@@ -2047,7 +2055,7 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
         for note_id in [n for n in note_ids if n]:  # Strip the None
             filn = note_file_by_id(note_id, self.folder, self.extension)
             if filn:
-                title = os.path.basename(filn).split(' ', 1)[1]
+                title = os.path.basename(filn).split('-', 1)[1]
                 title = title.replace(self.extension, '')
                 results.append((note_id, title))
         settings = get_settings()
@@ -2059,7 +2067,7 @@ class ZkMultiTagSearchCommand(sublime_plugin.WindowCommand):
             column = 1
         results.sort(key=itemgetter(column))
         for note_id, title in results:
-            line = '* ' + link_prefix + note_id + link_postfix + ' '
+            line = '* ' + link_prefix + note_id + link_postfix + '-'
             line += title
             lines.append(line)
         if ExternalSearch.EXTERNALIZE:
@@ -2321,6 +2329,7 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         """
         Generate auto-completion entries for markdown files, based on
         """
+        return
         point = locations[0]
         if view.match_selector(point, 'text.html.markdown') == 0:
             return
@@ -2341,15 +2350,15 @@ class NoteLinkHighlighter(sublime_plugin.EventListener):
         completions = []
         aux = [os.path.basename(f)
                for f in get_all_notes_for(folder, extension)]
-        ids_and_names = [f.split(' ', 1) for f in aux
+        ids_and_names = [f.split('-', 1) for f in aux
                          if f.endswith(extension)
-                         and ' ' in f]
+                         and '-' in f]
         do_insert_title = settings.get('insert_links_with_titles', False)
         for noteid, notename in ids_and_names:
             completion_str = prefix + noteid + postfix
             if do_insert_title:
-                completion_str += ' ' + notename.replace(extension, '')
-            completions.append([noteid + ' ' + notename, completion_str])
+                completion_str += '-' + notename.replace(extension, '')
+            completions.append([noteid + '-' + notename, completion_str])
 
         # now come the citekeys
         bibfile = Autobib.look_for_bibfile(view, settings)
