@@ -2,7 +2,7 @@
 
 	// Alt + Mouse 1 Column select
 	{
-		"button": "button1", "count": 2, "modifiers": ["alt"],
+		"button": "button1", "count": 1, "modifiers": ["super"],
 		"press_command": "zk_follow_wiki_link",
 		"context": [
             {
