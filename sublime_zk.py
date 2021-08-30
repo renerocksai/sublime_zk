@@ -578,6 +578,12 @@ class Autobib:
         return ''.join(chars)
 
     @staticmethod
+    def dedupe(seq):
+        seen = set()
+        seen_add = seen.add
+        return [x for x in seq if not (x in seen or seen_add(x))]
+
+    @staticmethod
     def find_citations(text, citekeys):
         """
         Find all mentioned citekeys in text
@@ -594,8 +600,7 @@ class Autobib:
             if citekey.startswith('[#'):
                 citekey = citekey[1:]
             founds.append(citekey[:-1])   # don't add stop char
-        founds = set(founds)
-        return founds
+        return Autobib.dedupe(founds)
 
     @staticmethod
     def create_bibliography(text, bibfile, pandoc='pandoc'):
@@ -607,38 +612,21 @@ class Autobib:
             return {}
         citekeys = Autobib.find_citations(text, citekeys)
         citekey2bib = {}
-        for citekey in citekeys:
-            pandoc_input = citekey.replace('#', '@', 1)
-            pandoc_out = Autobib.run(pandoc, bibfile, pandoc_input)
-            citation, bib = Autobib.parse_pandoc_out(pandoc_out)
-            citekey2bib[citekey] = bib
+        pandoc_out = Autobib.run(pandoc, bibfile)
+        pdsplit = pandoc_out.split('\n\n')
+        for x in range(len(citekeys)):
+            citekey = citekeys[x]
+            citekey2bib[citekey] = pdsplit[x]
         return citekey2bib
 
     @staticmethod
-    def parse_pandoc_out(pandoc_out):
-        """
-        Splits pandoc output into citation and bib part
-        """
-        # print('pandoc_out:', repr(pandoc_out))
-        pdsplit = pandoc_out.split('\n\n')
-        citation = '(no citation generated)'
-        bib = '(no bib generated)'
-        if len(pdsplit) >= 1:
-            citation = pdsplit[0]
-        if len(pdsplit) >= 2:
-            bib = pdsplit[1]
-        citation = citation.replace('\n', ' ')
-        bib = bib.replace('\n', ' ')
-        return citation, bib
-
-    @staticmethod
-    def run(pandoc_bin, bibfile, stdin):
-        args = [pandoc_bin, '-t', 'plain', '--bibliography', bibfile]
+    def run(pandoc_bin, bibfile):
+        args = [pandoc_bin, '-t', 'plain', '--citeproc', bibfile]
         # using universal_newlines here gets us into decoding troubles as the
         # encoding then is guessed and can be ascii which can't deal with
         # unicode characters. hence, we handle \r ourselves
         p = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        stdout, stderr = p.communicate(bytes(stdin, 'utf-8'))
+        stdout, stderr = p.communicate()
         # make me windows-safe
         stdout = stdout.decode('utf-8', errors='ignore').replace('\r', '')
         stderr = stderr.decode('utf-8', errors='ignore').replace('\r', '')
